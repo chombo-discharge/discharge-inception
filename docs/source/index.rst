@@ -18,6 +18,11 @@ This page contains documentation for a collection of python and bash/slurm scrip
    }
    </style>
 
+.. only:: latex
+
+   .. toctree::
+      :caption: Contents   
+
 
 Introduction
 ************

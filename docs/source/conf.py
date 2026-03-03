@@ -9,7 +9,7 @@
 project = 'Discharge Parametric Studies'
 copyright = '2026, SINTEF Energi AS'
 author = 'André Kapelrud'
-release = '0.1'
+release = '1.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
