@@ -8,7 +8,7 @@
 
 project = 'Discharge Parametric Studies'
 copyright = '2026, SINTEF Energi AS'
-author = 'André Kapelrud'
+author = 'André Kapelrud, Robert Marskar'
 release = '1.0'
 
 # -- General configuration ---------------------------------------------------

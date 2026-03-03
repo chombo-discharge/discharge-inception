@@ -45,9 +45,9 @@ jobs:
 
       - name: Deploy
         if: github.event_name == 'push' && github.repository == 'chombo-discharge/discharge-parametric-studies' && github.ref == 'refs/heads/main'
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: docs
           clean: false
