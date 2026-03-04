@@ -12,6 +12,9 @@
 
 using namespace ChomboDischarge;
 
+#warning "Try to simplify this file quite a bit"
+#warning "Ion densities must scale against N (currently, they do not)"
+
 int
 main(int argc, char* argv[])
 {
@@ -53,6 +56,7 @@ main(int argc, char* argv[])
           }
         }
       }
+    done:;
     }
     
     const Real N = p / (Units::kb * T);
@@ -137,8 +141,6 @@ main(int argc, char* argv[])
   else {
     MayDay::Error("App.mode must be 'inception' or 'plasma'");
   }
-
-
 
   ChomboDischarge::finalize();
 }

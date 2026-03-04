@@ -351,7 +351,3 @@ DischargeInceptionTagger.buffer          = 8        ## Grown buffer around flagg
 DischargeInceptionTagger.max_voltage     = 1        ## Maximum applied voltage
 DischargeInceptionTagger.ref_alpha       = 0.3      ## Refinement curvature criterion. Lower => more mesh
 DischargeInceptionTagger.plot            = false    ## Plot tagging field or not.
-
-# ====================================================================================================
-# Other physics adjustable physics data
-# ====================================================================================================

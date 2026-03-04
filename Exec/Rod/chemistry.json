@@ -98,8 +98,6 @@
 	    ]
         },
 	{
-	    // IMPORTANT: The mobility and diffusion coefficients for the ions need to be double checked, especially
-	    // as mu*N is a constant vs E/N
 	    "id": "N2+",            
 	    "Z" : 1,                
 	    "solver" : "ito",       
@@ -115,8 +113,6 @@
 	    }				
 	},
 	{
-	    // IMPORTANT: The mobility and diffusion coefficients for the ions need to be double checked, especially
-	    // as mu*N is a constant vs E/N	    
             "id": "O2+",            
 	    "Z" : 1,                
 	    "solver" : "ito",       
@@ -131,13 +127,6 @@
 		"value": 5E-6
 	    }		
 	},
-	// {
-        //     "id": "O-",             
-	//     "Z" : -1,               
-	//     "solver" : "ito",       
-	//     "mobile" : false,       
-	//     "diffusive" : false
-	// },		
 	{
             "id": "O2-",        
 	    "Z" : -1,           
@@ -204,7 +193,6 @@
 	    "include_dt_calc": true            
 	},
 	{
-	    // Note: Strictly speaking this attaches into O-, but O- converts to O2-
 	    "reaction": "e + O2 -> O2-",         
 	    "description": "Dissociative attachment",
 	    "type": "table vs E/N",              
