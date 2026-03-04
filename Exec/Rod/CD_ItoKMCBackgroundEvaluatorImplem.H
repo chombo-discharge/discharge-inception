@@ -26,13 +26,13 @@ ItoKMCBackgroundEvaluator<I, C, R, F>::ItoKMCBackgroundEvaluator(RefCountedPtr<I
 
   ParmParse pp("ItoKMCBackgroundEvaluator");
 
-  m_maxFieldExitCrit = std::numeric_limits<Real>::max();
-  m_maxFieldChange   = -1.0;
-  m_relFieldChange   = -1.0;
-  m_electrodeCharge  = 0.0;
-  m_ohmicCharge      = 0.0;
-  m_opticalSolver    = "2PN2";
-  m_maxInitialTimeStep  = 0.0;
+  m_maxFieldExitCrit   = std::numeric_limits<Real>::max();
+  m_maxFieldChange     = -1.0;
+  m_relFieldChange     = -1.0;
+  m_electrodeCharge    = 0.0;
+  m_ohmicCharge        = 0.0;
+  m_opticalSolver      = "2PN2";
+  m_maxInitialTimeStep = 0.0;
 
   pp.query("max_field_exit_crit", m_maxFieldExitCrit);
   pp.query("rel_field_exit_crit", m_relFieldExitCrit);
@@ -149,7 +149,7 @@ ItoKMCBackgroundEvaluator<I, C, R, F>::computeDt()
   }
 
   if (this->m_timeStep == 0 && m_maxInitialTimeStep > 0.0 && newDt > m_maxInitialTimeStep)
-      newDt = m_maxInitialTimeStep;
+    newDt = m_maxInitialTimeStep;
 
   return newDt;
 }

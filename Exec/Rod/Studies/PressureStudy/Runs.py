@@ -44,7 +44,7 @@ inception_stepper = {
             '../ParseReport.py',
             ],
         'required_files': [
-            'master.inputs',
+            rod_dir + 'master.inputs',
             rod_dir + 'chemistry.json',
             rod_dir + 'electron_transport_data.dat',
             rod_dir + 'detachment_rate.dat',
@@ -79,7 +79,7 @@ plasma_study_1 = {
             '../ParseReport.py',
             ],
         'required_files': [
-            'master.inputs',
+            rod_dir + 'master.inputs',
             rod_dir + 'Analyze.py',
             rod_dir + 'chemistry.json',
             rod_dir + 'detachment_rate.dat',

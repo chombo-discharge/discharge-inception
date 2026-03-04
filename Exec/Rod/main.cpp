@@ -17,44 +17,45 @@ main(int argc, char* argv[])
 {
   ChomboDischarge::initialize(argc, argv);
 
+  Random::seed();  
+
   std::string mode;
+  std::string chemistryFile;
+  
   ParmParse("App").get("mode", mode);
 
-  // Geometry and AMR are shared by both branches.
   auto compgeom = RefCountedPtr<ComputationalGeometry>(new Rod());
   auto amr      = RefCountedPtr<AmrMesh>(new AmrMesh());
+  auto physics  = RefCountedPtr<Physics::ItoKMC::ItoKMCPhysics>(new Physics::ItoKMC::ItoKMCJSON());
 
   if (mode == "inception") {
     using namespace Physics::DischargeInception;
 
-    // Read pressure and temperature from chemistry.json (single source of truth).
+    // Read pressure, temperature, and secondTownsend from chemistry.json (single source of truth).
     Real p, T;
+    Real secondTownsend = 0.0;
     {
-      std::ifstream f("chemistry.json");
+      std::string chemFile;
+      ParmParse("ItoKMCJSON").get("chemistry_file", chemFile);
+      std::ifstream f(chemFile);
       const auto    chem = nlohmann::json::parse(f);
       p                  = chem["gas"]["law"]["ideal_gas"]["pressure"].get<Real>();
       T                  = chem["gas"]["law"]["ideal_gas"]["temperature"].get<Real>();
+
+      // Derive gamma from electrode emission — first reaction that emits an electron.
+      for (const auto& entry : chem["electrode emission"]) {
+        const auto& products     = entry["@"];
+        const auto& efficiencies = entry["efficiencies"];
+        for (size_t i = 0; i < products.size(); ++i) {
+          if (products[i].get<std::string>() == "e") {
+            secondTownsend = efficiencies[i].get<Real>();
+            goto done;
+          }
+        }
+      }
     }
+    
     const Real N = p / (Units::kb * T);
-
-    // Create ItoKMCJSON physics object — derives alpha/eta from the reaction network.
-    auto physics = RefCountedPtr<Physics::ItoKMC::ItoKMCPhysics>(new Physics::ItoKMC::ItoKMCJSON());
-
-    // Read data for the voltage curve.
-    Real peak           = 0.0;
-    Real t0             = 0.0;
-    Real t1             = 0.0;
-    Real t2             = 0.0;
-    Real secondTownsend = 0.0;
-
-    ParmParse li("lightning_impulse");
-    li.get("peak", peak);
-    li.get("start", t0);
-    li.get("tail_time", t1);
-    li.get("front_time", t2);
-
-    ParmParse di("DischargeInception");
-    di.get("second_townsend", secondTownsend);
 
     // Alpha and eta from ItoKMCJSON (same source as plasma branch).
     auto alpha = [physics](const Real& E, const RealVect& x) -> Real {
@@ -83,7 +84,7 @@ main(int argc, char* argv[])
       return 4.E6;
     };
     auto voltageCurve = [&](const Real& t) -> Real {
-      return peak * (exp(-(t + t0) / t1) - exp(-(t + t0) / t2));
+      return 1.0;
     };
     auto fieldEmission = [&](const Real& E, const RealVect& x) -> Real {
       const Real beta = 1.0; // Field enhancement factor
@@ -97,7 +98,6 @@ main(int argc, char* argv[])
       return secondTownsend;
     };
 
-    // Set up time stepper
     auto timestepper = RefCountedPtr<DischargeInceptionStepper<>>(new DischargeInceptionStepper<>());
     auto celltagger  = RefCountedPtr<DischargeInceptionTagger>(
       new DischargeInceptionTagger(amr, timestepper->getElectricField(), alphaEff));
@@ -121,34 +121,24 @@ main(int argc, char* argv[])
   else if (mode == "plasma") {
     using namespace Physics::ItoKMC;
 
-    // Get potential and output basename from input script
-    Real        g_potential;
-    std::string basename;
-    {
-      ParmParse pp("StreamerIntegralCriterion");
-      pp.get("potential", g_potential);
-      pp.get("basename", basename);
-      setPoutBaseName(basename);
-    }
+    Real g_potential;
+    ParmParse("StreamerIntegralCriterion").get("potential", g_potential);
 
-    // Initialize RNG
-    Random::seed();
-
-    auto physics     = RefCountedPtr<ItoKMCPhysics>(new ItoKMCJSON());
     auto timestepper = RefCountedPtr<ItoKMCStepper<>>(new ItoKMCBackgroundEvaluator<>(physics));
-    auto tagger      = RefCountedPtr<CellTagger>(
-      new ItoKMCStreamerTagger<ItoKMCStepper<>>(physics, timestepper, amr));
+    auto tagger      = RefCountedPtr<CellTagger>(new ItoKMCStreamerTagger<ItoKMCStepper<>>(physics, timestepper, amr));
+    
+    timestepper->setVoltage([g_potential](const Real) {
+      return g_potential;
+    });
 
-    // Set constant voltage
-    timestepper->setVoltage([g_potential](const Real) { return g_potential; });
-
-    // Set up the Driver and run it
     auto engine = RefCountedPtr<Driver>(new Driver(compgeom, timestepper, amr, tagger));
-    engine->setupAndRun();
+    engine->setupAndRun();      
   }
   else {
     MayDay::Error("App.mode must be 'inception' or 'plasma'");
   }
+
+
 
   ChomboDischarge::finalize();
 }
