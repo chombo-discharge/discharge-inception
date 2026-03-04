@@ -10,7 +10,7 @@
 *.out
 compile_and_run.sh
 LB.txt
-
+.venv
 
 **/doc/html/**
 **/doc/sphinx/build/html/**
@@ -20,6 +20,7 @@ LB.txt
 **/mpi/memory/**
 *.doctree
 *.pyc
+__pycache__/
 **/app_builder/*.pyc
 /o
 /f
