@@ -20,7 +20,8 @@ from pathlib import Path
 sys.path.append(os.getcwd())  # needed for local imports from slurm scripts
 from ParseReport import parse_report_file  # noqa: E402
 from discharge_ps.config_util import (  # noqa: E402
-                         copy_files, backup_file,
+                         copy_files, backup_file, backup_dir,
+                         read_input_float_field,
                          get_slurm_array_task_id,
                          handle_combination,
                          DEFAULT_OUTPUT_DIR_PREFIX
@@ -63,13 +64,20 @@ if __name__ == '__main__':
         raise ValueError('missing *.inputs file in run directory')
     log.info(f"input file: {input_file}")
 
-    # get inception stepper run_directory
+    # get inception stepper run_directory.
+    # '../inception_stepper' is a symlink created by the configurator whose name
+    # matches the database's 'identifier' field (not the 'output_directory' field).
     with open('../inception_stepper/structure.json') as db_structure_file:
         db_structure = json.load(db_structure_file)
 
+    # derive all subsequent database paths from the identifier stored in structure.json
+    # so that renaming the database study doesn't silently break this script.
+    db_path = Path('..') / db_structure['identifier']
+
     # determine order of parameters (might differ from the order in this study)
     if 'space_order' not in db_structure:
-        raise ValueError("missing field 'space_order' in database 'inception_stepper'")
+        raise ValueError("missing field 'space_order' in database "
+                         f"'{db_structure['identifier']}'")
     db_param_order = db_structure['space_order']
 
     # load this run's parameters (radius, pressure, etc.)
@@ -93,23 +101,20 @@ if __name__ == '__main__':
     for db_param in db_param_order:
         db_search_index.append(parameters[db_param])
 
-    with open('../inception_stepper/index.json') as db_index_file:
+    with open(db_path / 'index.json') as db_index_file:
         db_index = json.load(db_index_file)
 
-    # linear search through index, which is a dictionary.
-    # TODO: change the index to a better file format (sqlite3)
-    index = -1
-    for db_i, params in db_index['index'].items():
-        if params == db_search_index:
-            index = int(db_i)
-            break
+    # build a reverse lookup map for O(1) search (JSON-serialised list as key)
+    reverse_index = {json.dumps(params): int(db_i)
+                     for db_i, params in db_index['index'].items()}
+    index = reverse_index.get(json.dumps(db_search_index), -1)
     if index < 0:
         raise RuntimeError(f'Unable to find db parameter_set: {db_param_order} = ' +
                            f'{db_search_index}')
     log.info(f"Found database parameters {db_param_order} = {db_search_index} "
              f"at index: {index}")
 
-    db_run_path = Path('../inception_stepper')
+    db_run_path = db_path
     if 'prefix' in db_index:
         db_run_path /= db_index['prefix'] + str(index)
     else:

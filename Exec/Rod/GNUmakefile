@@ -1,14 +1,24 @@
+include $(DISCHARGE_HOME)/Lib/Definitions.make
 
-TOPTARGETS := all clean
-SUBDIRS := DischargeInception ItoKMC
+# Things for the Chombo makefile system.
+ebase    = main
+include $(CHOMBO_HOME)/mk/Make.example
 
-$(TOPTARGETS): $(SUBDIRS)
+# For building this application -- it needs the chombo-discharge source code.
+$(ebaseobject): dependencies
+.DEFAULT_GOAL=$(ebase)
 
-$(SUBDIRS): | discharge-lib
-	$(MAKE) -C $@ $(MAKECMDGOALS)
-
-discharge-lib:
+# Build dependencies if they do not exist.
+dependencies:
 	$(MAKE) --directory=$(DISCHARGE_HOME) discharge-lib
+	$(MAKE) --directory=$(DISCHARGE_HOME) dischargeinception
+	$(MAKE) --directory=$(DISCHARGE_HOME) ito-kmc
 
-.PHONY: $(TOPTARGETS) $(SUBDIRS) discharge-lib
+# Make both physics library headers and libraries visible.
+XTRACPPFLAGS += $(DISCHARGEINCEPTION_INCLUDE) \
+                $(ITOKMC_INCLUDE) \
+                -I$(DISCHARGE_HOME)/Submodules/json/include \
+                -I.
 
+XTRALIBFLAGS += $(addprefix -l, $(DISCHARGEINCEPTION_LIB))$(config) \
+                $(addprefix -l, $(ITOKMC_LIB))$(config)

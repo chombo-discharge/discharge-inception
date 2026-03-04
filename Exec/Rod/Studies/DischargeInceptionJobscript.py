@@ -61,7 +61,7 @@ if __name__ == '__main__':
     #   file is probably shared with the ItoKMC solver step of the study, so
     #   the DischargeInceptionStepper.mode = stationary is probably going to
     #   cause an error message and a hard abort/panic.
-    cmd = f"mpirun main {input_file} Random.seed={task_id:d} Driver.max_steps=0 Driver.plot_interval=-1"
+    cmd = f"mpirun main {input_file} App.mode=inception Random.seed={task_id:d} Driver.max_steps=0 Driver.plot_interval=-1"
     log.info(f"cmdstr: '{cmd}'")
     p = subprocess.Popen(cmd, shell=True, executable="/bin/bash")
     while p.poll() is None:

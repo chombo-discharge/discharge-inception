@@ -155,7 +155,7 @@ The jobscripts depend on two python scripts: ``ParseReport.py`` and ``ConfigUtil
 
     # local imports
     sys.path.append(os.getcwd())  # needed for local imports from slurm scripts
-    from ParseReport import ParseReport_file  # noqa: E402
+    from ParseReport import parse_report_file  # noqa: E402
     from ConfigUtil import (  # noqa: E402
                              get_slurm_array_task_id,
                              handle_combination,
@@ -201,11 +201,14 @@ The jobscripts depend on two python scripts: ``ParseReport.py`` and ``ConfigUtil
             raise ValueError('missing *.inputs file in run directory')
 
         # We are now ready to run mpi on our chombo-discharge executable
-        # through the main symlink If there are any quirks specific to this
-        # invocation that is not taken care of in your *.inputs file, you can add
-        # them here:
+        # through the main symlink. Any ParmParse key can be overridden on the
+        # command line; overrides take precedence over the *.inputs file.
+        # A common use-case is to force a specific mode when a single binary
+        # supports multiple execution paths, e.g.:
+        #   App.mode=inception
+        # The Rod case uses exactly this pattern via DischargeInceptionJobscript.py.
 
-        cmd = f"mpirun main {input_file} Random.seed={task_id:d} SomeNamespace.variable=QuirkSolution"
+        cmd = f"mpirun main {input_file} Random.seed={task_id:d} App.mode=inception"
         log.info(f"cmdstr: '{cmd}'")
         p = subprocess.Popen(cmd, shell=True, executable="/bin/bash")
         while p.poll() is None:
@@ -235,7 +238,7 @@ The jobscripts depend on two python scripts: ``ParseReport.py`` and ``ConfigUtil
 
         # If we need to read something from a *.inputs file we can of course do that:
         orig_iv = read_input_float_field(input_file, 'SomeNamespace.interrestingvariable')
-        if orig_iv None:
+        if orig_iv is None:
             raise RuntimeError(f"'{input_file}' does not contain 'SomeNamespace.interrestingvariable' field")
 
         # some decision point
@@ -288,7 +291,7 @@ This is a rather long example where we traverse the database directories to find
 
     # local imports
     sys.path.append(os.getcwd())  # needed for local imports from slurm scripts
-    from ParseReport import ParseReport_file  # noqa: E402
+    from ParseReport import parse_report_file  # noqa: E402
     from ConfigUtil import (  # noqa: E402
                              copy_files, backup_file,
                              get_slurm_array_task_id,
@@ -390,7 +393,7 @@ This is a rather long example where we traverse the database directories to find
         # Maybe we need to do some selective picking of data based on a dummy-parameter?
         # here we can for easily check a 'dummy' parameter
         if 'dummy-parameter' in parameters:
-            data = some_filter_action(parameters['dummy-parameter']  #do something meaningful
+            data = some_filter_action(parameters['dummy-parameter'])  # do something meaningful
 
         #----------------------------------------------------------------------------
         # At this point we can do whatever we like with the data.

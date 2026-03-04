@@ -21,17 +21,23 @@ Compile
     cd Exec/Rod
     make -j4
 
-This builds two executables:
+This builds a single executable directly in ``Exec/Rod/``:
 
-* ``DischargeInception/main{N}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex`` — used for the database (inception voltage) step.
-* ``ItoKMC/main{N}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex`` — used for the plasma simulation study step.
+* ``main{N}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex`` — handles **both** the inception-voltage database step and the full plasma simulation step.
+  The active mode is selected at runtime via the ``App.mode`` parameter in the ``.inputs`` file (``inception`` or ``plasma``).
 
 The ``{N}`` in the filename is replaced at runtime by the dimensionality specified with ``--dim``.
+
+.. note::
+
+    Both pipeline stages share the same ``chemistry.json`` as their single source of truth for gas properties and transport data.
+    In ``inception`` mode, alpha and eta are computed via ``ItoKMCJSON::computeAlpha/computeEta``, which derives them from the reaction network in ``chemistry.json`` — the same path used by the ``plasma`` mode.
+    No separate ``transport_data.txt`` is needed.
 
 Configure the parameter space
 ------------------------------
 
-Open ``Exec/Rod/Studies/pressure_study/Runs.py`` to inspect or adjust the parameter space.
+Open ``Exec/Rod/Studies/PressureStudy/Runs.py`` to inspect or adjust the parameter space.
 The top-level structure is:
 
 .. code-block:: python
@@ -41,14 +47,37 @@ The top-level structure is:
             studies=[plasma_study_1]
             )
 
-**Database** (``inception_stepper``) — computes inception voltages over a grid of pressures and rod radii:
+Both studies point to the same binary in the flat ``Exec/Rod/`` directory:
+
+.. code-block:: python
+
+    rod_dir = '../../'
+
+    inception_stepper = {
+        'program': rod_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
+        ...
+    }
+
+    plasma_study_1 = {
+        'program': rod_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
+        ...
+    }
+
+**Database** (``inception_stepper``) — computes inception voltages over a grid of pressures and rod radii.
+``App_mode`` is set to ``inception`` so the binary runs the inception-voltage sweep.
+Pressure is written into ``chemistry.json`` so both stages always use the same gas conditions:
 
 .. code-block:: python
 
     'parameter_space': {
-        "pressure": {
+        "App_mode": {
             "target": "master.inputs",
-            "uri": "DischargeInception.pressure"
+            "uri": "App.mode",
+            "values": ["inception"]
+            },
+        "pressure": {
+            "target": "chemistry.json",
+            "uri": ["gas", "law", "ideal_gas", "pressure"]
             },
         "geometry_radius": {
             "target": "master.inputs",
@@ -60,11 +89,17 @@ The top-level structure is:
             }
         }
 
-**Study** (``plasma_study_1``) — runs plasma simulations using the database results:
+**Study** (``plasma_study_1``) — runs plasma simulations using the database results.
+``App_mode`` is set to ``plasma`` so the same binary runs the full ItoKMC simulation:
 
 .. code-block:: python
 
     'parameter_space': {
+        "App_mode": {
+            "target": "master.inputs",
+            "uri": "App.mode",
+            "values": ["plasma"]
+            },
         "geometry_radius": {
             "database": "inception_stepper",
             "target": "master.inputs",
@@ -88,6 +123,10 @@ The top-level structure is:
             "values": [[1.0, 0.0]]
             },
         }
+
+.. note::
+
+    Because both studies write their geometry parameters (e.g. ``Rod.radius``) into the **same** ``master.inputs`` template, rod geometry is defined in one place and cannot fall out of sync between the two stages.
 
 Parameters marked with ``"database": "inception_stepper"`` declare a dependency: the study jobs will not start until all database jobs have finished.
 See :doc:`RunDefinition` for full parameter space syntax.
@@ -122,10 +161,11 @@ The resulting directory layout looks like:
     array_job_id  DischargeInceptionJobscript.py  GenericArrayJob.sh
     index.json    master.inputs                   ParseReport.py
     main2d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex
-    run_0/  structure.json  transport_data.txt
+    run_0/  structure.json  chemistry.json  electron_transport_data.dat  detachment_rate.dat
 
     ./PDIV_DB/run_0:
-    chk/  master.inputs  parameters.json  plt/  pout.*  main@  transport_data.txt
+    chk/  master.inputs  parameters.json  plt/  pout.*  main@
+    chemistry.json  electron_transport_data.dat  detachment_rate.dat
 
     ./study0:
     array_job_id  chemistry.json  GenericArrayJob.sh  inception_stepper@
@@ -137,9 +177,19 @@ The resulting directory layout looks like:
     chemistry.json  detachment_rate.dat  electron_transport_data.dat
     master.inputs   parameters.json      main@
 
+In both stages the ``main`` symlink points to the same executable from ``Exec/Rod/``.
+The ``master.inputs`` files differ only in their ``App.mode`` line, which the Configurator writes
+automatically: ``App.mode = inception`` in ``PDIV_DB/`` run directories and ``App.mode = plasma``
+in ``study0/`` run directories.
+
 .. note::
 
     ``study0/inception_stepper`` is a symlink pointing to ``../PDIV_DB``, giving study job scripts direct access to the database results.
+
+.. note::
+
+    Geometry parameters such as ``Rod.radius`` appear only in the shared ``master.inputs`` template.
+    Both stages read them from the same copy — there is no manual sync required.
 
 Monitor jobs
 -------------

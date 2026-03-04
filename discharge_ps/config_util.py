@@ -83,6 +83,20 @@ def set_nested_value(d, keys: list[str], value):
 
 
 def expand_uri(uri, disparate=False, level=0):
+    """Expand a URI specification into a list of concrete key paths.
+
+    A URI can be a scalar string (e.g. "Rod.radius" for .inputs files), a list
+    of nested keys (e.g. ["gas", "law", "ideal_gas", "pressure"] for JSON), or
+    a list that contains an inner list of alternatives to produce multiple
+    parallel paths (e.g. [..., ["center", "radius"]] yields two paths, one
+    ending in "center" and one in "radius").
+
+    When ``disparate=True`` each top-level element of the outer list is treated
+    as an independent URI that expands on its own, so the result is a list of
+    separate paths rather than one combined path.
+
+    Returns a list of paths, where each path is itself a list of key strings.
+    """
     res = []
     if isinstance(uri, list):
         for uri_elem in uri:
@@ -144,16 +158,12 @@ def handle_json_combination(json_content, key, pspace, comb_dict):
                          comb_dict[key] if dims == 1 else comb_dict[key][i])
 
 def read_input_float_field(input_file: Path, key: str):
-    value = None
-    try:
-        with open(input_file, 'r') as file:
-            for line in file:
-                if line.startswith(key.strip()):
-                    s = line.split('=')
-                    value = float(s[1].split('#')[0])
-    finally:
-        pass
-    return value
+    with open(input_file, 'r') as file:
+        for line in file:
+            if line.startswith(key.strip()):
+                s = line.split('=')
+                return float(s[1].split('#')[0])
+    return None
 
 
 def handle_input_combination(input_file, key, pspace, comb_dict):
@@ -276,15 +286,15 @@ def backup_file(file_path: Path, max_backups=100):
                 raise RuntimeError(f'Reached {max_backups}th iteration when trying to backup index.json')
 
 
-def backup_dir(dir_path: Path, max_backupus=100):
+def backup_dir(dir_path: Path, max_backups=100):
     if dir_path.is_dir():
         for i in itertools.count(start=0, step=1):
             path_suggestion = dir_path.with_suffix(f'.bak{i:d}')
             if not path_suggestion.is_dir():
                 shutil.move(dir_path, path_suggestion)
                 break
-            if i > MAX_BACKUPS:  # simple guard
-                raise RuntimeError('Reached 100th iteration when trying to backup voltage directories')
+            if i > max_backups:  # simple guard
+                raise RuntimeError(f'Reached {max_backups}th iteration when trying to backup voltage directories')
 
 
 def get_output_prefix(obj):

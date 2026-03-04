@@ -7,13 +7,37 @@ Copyright © 2025 SINTEF Energi AS
 import json
 import numpy as np
 
-stepper_dir = '../../DischargeInception/'
-plasma_dir = '../../ItoKMC/'
+rod_dir = '../../'
+
+# ---------------------------------------------------------------------------
+# URI conventions used in parameter_space entries
+# ---------------------------------------------------------------------------
+# .inputs files  — "uri" is a dot-separated string matching the field name at
+#                  the start of a line, e.g. "Rod.radius" or
+#                  "DischargeInception.pressure".
+#
+# .json files    — "uri" is a list of nested dictionary keys forming a path
+#                  into the JSON tree:
+#                    ["gas", "law", "ideal_gas", "pressure"]
+#                  List elements within the JSON can be matched by a
+#                  requirement expression:
+#                    '+["id"="e"]'  — required match on field "id" == "e"
+#                    '*["id"="e"]'  — optional match (creates element if absent)
+#                    '+["reaction"=<chem_react>"..."]'  — chemical reaction match
+#                  An inner Python list at any level produces multiple parallel
+#                  paths (one per entry), e.g. ["center", "radius"] yields two
+#                  simultaneous writes.
+#
+# "database" field — marks a parameter as shared with a database study.
+#                  The configurator ensures only combinations that exist in the
+#                  named database are used, so the plasma runs stay in sync
+#                  with the corresponding inception-voltage database entry.
+# ---------------------------------------------------------------------------
 
 inception_stepper = {
         'identifier': 'inception_stepper',
         'job_script': '../DischargeInceptionJobscript.py',
-        'program': stepper_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
+        'program': rod_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
         'output_directory': 'PDIV_DB',
         'job_script_dependencies': [
             '../../../../Util/GenericArrayJob.sh',
@@ -21,12 +45,19 @@ inception_stepper = {
             ],
         'required_files': [
             'master.inputs',
-            stepper_dir + 'transport_data.txt'
+            rod_dir + 'chemistry.json',
+            rod_dir + 'electron_transport_data.dat',
+            rod_dir + 'detachment_rate.dat',
             ],
         'parameter_space': {
-            "pressure": {
+            "App_mode": {
                 "target": "master.inputs",
-                "uri": "DischargeInception.pressure"
+                "uri": "App.mode",
+                "values": ["inception"]
+                },
+            "pressure": {
+                "target": "chemistry.json",
+                "uri": ["gas", "law", "ideal_gas", "pressure"]
                 },
             "geometry_radius": {
                 "target": "master.inputs",
@@ -41,7 +72,7 @@ inception_stepper = {
 
 plasma_study_1 = {
         'identifier': 'photoion',
-        'program': plasma_dir+'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
+        'program': rod_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
         'job_script': '../PlasmaJobscript.py',
         'job_script_dependencies': [
             '../../../../Util/GenericArrayJob.sh',
@@ -49,16 +80,21 @@ plasma_study_1 = {
             ],
         'required_files': [
             'master.inputs',
-            plasma_dir+'Analyze.py',
-            plasma_dir+'chemistry.json',
-            plasma_dir+'detachment_rate.dat',
-            plasma_dir+'electron_transport_data.dat',
+            rod_dir + 'Analyze.py',
+            rod_dir + 'chemistry.json',
+            rod_dir + 'detachment_rate.dat',
+            rod_dir + 'electron_transport_data.dat',
             '../../../../Util/GenericArrayJob.sh',  # used at voltage step level
             '../../../../GenericArrayJobJobscript.py'  # used at voltage step level
             ],
         'output_directory': 'study0',
         'output_dir_prefix': 'run_',
         'parameter_space': {
+            "App_mode": {
+                "target": "master.inputs",
+                "uri": "App.mode",
+                "values": ["plasma"]
+                },
             "geometry_radius": {
                 "database": "inception_stepper",  # database dependency
                 "target": "master.inputs",
