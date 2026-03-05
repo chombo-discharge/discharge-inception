@@ -8,21 +8,29 @@
 # per-stage resource requests. The values are injected into sbatch calls at
 # runtime, so no shell scripts need to be edited per cluster.
 #
-# Resource requests (account, ntasks, time) can also be provided via the
-# standard SLURM environment variables SBATCH_ACCOUNT, SBATCH_NTASKS, and
-# SBATCH_TIMELIMIT if you prefer not to use this file.
+# Resource requests can also be provided via standard SLURM environment
+# variables (SBATCH_ACCOUNT, SBATCH_TIMELIMIT, etc.) if you prefer not to
+# use this file.
 
 [slurm]
-account   = ""        # SLURM account; empty string uses the cluster default
-partition = ""        # SLURM partition; empty string uses the cluster default
-mpi       = "mpirun"  # MPI launcher: "mpirun", "srun", or "mpiexec"
-modules   = []        # Modules to load before running, e.g.:
-                      #   ["foss/2023a", "HDF5/1.14.0-gompi-2023a", "Python/3.11.3-GCCcore-12.3.0"]
+account        = ""        # SLURM account; empty string uses the cluster default
+partition      = ""        # SLURM partition; empty string uses the cluster default
+mpi            = "mpirun"  # MPI launcher: "mpirun", "srun", or "mpiexec"
+modules        = []        # Modules to load before running, e.g.:
+                           #   ["foss/2023a", "HDF5/1.14.0-gompi-2023a", "Python/3.11.3-GCCcore-12.3.0"]
+nodes          = 1         # Default number of nodes for all stages
+tasks_per_node = 16        # Default MPI tasks per node for all stages
 
 [slurm.inception]
-ntasks = 4
-time   = "0-00:30:00"
+# Per-stage overrides for inception (database) runs.
+# Omit a key to inherit the top-level default.
+# nodes          = 1
+# tasks_per_node = 4
+time = "0-00:30:00"
 
 [slurm.plasma]
-ntasks = 16
-time   = "0-02:00:00"
+# Per-stage overrides for plasma (voltage) runs.
+# Omit a key to inherit the top-level default.
+# nodes          = 1
+# tasks_per_node = 16
+time = "0-02:00:00"

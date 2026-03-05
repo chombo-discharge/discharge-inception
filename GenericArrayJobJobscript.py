@@ -4,59 +4,18 @@ Author André Kapelrud
 Copyright © 2025 SINTEF Energi AS
 """
 
-import os
 import sys
-import json
-import re
-import logging
 import subprocess
 
 # local imports
-from discharge_ps.config_util import get_slurm_array_task_id
-
-
-def _load_slurm_config() -> dict:
-    """Return the [slurm] table from slurm.toml, or {} if not configured."""
-    import tomllib
-    path = os.environ.get('DISCHARGE_PS_SLURM_CONFIG', '')
-    if path and os.path.isfile(path):
-        with open(path, 'rb') as f:
-            return tomllib.load(f).get('slurm', {})
-    return {}
+from discharge_ps.config_util import setup_jobscript_logging_and_dir, load_slurm_config
 
 
 if __name__ == '__main__':
 
-    log = logging.getLogger(sys.argv[0])
-    formatter = logging.Formatter(
-            '%(asctime)s | %(levelname)s :: %(message)s')
-    sh = logging.StreamHandler(sys.stdout)
-    sh.setFormatter(formatter)
-    log.addHandler(sh)
-    log.setLevel(logging.INFO)
+    log, task_id, run_dir, input_file = setup_jobscript_logging_and_dir()
 
-    task_id = get_slurm_array_task_id()
-    log.info(f'found task id: {task_id}')
-
-    with open('index.json') as index_file:
-        index_dict = json.load(index_file)
-    job_prefix = index_dict['prefix']
-
-    dpattern = f'^({job_prefix}[0]*{task_id:d})$'  # account for possible leading zeros
-    dname = [f for f in os.listdir() if (os.path.isdir(f) and re.match(dpattern, f))][0]
-    log.info(f'chdir: {dname}')
-    os.chdir(dname)
-
-    input_file = None
-    for f in os.listdir():
-        if os.path.isfile(f) and f.endswith('.inputs'):
-            input_file = f
-            break
-
-    if not input_file:
-        raise ValueError('missing *.inputs file in run directory')
-
-    slurm = _load_slurm_config()
+    slurm = load_slurm_config()
     mpi = slurm.get('mpi', 'mpirun')
 
     cmd = f"{mpi} main {input_file} Random.seed={task_id:d}"

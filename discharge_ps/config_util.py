@@ -314,3 +314,93 @@ def get_slurm_array_task_id():
         raise RuntimeError(f'${S_ENV} not found in os.environ[]. Run this'
                            ' script through sbatch --array=... !!')
     return int(os.environ['SLURM_ARRAY_TASK_ID'])
+
+
+def build_sbatch_resource_args(slurm: dict, stage: str | None = None) -> list[str]:
+    """Return sbatch resource arguments for *stage*, with top-level defaults.
+
+    Keys ``nodes`` and ``tasks_per_node`` are read from ``slurm[stage]`` if
+    present, otherwise from the top-level *slurm* dict, otherwise from the
+    hard-coded defaults (1 node, 16 tasks per node).
+
+    ``account``, ``partition``, and ``time`` follow the same precedence for
+    ``time``; ``account`` and ``partition`` are top-level only.
+    """
+    stage_cfg = slurm.get(stage, {}) if stage else {}
+
+    nodes          = stage_cfg.get('nodes',          slurm.get('nodes',          1))
+    tasks_per_node = stage_cfg.get('tasks_per_node', slurm.get('tasks_per_node', 16))
+    time           = stage_cfg.get('time',           slurm.get('time'))
+
+    args = [
+        f'--nodes={nodes}',
+        f'--ntasks-per-node={tasks_per_node}',
+    ]
+    if time:
+        args.append(f'--time={time}')
+    if slurm.get('account'):
+        args.append(f'--account={slurm["account"]}')
+    if slurm.get('partition'):
+        args.append(f'--partition={slurm["partition"]}')
+    return args
+
+
+def load_slurm_config() -> dict:
+    """Return the [slurm] table from slurm.toml, or {} if not configured.
+
+    The path to slurm.toml is read from the DISCHARGE_PS_SLURM_CONFIG
+    environment variable.
+    """
+    import tomllib
+    path = os.environ.get('DISCHARGE_PS_SLURM_CONFIG', '')
+    if path and os.path.isfile(path):
+        with open(path, 'rb') as f:
+            return tomllib.load(f).get('slurm', {})
+    return {}
+
+
+def setup_jobscript_logging_and_dir(prefix: str | None = None
+                                    ) -> tuple[logging.Logger, int, Path, str]:
+    """Standard jobscript setup used by all three Python jobscripts.
+
+    Configures logging, reads the SLURM array task ID, navigates to the
+    matching run subdirectory, and locates the ``.inputs`` file.
+
+    If *prefix* is ``None`` the run-directory prefix is read from
+    ``index.json`` in the current working directory (the common case for
+    GenericArrayJobJobscript and DischargeInceptionJobscript).  Pass an
+    explicit *prefix* string when the caller has already loaded it from
+    another source (e.g. ``structure.json`` in PlasmaJobscript).
+
+    Returns ``(log, task_id, run_dir, input_file)``.  The working directory
+    is changed to *run_dir* as a side effect.
+    """
+    log = logging.getLogger(sys.argv[0])
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s :: %(message)s')
+    sh = logging.StreamHandler(sys.stdout)
+    sh.setFormatter(formatter)
+    log.addHandler(sh)
+    log.setLevel(logging.INFO)
+
+    task_id = get_slurm_array_task_id()
+    log.info(f'found task id: {task_id}')
+
+    if prefix is None:
+        with open('index.json') as f:
+            prefix = json.load(f)['prefix']
+
+    dpattern = f'^({prefix}[0]*{task_id:d})$'  # account for possible leading zeros
+    dname = [f for f in os.listdir() if (os.path.isdir(f) and re.match(dpattern, f))][0]
+    log.info(f'chdir: {dname}')
+    os.chdir(dname)
+
+    input_file = None
+    for f in os.listdir():
+        if os.path.isfile(f) and f.endswith('.inputs'):
+            input_file = f
+            break
+    if not input_file:
+        raise ValueError('missing *.inputs file in run directory')
+    log.info(f'input file: {input_file}')
+
+    return log, task_id, Path(dname), input_file

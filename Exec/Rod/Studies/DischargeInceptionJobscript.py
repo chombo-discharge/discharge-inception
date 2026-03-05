@@ -6,63 +6,24 @@ Copyright © 2025 SINTEF Energi AS
 
 import os
 import sys
-import json
-import re
-import logging
-import subprocess
-import time
 import math
 import shutil
+import subprocess
+import time
 
 # local imports
 sys.path.append(os.getcwd())  # needed for local imports from slurm scripts
 from ParseReport import parse_report_file  # noqa: E402
 from discharge_ps.config_util import (  # noqa: E402
-                         get_slurm_array_task_id,
-                         handle_combination, read_input_float_field
-                         )
+    setup_jobscript_logging_and_dir, load_slurm_config,
+    handle_combination, read_input_float_field,
+)
 
-
-def _load_slurm_config() -> dict:
-    """Return the [slurm] table from slurm.toml, or {} if not configured."""
-    import tomllib
-    path = os.environ.get('DISCHARGE_PS_SLURM_CONFIG', '')
-    if path and os.path.isfile(path):
-        with open(path, 'rb') as f:
-            return tomllib.load(f).get('slurm', {})
-    return {}
 
 if __name__ == '__main__':
 
-    log = logging.getLogger(sys.argv[0])
-    formatter = logging.Formatter(
-            '%(asctime)s | %(levelname)s :: %(message)s')
-    sh = logging.StreamHandler(sys.stdout)
-    sh.setFormatter(formatter)
-    log.addHandler(sh)
-    log.setLevel(logging.INFO)
+    log, task_id, run_dir, input_file = setup_jobscript_logging_and_dir()
 
-    task_id = get_slurm_array_task_id()
-    log.info(f'found task id: {task_id}')
-
-    with open('index.json') as index_file:
-        index_dict = json.load(index_file)
-    job_prefix = index_dict['prefix']
-
-    dpattern = f'^({job_prefix}[0]*{task_id:d})$'  # account for possible leading zeros
-    dname = [f for f in os.listdir() if (os.path.isdir(f) and re.match(dpattern, f))][0]
-    log.info(f'chdir: {dname}')
-    os.chdir(dname)
-
-    input_file = None
-    for f in os.listdir():
-        if os.path.isfile(f) and f.endswith('.inputs'):
-            input_file = f
-            break
-
-    if not input_file:
-        raise ValueError('missing *.inputs file in run directory')
-    
     # Set some inception stepper only options:
     #   +Turn off plotting for inception stepper runs. The handling of the HDF5
     #   output file might create a OOM crash on slurm if the number of K values
@@ -71,7 +32,7 @@ if __name__ == '__main__':
     #   file is probably shared with the ItoKMC solver step of the study, so
     #   the DischargeInceptionStepper.mode = stationary is probably going to
     #   cause an error message and a hard abort/panic.
-    slurm = _load_slurm_config()
+    slurm = load_slurm_config()
     mpi = slurm.get('mpi', 'mpirun')
 
     cmd = f"{mpi} main {input_file} app.mode=inception Random.seed={task_id:d} Driver.max_steps=0 Driver.plot_interval=-1"
@@ -98,7 +59,7 @@ if __name__ == '__main__':
 
     if orig_max_voltage < calculated_max_voltage:
         log.info('renaming: report.txt -> report.txt.0')
-        shutil.move('report.txt', 'report.txt.0') 
+        shutil.move('report.txt', 'report.txt.0')
 
         # round up to nearest kV
         new_max_voltage = math.ceil(calculated_max_voltage / 1000) * 1000
@@ -117,4 +78,3 @@ if __name__ == '__main__':
         while p.poll() is None:
             time.sleep(0.5)
         sys.exit(p.returncode)
-

@@ -38,7 +38,7 @@ inception_stepper = {
     'identifier': 'inception_stepper',
     'job_script': '../DischargeInceptionJobscript.py',
     'program': rod_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
-    'output_directory': 'PDIV_DB',
+    'output_directory': 'pdiv_database',
     'job_script_dependencies': [
         '../../../../Util/GenericArrayJob.sh',
         '../ParseReport.py',
@@ -83,7 +83,7 @@ plasma_study_1 = {
         '../../../../Util/GenericArrayJob.sh',  # used at voltage step level
         '../../../../GenericArrayJobJobscript.py'  # used at voltage step level
     ],
-    'output_directory': 'study0',
+    'output_directory': 'plasma_simulations',
     'output_dir_prefix': 'run_',
     'parameter_space': {
         "app_mode": {

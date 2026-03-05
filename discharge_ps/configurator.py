@@ -16,7 +16,8 @@ import re
 
 from discharge_ps.config_util import (
         handle_combination, copy_files, get_output_prefix,
-        DEFAULT_OUTPUT_DIR_PREFIX
+        DEFAULT_OUTPUT_DIR_PREFIX,
+        load_slurm_config, build_sbatch_resource_args,
         )
 
 from subprocess import Popen, PIPE
@@ -331,11 +332,14 @@ def setup(log,
 
     log.info(LOG_SPACER_STR)
 
+    slurm = load_slurm_config()
+
     # fire of db slurm jobs
     for db_id, db in databases.items():
         db['job_id'] = schedule_slurm_jobs(log, db['structure'],
                                            db['directory'], structure_rel_include_path,
-                                           sorted(db['combination_set']))
+                                           sorted(db['combination_set']),
+                                           slurm=slurm, stage='inception')
     log.info(LOG_SPACER_STR)
 
     # start dependent slurm array jobs
@@ -360,7 +364,8 @@ def setup(log,
         schedule_slurm_jobs(log, study['structure'],
                             study['directory'], structure_rel_include_path,
                             study['combinations'],
-                            afterok_joblist=dep_joblist)
+                            afterok_joblist=dep_joblist,
+                            slurm=slurm, stage='plasma')
     log.info(LOG_SPACER_STR)
 
     return
@@ -375,7 +380,7 @@ def get_sort_order(sort_list, orig_list):
 
 
 def schedule_slurm_jobs(log, structure, out_dir, rel_path, sorted_combinations,
-                        afterok_joblist=None):
+                        afterok_joblist=None, slurm=None, stage=None):
     num_jobs = len(sorted_combinations)
     if num_jobs < 1:
         raise ValueError('num_jobs < 1')
@@ -403,8 +408,10 @@ def schedule_slurm_jobs(log, structure, out_dir, rel_path, sorted_combinations,
                       output_name_pattern, rel_path, out_dir,
                       i, combination)
 
-    cmdstr = f'sbatch --array=0-{num_jobs-1} --chdir="{out_dir}" ' + \
-            f'--job-name="{structure["identifier"]}" '
+    resource_args = build_sbatch_resource_args(slurm or {}, stage)
+    cmdstr = (f'sbatch --array=0-{num_jobs-1} --chdir="{out_dir}" '
+              f'--job-name="{structure["identifier"]}" '
+              + ' '.join(resource_args) + ' ')
 
     if afterok_joblist:
         cmdstr += f"--dependency=afterok:{','.join([str(j) for j in afterok_joblist])} "
