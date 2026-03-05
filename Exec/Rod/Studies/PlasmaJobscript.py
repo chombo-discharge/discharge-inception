@@ -20,19 +20,19 @@ from pathlib import Path
 sys.path.append(os.getcwd())  # needed for local imports from slurm scripts
 from ParseReport import parse_report_file  # noqa: E402
 from discharge_ps.config_util import (  # noqa: E402
-                         copy_files, backup_file, backup_dir,
-                         read_input_float_field,
-                         get_slurm_array_task_id,
-                         handle_combination,
-                         DEFAULT_OUTPUT_DIR_PREFIX
-                         )
+    copy_files, backup_file, backup_dir,
+    read_input_float_field,
+    get_slurm_array_task_id,
+    handle_combination,
+    DEFAULT_OUTPUT_DIR_PREFIX
+)
 
 
 if __name__ == '__main__':
 
     log = logging.getLogger(sys.argv[0])
     formatter = logging.Formatter(
-            '%(asctime)s | %(levelname)s :: %(message)s')
+        '%(asctime)s | %(levelname)s :: %(message)s')
     sh = logging.StreamHandler(sys.stdout)
     sh.setFormatter(formatter)
     log.addHandler(sh)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
             polarity = 1
         elif parameters['plasma_polarity'] == 'negative':
             polarity = -1
-    log.info(f'Running with polarity {polarity} (0:both, 1:positive, -1:negative)')
+            log.info(f'Running with polarity {polarity} (0:both, 1:positive, -1:negative)')
 
     # put the parameters in the same order as the database index needs them
     db_search_index = []
@@ -187,7 +187,7 @@ if __name__ == '__main__':
             key=["voltage", "K", "particle_position"],
             prefix=output_prefix,
             index={i: item for i, item in enum_table}
-            ),
+        ),
                   voltage_index_file, indent=4)
 
     if not os.path.islink('jobscript_symlink'):
@@ -215,47 +215,47 @@ if __name__ == '__main__':
         # building a fake combination and parameter space:
         particle_pos = [0.0, row[2][1], 0.0]  # strip X and Z coords
         comb_dict = dict(
-                voltage=row[0],
-                sphere_dist_props=[
-                    particle_pos,  # center position
-                    0.5*parameters['geometry_radius']  # half the tip's radius
-                    ],
-                single_particle_position=particle_pos# center position
-                )
+            voltage=row[0],
+            sphere_dist_props=[
+                particle_pos,  # center position
+                0.5*parameters['geometry_radius']  # half the tip's radius
+            ],
+            single_particle_position=particle_pos# center position
+        )
         distribution_type = 'sphere distribution'
         pspace = {
-                "voltage": {
-                    "target": voltage_dir/input_file,
-                    "uri": "StreamerIntegralCriterion.potential",
-                    },
-                "sphere_dist_props": {
-                    "target": voltage_dir/'chemistry.json',
-                    'uri': [
-                        'plasma species',
-                        '+["id"="e"]',  # find electrons in list
-                        'initial particles',
-                        f'+["{distribution_type}"]',
-                        distribution_type,  # TODO: fix duplicity here
-                        ['center', 'radius']  # NB! two parameters
-                        ]
-                    },
-                "single_particle_position": {
-                    "target": voltage_dir/'chemistry.json',
-                    'uri': [
-                        'plasma species',
-                        '+["id"="e"]',  # find electrons in list
-                        'initial particles',
-                        f'+["single particle"]',
-                        "single particle",  # TODO: fix duplicity here
-                        'position'  # NB! two parameters
-                        ]
-                    }
-                }
+            "voltage": {
+                "target": voltage_dir/input_file,
+                "uri": "plasma.voltage",
+            },
+            "sphere_dist_props": {
+                "target": voltage_dir/'chemistry.json',
+                'uri': [
+                    'plasma species',
+                    '+["id"="e"]',  # find electrons in list
+                    'initial particles',
+                    f'+["{distribution_type}"]',
+                    distribution_type,  # TODO: fix duplicity here
+                    ['center', 'radius']  # NB! two parameters
+                ]
+            },
+            "single_particle_position": {
+                "target": voltage_dir/'chemistry.json',
+                'uri': [
+                    'plasma species',
+                    '+["id"="e"]',  # find electrons in list
+                    'initial particles',
+                    f'+["single particle"]',
+                    "single particle",  # TODO: fix duplicity here
+                    'position'  # NB! two parameters
+                ]
+            }
+        }
         handle_combination(pspace, comb_dict)
 
     cmdstr = f'sbatch --array=0-{len(enum_table)-1} ' + \
-            f'--job-name="{structure["identifier"]}_voltage" ' + \
-            'GenericArrayJob.sh'
+        f'--job-name="{structure["identifier"]}_voltage" ' + \
+        'GenericArrayJob.sh'
     log.debug(f'cmd string: \'{cmdstr}\'')
     p = Popen(cmdstr, shell=True, stdout=PIPE, encoding='utf-8')
 
@@ -273,8 +273,8 @@ if __name__ == '__main__':
 
                 with open(array_job_id_path, 'w') as job_id_file:
                     job_id_file.write(job_id)
-                log.info(f"Submitted array job (for '{structure['identifier']}" +
-                         f"_voltage' combination set). [slurm job id = {job_id}]")
+                    log.info(f"Submitted array job (for '{structure['identifier']}" +
+                             f"_voltage' combination set). [slurm job id = {job_id}]")
 
         if p.poll() is not None:
             break

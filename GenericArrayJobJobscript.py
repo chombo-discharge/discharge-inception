@@ -45,7 +45,7 @@ if __name__ == '__main__':
     if not input_file:
         raise ValueError('missing *.inputs file in run directory')
 
-    cmd = f"mpirun program {input_file} Random.seed={task_id:d}"
+    cmd = f"mpirun main {input_file} Random.seed={task_id:d}"
     log.info(f"cmdstr: '{cmd}'")
     p = subprocess.Popen(cmd, shell=True, executable="/bin/bash")
 
