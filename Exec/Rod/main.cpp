@@ -33,7 +33,6 @@ main(int argc, char* argv[])
   Real voltage;
   Real pressure;
   Real temperature;
-  Real secondTownsend;
   Real N;
 
   app.get("mode", mode);
@@ -57,7 +56,8 @@ main(int argc, char* argv[])
 
     // Second Townsend ionization coefficient. This is something that now becomes hard-wired to the chemistry file. For simplicity, we use the
     // average rate of reactions that produce electrons.
-    int numEmissionMechanisms = 0;
+    int  numEmissionMechanisms = 0;
+    Real secondTownsend        = 0.0;
 
     for (const auto& entry : json["electrode emission"]) {
       const auto& products     = entry["@"];
@@ -66,6 +66,7 @@ main(int argc, char* argv[])
       for (size_t i = 0; i < products.size(); ++i) {
         if (products[i].get<std::string>() == "e") {
           secondTownsend += efficiencies[i].get<Real>();
+          numEmissionMechanisms += 1;
         }
       }
     }
