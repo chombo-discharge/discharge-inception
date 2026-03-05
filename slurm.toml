@@ -25,12 +25,12 @@ tasks_per_node = 16        # Default MPI tasks per node for all stages
 # Per-stage overrides for inception (database) runs.
 # Omit a key to inherit the top-level default.
 # nodes          = 1
-# tasks_per_node = 4
+tasks_per_node = 4
 time = "0-00:30:00"
 
 [slurm.plasma]
 # Per-stage overrides for plasma (voltage) runs.
 # Omit a key to inherit the top-level default.
 # nodes          = 1
-# tasks_per_node = 16
+tasks_per_node = 16
 time = "0-02:00:00"

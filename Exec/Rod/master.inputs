@@ -197,7 +197,7 @@ McPhoto.deposition_cf            = transition       ## Coarse-fine deposition. M
 # ====================================================================================================
 # Rod class options
 # ====================================================================================================
-Rod.radius     = 1E-3            ## Rod radius
+Rod.radius     = 10E-3            ## Rod radius
 Rod.point2     = 0.0 20E-3 0.0    ## One endpoint
 Rod.point1     = 0.0 99 0.0       ## Other endpoint
 Rod.live       = true             ## Live or not
@@ -339,6 +339,6 @@ DischargeInceptionStepper.max_dt_growth     = 0.05     ## Maximum relative chang
 # ====================================================================================================
 DischargeInceptionTagger.verbosity       = -1       ## Tagger chattiness.
 DischargeInceptionTagger.buffer          = 8        ## Grown buffer around flagged cells
-DischargeInceptionTagger.max_voltage     = 1        ## Maximum applied voltage
+DischargeInceptionTagger.max_voltage     = 70E3        ## Maximum applied voltage
 DischargeInceptionTagger.ref_alpha       = 0.3      ## Refinement curvature criterion. Lower => more mesh
 DischargeInceptionTagger.plot            = false    ## Plot tagging field or not.

@@ -13,7 +13,7 @@ dependencies = ["numpy"]
 plot = ["matplotlib", "scipy"]
 
 [project.scripts]
-discharge-ps = "discharge_ps.configurator:main"
+discharge-ps = "discharge_ps.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
