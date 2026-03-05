@@ -14,8 +14,6 @@ using namespace ChomboDischarge;
 using namespace Physics::ItoKMC;
 using namespace Physics::DischargeInception;
 
-#warning "Ion mobilities must scale against N (currently, they do not)"
-
 int
 main(int argc, char* argv[])
 {

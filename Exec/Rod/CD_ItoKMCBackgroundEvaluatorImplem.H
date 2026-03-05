@@ -27,6 +27,7 @@ ItoKMCBackgroundEvaluator<I, C, R, F>::ItoKMCBackgroundEvaluator(RefCountedPtr<I
   ParmParse pp("ItoKMCBackgroundEvaluator");
 
   m_maxFieldExitCrit   = std::numeric_limits<Real>::max();
+  m_relFieldExitCrit   = std::numeric_limits<Real>::max();  
   m_maxFieldChange     = -1.0;
   m_relFieldChange     = -1.0;
   m_electrodeCharge    = 0.0;
@@ -285,7 +286,7 @@ ItoKMCBackgroundEvaluator<I, C, R, F>::evaluateSpaceChargeEffects() noexcept
 
     const int nbox = dit.size();
 
-#pragma omp parallel for schedule(runtime)
+#pragma omp parallel for schedule(runtime) reduction(max : relChange)
     for (int mybox = 0; mybox < nbox; mybox++) {
       const DataIndex&     din        = dit[mybox];
       const Box            box        = dbl[din];
@@ -352,7 +353,7 @@ ItoKMCBackgroundEvaluator<I, C, R, F>::integrateElectrodeSurfaceCharge() const n
 
     const int numBoxes = dit.size();
 
-#pragma omp parallel for schedule(runtime);
+#pragma omp parallel for schedule(runtime) reduction(+ : Enorm)
     for (int mybox = 0; mybox < numBoxes; mybox++) {
       const DataIndex&     din        = dit[mybox];
       const EBISBox&       ebisbox    = ebisl[din];
@@ -400,8 +401,6 @@ ItoKMCBackgroundEvaluator<I, C, R, F>::integrateOpticalExcitations() const noexc
     pout() << "ItoKMCBackgroundEvaluator::integrateOpticalExcitations" << endl;
   }
 
-  const RefCountedPtr<ItoKMCJSON>& physics = static_cast<const RefCountedPtr<ItoKMCJSON>&>(this->m_physics);
-
   Real sumPhi = 0.0;
   Real sumSrc = 0.0;
 
@@ -418,7 +417,7 @@ ItoKMCBackgroundEvaluator<I, C, R, F>::integrateOpticalExcitations() const noexc
 
         const int numBoxes = dit.size();
 
-#pragma omp parallel for schedule(runtime);
+#pragma omp parallel for schedule(runtime) reduction(+ : SumPhi, sumSrc)
         for (int mybox = 0; mybox < numBoxes; mybox++) {
           const DataIndex&     din        = dit[mybox];
           const Box            cellBox    = dbl[din];
