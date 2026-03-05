@@ -52,7 +52,7 @@ inception_stepper = {
         'parameter_space': {
             "App_mode": {
                 "target": "master.inputs",
-                "uri": "App.mode",
+                "uri": "app.mode",
                 "values": ["inception"]
                 },
             "pressure": {
