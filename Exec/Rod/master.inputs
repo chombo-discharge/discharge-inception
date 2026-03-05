@@ -197,7 +197,7 @@ McPhoto.deposition_cf            = transition       ## Coarse-fine deposition. M
 # ====================================================================================================
 # Rod class options
 # ====================================================================================================
-Rod.radius     = 10E-3            ## Rod radius
+Rod.radius     = 1E-3            ## Rod radius
 Rod.point2     = 0.0 20E-3 0.0    ## One endpoint
 Rod.point1     = 0.0 99 0.0       ## Other endpoint
 Rod.live       = true             ## Live or not
