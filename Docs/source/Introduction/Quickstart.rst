@@ -94,17 +94,13 @@ Both studies point to the same binary in the flat ``Exec/Rod/`` directory:
     }
 
 **Database** (``inception_stepper``) — computes inception voltages over a grid of pressures and rod radii.
-``app.mode`` is set to ``inception`` so the binary runs the inception-voltage sweep.
+``app.mode=inception`` is injected on the command line by ``DischargeInceptionJobscript.py`` at runtime,
+so it is not part of the parameter space.
 Pressure is written into ``chemistry.json`` so both stages always use the same gas conditions:
 
 .. code-block:: python
 
     'parameter_space': {
-        "App_mode": {
-            "target": "master.inputs",
-            "uri": "app.mode",
-            "values": ["inception"]
-            },
         "pressure": {
             "target": "chemistry.json",
             "uri": ["gas", "law", "ideal_gas", "pressure"]
@@ -120,14 +116,13 @@ Pressure is written into ``chemistry.json`` so both stages always use the same g
         }
 
 **Study** (``plasma_study_1``) — runs plasma simulations using the database results.
-``app.mode`` is set to ``plasma`` so the same binary runs the full ItoKMC simulation.
-The applied voltage is fixed by ``plasma.voltage`` in ``master.inputs``; each run can also
-override it through the parameter space if needed:
+``app.mode`` is set to ``plasma`` by its own parameter space entry so the same binary runs the full ItoKMC simulation.
+The applied voltage comes from the inception database results and is set per voltage sub-run:
 
 .. code-block:: python
 
     'parameter_space': {
-        "App_mode": {
+        "app_mode": {
             "target": "master.inputs",
             "uri": "app.mode",
             "values": ["plasma"]
@@ -247,6 +242,52 @@ After both jobs complete:
     # Study results — plasma simulation output
     ls ~/my_rod_study/study0/run_*/pout.*
     ls ~/my_rod_study/study0/run_*/plt/
+
+Identify the settings for each run
+------------------------------------
+
+Each run directory has two files that record its exact parameter values.
+
+**``index.json``** at the top of each stage directory maps integer run index to parameter tuple:
+
+.. code-block:: json
+
+    {
+        "prefix": "run_",
+        "keys": ["pressure", "geometry_radius", "K_max"],
+        "index": {
+            "0": [100000.0, 0.001, 12.0],
+            "1": [200000.0, 0.001, 12.0]
+        }
+    }
+
+The key order in ``"keys"`` matches the tuple order in ``"index"``, so run ``run_0`` used
+``pressure = 1e5 Pa``, ``Rod.radius = 1e-3 m``, ``K_max = 12``.
+
+**``parameters.json``** inside every run directory contains the same information as a named dict,
+which is more convenient for direct inspection:
+
+.. code-block:: bash
+
+    cat ~/my_rod_study/PDIV_DB/run_0/parameters.json
+
+.. code-block:: json
+
+    {
+        "pressure": 100000.0,
+        "geometry_radius": 0.001,
+        "K_max": 12.0
+    }
+
+So ``PDIV_DB/run_0/report.txt`` was produced with those settings.
+For a quick overview of all runs:
+
+.. code-block:: bash
+
+    # Print settings for every database run
+    for d in ~/my_rod_study/PDIV_DB/run_*/; do
+        echo "$d"; cat "$d/parameters.json"; echo
+    done
 
 Post-process
 -------------
