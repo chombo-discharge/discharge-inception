@@ -1,12 +1,8 @@
 # ====================================================================================================
-# Combined binary mode: 'inception' or 'plasma'
+# Global input options.
 # ====================================================================================================
-App.mode     = inception
-
-# ====================================================================================================
-# Voltage curve
-# ====================================================================================================
-StreamerIntegralCriterion.potential                 = 29000
+app.mode           = inception    ## Mode. Either run DischargeInceptionStepper or ItoKMC
+plasma.voltage     = 40E3         ## Default voltage used when running ItoKMC
 
 # ====================================================================================================
 # ItoKMCBackgroundEvaluator class options

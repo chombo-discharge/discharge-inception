@@ -19,7 +19,6 @@
 	],
 	"law" : {
 	    "id" : "ideal_gas", 
-	    "plot" : true,      
 	    "ideal_gas" : {
 		"type" : "ideal",
 		"temperature" : 300,
@@ -31,13 +30,27 @@
 	"method": "downstream", 
 	"species": "e"		
     },    
-    "alpha": {		
-	"type": "auto", 
-	"species": "e"	
+    "alpha": {
+	"type" : "table vs E/N",                                   
+	"file" : "electron_transport_data.dat",                                 
+	"header" : "E/N (Td)\tTownsend ioniz. coef. alpha/N (m2)", 
+	"E/N column" : 0,                                          
+	"alpha/N column" : 1,                                      
+	"min E/N" : 1.0,                                           
+	"max E/N" : 10000.0,                                       
+	"num points" : 1000,                                       
+	"spacing" : "exponential"                                 
     },
-    "eta": {		
-	"type": "auto", 
-	"species": "e"	
+    "eta": {
+	"type" : "table vs E/N",                                  
+	"file" : "electron_transport_data.dat",                                
+	"header" : "E/N (Td)\tTownsend attach. coef. eta/N (m2)", 
+	"E/N column" : 0,                                         
+	"eta/N column" : 1,                                       
+	"min E/N" : 1.0,                                          
+	"max E/N" : 10000.0,                                      
+	"num points" : 1000,                                      
+	"spacing" : "exponential"                                
     },    
     "plasma species" :
     [
@@ -283,8 +296,6 @@
 	    "reaction": "O2+ -> @",
 	    "@": ["e", "(null)"],
 	    "efficiencies": [1E-3, 0.999]
-	}	
+	}
     ]
-
-    
 }
