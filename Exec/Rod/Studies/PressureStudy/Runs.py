@@ -51,11 +51,6 @@ inception_stepper = {
         rod_dir + 'detachment_rate.dat',
     ],
     'parameter_space': {
-        "app_mode": {
-            "target": "master.inputs",
-            "uri": "app.mode",
-            "values": ["inception"]
-        },
         "pressure": {
             "target": "chemistry.json",
             "uri": ["gas", "law", "ideal_gas", "pressure"]
