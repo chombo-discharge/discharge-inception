@@ -1,504 +1,394 @@
 Writing Jobscripts
 ******************
 
-*Configurator.py* schedules slurm jobs through `sbatch` expecting the bash script ``GenericArrayJob.sh``. This should edited to suit the system configuration, and added as a ``job_script_dependency`` to the studies:
+.. contents::
+   :local:
+   :depth: 2
+
+.. _jobscripts_where_fit:
+
+Where jobscripts fit
+====================
+
+``discharge-ps run`` sets up the directory structure and submits SLURM array
+jobs, but the actual simulation work is done by *jobscripts* — Python scripts
+that run inside each SLURM task.  ``GenericArrayJob.sh`` is the SLURM entry
+point; it activates the environment and then calls
+``python ./jobscript_symlink``, which resolves to the specific jobscript for
+that stage.
+
+See :ref:`arch_call_chain` for a full picture of how the pieces connect.
+
+.. _jobscripts_generic_array:
+
+GenericArrayJob.sh — the SLURM wrapper
+=======================================
+
+``Util/GenericArrayJob.sh`` is the **only** ``#SBATCH`` script in the project.
+It contains no hardcoded resource requests (nodes, tasks, time, account).
+Instead, resource values are injected at submission time by the Python
+jobscripts via ``build_sbatch_resource_args()``, which reads ``slurm.toml``
+(see :ref:`arch_slurm_config`).
+
+The only ``#SBATCH`` directives it does contain redirect stdout/stderr to
+per-array-task log files:
 
 .. code-block:: bash
-    :caption: GenericArrayJob.sh
+   :caption: Util/GenericArrayJob.sh
 
-    #!/bin/bash
-    # Author André Kapelrud
-    # Copyright © 2025 SINTEF Energi AS
+   #!/bin/bash
+   # Generic SLURM array job launcher for discharge-parametric-studies.
+   #
+   # Resource requests (account, partition, ntasks, time) are intentionally
+   # absent here so the script is portable across clusters. Supply them via:
+   #   - sbatch CLI arguments:  sbatch --account=X --ntasks=N --time=HH:MM:SS ...
+   #   - SLURM environment variables: export SBATCH_ACCOUNT=X before submitting
+   #   - The Python job scripts read slurm.toml and pass these automatically
+   #     when they invoke sbatch themselves (e.g. for the voltage sub-array).
 
-    #SBATCH --account=<cluster account>
-    #SBATCH --output=R-%x.%A-%a.out
-    #SBATCH --error=R-%x.%A-%a.err
+   #SBATCH --output=R-%x.%A-%a.out
+   #SBATCH --error=R-%x.%A-%a.err
 
-    # typical options needed for running on cluster
-    # remove leading '#' to use
-    ##SBATCH --nodes=4 --ntasks-per-node=128
-    ##SBATCH --partition=normal
-    ##SBATCH --time=0-00:10:00
+   set -o errexit
+   set -o nounset
 
-    # Local slurm testing,
-    # add extra '#' to comment out
-    #SBATCH --ntasks=5 --cpus-per-task=1
-    #SBATCH --time=0-00:25:00
+   # Load cluster modules listed in slurm.toml (requires DISCHARGE_PS_SLURM_CONFIG
+   # to be set and exported before submitting the job). Uses the system python3
+   # (before venv activation) to parse the TOML. The block is skipped entirely on
+   # systems without the 'module' command or without the config file.
+   if command -v module > /dev/null 2>&1 \
+           && [ -n "${DISCHARGE_PS_SLURM_CONFIG:-}" ] \
+           && [ -f "${DISCHARGE_PS_SLURM_CONFIG}" ]; then
+       while IFS= read -r mod; do
+           [ -n "$mod" ] && module load "$mod"
+       done < <(python3 -c "
+   import sys, tomllib
+   with open(sys.argv[1], 'rb') as f:
+       c = tomllib.load(f)
+   for m in c.get('slurm', {}).get('modules', []):
+       print(m)
+   " "${DISCHARGE_PS_SLURM_CONFIG}")
+   fi
 
-    set -o errexit
-    set -o nounset
+   if [ -n "${DISCHARGE_PS_VENV:-}" ]; then
+       source "$DISCHARGE_PS_VENV/bin/activate"
+   fi
 
-    # example sigma2, module loading code
-    if command -v module > /dev/null 2>&1
-    then
-        module restore system
-        module load foss/2023a
-        module load HDF5/1.14.0-gompi-2023a  # needed by chombo-discharge
-        module load Python/3.11.3-GCCcore-12.3.0  # needed by jobscripts
-    fi
+   python ./jobscript_symlink
+   exit $?
 
-    python ./jobscript_symlink  # run python through job-script
-    exit $?
+``GenericArrayJob.sh`` must be listed as a ``job_script_dependency`` in every
+run definition entry so the configurator copies it into the stage directory
+(see :ref:`arch_run_definition`).
 
-The script configures the resource requirements, sets error conditions and loads sigma2 system modules (c.f. `Lmod <https://lmod.readthedocs.io/en/latest/>`_).
+.. _jobscripts_setup_helper:
 
-.. note::
-    It is possible to submit python scripts to sbatch directly if the python script has the correct shebang (``#! /usr/bin/env python``), the ``#SBATCH``-specific comment directives also works from a python script. Routing through an intermediate bash-script made it somewhat easier to configure module-loading on sigma2.
+Standard jobscript setup — the helper
+======================================
 
-    A simple way of having two different versions of this bash script is to just make ``GenericArrayJob.sh`` a symlink to a correct system-tailored version, or even copy it in similar to the way chombo-discharge deals with the library makefiles.
-
-Template jobscripts
--------------------
-
-At this stage the work is not done, because alot of of the heavy lifting has to be done by your jobscripts. Regard the *Configurator.py* script as setting up the infrastructure. It is now up to you to start meaningful simulations. This section gives some examples on how to accomplish this.
-
-Generic python jobscript example
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-A vanilla, quite simple python-based jobscript might look like this:
-
-.. code-block:: python
-    :caption: GenericArrayJobJobscript.py
-    :linenos:
-
-    #!/usr/bin/env python
-    """
-    Author André Kapelrud
-    Copyright © 2025 SINTEF Energi AS
-    """
-
-    import os
-    import sys
-    import json
-    import re
-    import logging
-    import subprocess
-
-    # local imports
-    sys.path.append(os.getcwd())  # needed for local imports from slurm scripts
-    from ConfigUtil import get_slurm_array_task_id
-
-    if __name__ == '__main__':
-
-        log = logging.getLogger(sys.argv[0])
-        formatter = logging.Formatter(
-                '%(asctime)s | %(levelname)s :: %(message)s')
-        sh = logging.StreamHandler(sys.stdout)
-        sh.setFormatter(formatter)
-        log.addHandler(sh)
-        log.setLevel(logging.INFO)
-
-        task_id = get_slurm_array_task_id()
-        log.info(f'found task id: {task_id}')
-
-        with open('index.json') as index_file:
-            index_dict = json.load(index_file)
-        job_prefix = index_dict['prefix']
-
-        dpattern = f'^({job_prefix}[0]*{task_id:d})$'  # account for possible leading zeros
-        dname = [f for f in os.listdir() if (os.path.isdir(f) and re.match(dpattern, f))][0]
-        log.info(f'chdir: {dname}')
-        os.chdir(dname)
-
-        input_file = None
-        for f in os.listdir():
-            if os.path.isfile(f) and f.endswith('.inputs'):
-                input_file = f
-                break
-
-        if not input_file:
-            raise ValueError('missing *.inputs file in run directory')
-
-        cmd = f"mpirun main {input_file} Random.seed={task_id:d}"
-        log.info(f"cmdstr: '{cmd}'")
-        p = subprocess.Popen(cmd, shell=True, executable="/bin/bash")
-
-        while True:
-            res = p.poll()
-            if res is not None:
-                break
-
-.. _ex_database:
-
-Database-dependent jobscript examples
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This section contains two example jobscripts.
-
-* One for a database where the simulation (chombo discharge) is rerun under some condition.
-* One for a study that needs to extract some dataset from a database and set up sub directories per parameter space run.
-
-The jobscripts depend on two python scripts: ``ParseReport.py`` and ``ConfigUtil.py`` that needs to be included as ``job_script_dependencies`` in the *run_definition*.
-
-.. warning::
-   These are not *ready-to-run*, but illustrates a concept. For specific examples see the actual source code listings of this project.
+Every jobscript begins by calling two helpers from ``discharge_ps.config_util``:
 
 .. code-block:: python
-    :caption: Example database (python) jobscript
-    :linenos:
 
-    #!/usr/bin/env python
-    """
-    Author André Kapelrud
-    Copyright © 2025 SINTEF Energi AS
-    """
+   from discharge_ps.config_util import setup_jobscript_logging_and_dir, load_slurm_config
 
-    import os
-    import sys
-    import json
-    import re
-    import logging
-    import subprocess
-    import time
-    import math
-    import shutil
+``setup_jobscript_logging_and_dir(prefix=None)``
+   Reads ``$SLURM_ARRAY_TASK_ID``, sets up a ``logging`` instance, locates the
+   run directory for this task (using ``index.json`` for leaf-level scripts or
+   ``prefix`` from ``structure.json`` for study scripts), changes into it, and
+   finds the ``*.inputs`` file.
 
-    # local imports
-    sys.path.append(os.getcwd())  # needed for local imports from slurm scripts
-    from ParseReport import parse_report_file  # noqa: E402
-    from ConfigUtil import (  # noqa: E402
-                             get_slurm_array_task_id,
-                             handle_combination,
-                             read_input_float_field
-                             )
+   Returns a 4-tuple ``(log, task_id, run_dir, input_file)``.
 
-    if __name__ == '__main__':
+   * ``log`` — configured ``logging.Logger``
+   * ``task_id`` — integer SLURM array task index
+   * ``run_dir`` — ``pathlib.Path`` to the current run directory
+   * ``input_file`` — filename of the ``*.inputs`` file in that directory
 
-        log = logging.getLogger(sys.argv[0])
-        formatter = logging.Formatter(
-                '%(asctime)s | %(levelname)s :: %(message)s')
-        sh = logging.StreamHandler(sys.stdout)
-        sh.setFormatter(formatter)
-        log.addHandler(sh)
-        log.setLevel(logging.INFO)
+   Pass ``prefix`` explicitly when reading it from ``structure.json`` (study
+   scripts) rather than using the default ``"run_"`` prefix.
 
-        task_id = get_slurm_array_task_id()
-        log.info(f'found task id: {task_id}')
+``load_slurm_config(stage=None)``
+   Reads ``slurm.toml`` (via ``DISCHARGE_PS_SLURM_CONFIG``) and returns the
+   merged configuration dict for the requested stage.  Keys at
+   ``[slurm.<stage>]`` override top-level ``[slurm]`` defaults.
 
-        with open('index.json') as index_file:
-            index_dict = json.load(index_file)
+.. _jobscripts_simple:
 
-        # extract the directory prefix of run directories (default is 'run_',
-        # but make no assumptions.
-        job_prefix = index_dict['prefix']
+Writing a simple jobscript
+==========================
 
-        # find the directory corresponding to this array task id
-        dpattern = f'^({job_prefix}[0]*{task_id:d})$'  # account for possible leading zeros
-        dname = [f for f in os.listdir() if (os.path.isdir(f) and re.match(dpattern, f))][0]
-
-        # step into directory
-        log.info(f'chdir: {dname}')
-        os.chdir(dname)
-
-        # find chombo-discharge *.inputs file
-        input_file = None
-        for f in os.listdir():
-            if os.path.isfile(f) and f.endswith('.inputs'):
-                input_file = f
-                break
-
-        if not input_file:
-            raise ValueError('missing *.inputs file in run directory')
-
-        # We are now ready to run mpi on our chombo-discharge executable
-        # through the main symlink. Any ParmParse key can be overridden on the
-        # command line; overrides take precedence over the *.inputs file.
-        # A common use-case is to force a specific mode when a single binary
-        # supports multiple execution paths, e.g.:
-        #   App.mode=inception
-        # The Rod case uses exactly this pattern via DischargeInceptionJobscript.py.
-
-        cmd = f"mpirun main {input_file} Random.seed={task_id:d} App.mode=inception"
-        log.info(f"cmdstr: '{cmd}'")
-        p = subprocess.Popen(cmd, shell=True, executable="/bin/bash")
-        while p.poll() is None:
-            time.sleep(0.5)
-        # propagate nonzero exit code to calling jobscript
-        if p.returncode != 0:
-            sys.exit(p.returncode)
-
-        # First simulation step done.
-        # We are free to do whatever is necessary here. One likely scenario is
-        # to parse some results, alter some parameters and rerun the invocation
-        # above.
-
-        result_fn = "result-file-name"
-
-        def parse_some_result_file(result_filename):
-            """ meaningless stub """
-            return None
-
-        data = parse_some_result_file(result_fn)
-        log.info("Some description of this step...")
-
-        def calculate_interresting_value(data):
-            """ meaningless stub """
-            return None  # stub
-        iv = calculate_interresting_value(data)
-
-        # If we need to read something from a *.inputs file we can of course do that:
-        orig_iv = read_input_float_field(input_file, 'SomeNamespace.interrestingvariable')
-        if orig_iv is None:
-            raise RuntimeError(f"'{input_file}' does not contain 'SomeNamespace.interrestingvariable' field")
-
-        # some decision point
-        if orig_iv != iv:
-            log.info(f'renaming: {result_fn} -> {result_fn}.0')
-            shutil.move(result_fn, f'{result_fn}.0')
-
-            # You might want to back up other results here.
-
-            # update input file, this mirrors the run_definition file syntax
-            handle_combination({
-                "interresting_parameter": {  # parameter name
-                    "target": input_file,  # file target
-                    "uri": "SomeNamespace.interrestingvariable"
-                    }
-                }, dict(interresting_parameter=iv))
-
-            # rerun the simulation!
-            log.info('Rerunning calculations')
-            p = subprocess.Popen(cmd, shell=True, executable="/bin/bash")
-            while p.poll() is None:
-                time.sleep(0.5)
-            sys.exit(p.returncode)
-
-Study (database-dependent) jobscript example
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This is a rather long example where we traverse the database directories to find relevant data and then set up detailed simulations to use that data. This can be a single simulation, or a complex-subhierarchy of simulations. The last part is only pseudo-code, so the reader is advised to check out some of the checked in example studies in the main repository.
+The simplest jobscript navigates to its run directory and launches the solver.
+The example below matches the actual ``GenericArrayJobJobscript.py`` used for
+the leaf-level voltage runs:
 
 .. code-block:: python
-    :linenos:
+   :caption: GenericArrayJobJobscript.py
+   :linenos:
 
-    #!/usr/bin/env python
-    """
-    Author André Kapelrud
-    Copyright © 2025 SINTEF Energi AS
-    """
+   #!/usr/bin/env python
+   """
+   Author André Kapelrud
+   Copyright © 2025 SINTEF Energi AS
+   """
 
-    import os
-    import sys
-    import json
-    import re
-    import logging
-    import itertools
-    import shutil
+   import sys
+   import subprocess
 
-    from subprocess import Popen, PIPE
-
-    from pathlib import Path
-
-    # local imports
-    sys.path.append(os.getcwd())  # needed for local imports from slurm scripts
-    from ParseReport import parse_report_file  # noqa: E402
-    from ConfigUtil import (  # noqa: E402
-                             copy_files, backup_file,
-                             get_slurm_array_task_id,
-                             handle_combination,
-                             DEFAULT_OUTPUT_DIR_PREFIX
-                             )
+   from discharge_ps.config_util import setup_jobscript_logging_and_dir, load_slurm_config
 
 
-    if __name__ == '__main__':
+   if __name__ == '__main__':
 
-        log = logging.getLogger(sys.argv[0])
-        formatter = logging.Formatter(
-                '%(asctime)s | %(levelname)s :: %(message)s')
-        sh = logging.StreamHandler(sys.stdout)
-        sh.setFormatter(formatter)
-        log.addHandler(sh)
-        log.setLevel(logging.INFO)
+       # Step 1: Set up logging, navigate to run directory, find *.inputs file
+       log, task_id, run_dir, input_file = setup_jobscript_logging_and_dir()
 
-        task_id = get_slurm_array_task_id()
-        log.info(f'found task id: {task_id}')
+       # Step 2: Load SLURM / MPI configuration from slurm.toml
+       slurm = load_slurm_config()
+       mpi = slurm.get('mpi', 'mpirun')
 
-        with open('structure.json') as structure_file:
-            structure = json.load(structure_file)
+       # Step 3: Build and launch the MPI command
+       cmd = f"{mpi} main {input_file} Random.seed={task_id:d}"
+       log.info(f"cmdstr: '{cmd}'")
+       p = subprocess.Popen(cmd, shell=True)
 
-        # extract the directory prefix of run directories (default is 'run_',
-        # but make no assumptions.
-        job_prefix = 'run_'
-        if 'output_dir_prefix' in structure:
-            job_prefix = structure['output_dir_prefix']
+       while True:
+           res = p.poll()
+           if res is not None:
+               break
 
-        dpattern = f'^({job_prefix}[0]*{task_id:d})$'  # account for possible leading zeros
-        dname = [f for f in os.listdir() if (os.path.isdir(f) and re.match(dpattern, f))][0]
-        log.info(f'chdir: {dname}')
-        os.chdir(dname)
+**Step 1** — ``setup_jobscript_logging_and_dir()`` reads
+``$SLURM_ARRAY_TASK_ID``, uses ``index.json`` to find the matching
+``run_<N>/`` directory, changes into it, and returns the logger, task id,
+directory path, and input filename.
 
-        # locate .inputs file (should be in the required_files list, and copied to the
-        # current directory):
-        input_file = None
-        for f in os.listdir():
-            if os.path.isfile(f) and f.endswith('.inputs'):
-                input_file = f
-                break
-        if not input_file:
-            raise ValueError('missing *.inputs file in run directory')
-        log.info(f"input file: {input_file}")
+**Step 2** — ``load_slurm_config()`` reads ``slurm.toml`` and returns the
+merged configuration dict.  Retrieve the MPI launcher with
+``slurm.get('mpi', 'mpirun')``.
 
-        # get access to structure of dependent database through symlink
-        with open('../inception_stepper/structure.json') as db_structure_file:
-            db_structure = json.load(db_structure_file)
+**Step 3** — Build a shell command string and run it with ``subprocess.Popen``.
+The ``main`` symlink in the run directory points to the executable in the
+parent stage directory.
 
-        # determine order of parameters in database (might differ from the order in this study)
-        if 'space_order' not in db_structure:
-            raise ValueError("missing field 'space_order' in database 'inception_stepper'")
-        db_param_order = db_structure['space_order']
+.. _jobscripts_database:
 
-        # load this run's parameters (radius, pressure, etc.)
-        with open('parameters.json') as param_file:
-            parameters = json.load(param_file)
+Writing a database jobscript
+=============================
 
-        # we can add run-time checks:
-        if 'geometry_radius' not in parameters:
-            raise RuntimeError("'geometry_radius' is missing from 'parameters.json'")
+A database jobscript runs the solver, inspects the results, and conditionally
+reruns with updated parameters.  The example below closely follows the actual
+``DischargeInceptionJobscript.py``:
 
-        # put the parameters in the same order as the database index needs them
-        db_search_index = []
-        for db_param in db_param_order:
-            db_search_index.append(parameters[db_param])
+.. code-block:: python
+   :caption: DischargeInceptionJobscript.py
+   :linenos:
 
-        # Now, we need to locate the corresponding data in the 'database':
-        with open('../inception_stepper/index.json') as db_index_file:
-            db_index = json.load(db_index_file)
+   #!/usr/bin/env python
 
-        # linear search through index, which is a dictionary.
-        index = -1
-        for db_i, params in db_index['index'].items():
-            if params == db_search_index:
-                index = int(db_i)
-                break
-        if index < 0:
-            raise RuntimeError(f'Unable to find db parameter_set: {db_param_order} = ' +
-                               f'{db_search_index}')
-        log.info(f"Found database parameters {db_param_order} = {db_search_index} "
-                 f"at index: {index}")
+   import sys
+   import math
+   import shutil
+   import subprocess
+   import time
 
-        # we have the index, now locate the correct subdirectory:
-        db_run_path = Path('../inception_stepper')
-        if 'prefix' in db_index:
-            db_run_path /= db_index['prefix'] + str(index)
-        else:
-            db_run_path /= DEFAULT_OUTPUT_DIR_PREFIX + str(index)
+   sys.path.append(os.getcwd())  # needed for local ParseReport import
+   from ParseReport import parse_report_file
 
+   from discharge_ps.config_util import (
+       setup_jobscript_logging_and_dir, load_slurm_config,
+       handle_combination, read_input_float_field,
+   )
 
-        def parse_and_get_interresting_data(filename):
-            """ stub """
-            return None
+   if __name__ == '__main__':
 
-        data = parse_and_get_interresting_data(db_run_path / '<some-database-result-file>')
+       # Step 1: Navigate to run directory
+       log, task_id, run_dir, input_file = setup_jobscript_logging_and_dir()
 
-        # Maybe we need to do some selective picking of data based on a dummy-parameter?
-        # here we can for easily check a 'dummy' parameter
-        if 'dummy-parameter' in parameters:
-            data = some_filter_action(parameters['dummy-parameter'])  # do something meaningful
+       # Step 2: Load SLURM config
+       slurm = load_slurm_config()
+       mpi = slurm.get('mpi', 'mpirun')
 
-        #----------------------------------------------------------------------------
-        # At this point we can do whatever we like with the data.
+       # Step 3: Run the inception solver
+       cmd = (f"{mpi} main {input_file} app.mode=inception "
+              f"Random.seed={task_id:d} Driver.max_steps=0 Driver.plot_interval=-1")
+       log.info(f"cmdstr: '{cmd}'")
+       p = subprocess.Popen(cmd, shell=True)
+       while p.poll() is None:
+           time.sleep(0.5)
+       if p.returncode != 0:
+           sys.exit(p.returncode)
 
-        # Maybe the database study gave an estimate of a parameter and we just
-        # want to write that parameter to an *.inputs file or *.json file and run
-        # a detailed simulation.
-        # If so, use the handle_combination() function to write the data and
-        # launch the job using mpirun. See database example.
+       # Step 4: Parse results from report.txt
+       report_data = parse_report_file('report.txt',
+                                       ['+/- Voltage', 'Max K(+)', 'Max K(-)'])
+       calculated_max_voltage = report_data[1][-1][0]
+       log.info(f'DischargeInception found max voltage: {calculated_max_voltage}')
 
-        # If on the other hand, the database produces e.g. a voltage list and some
-        # other associated input data, then we need to create a sub-file
-        # hierarchy in the run-directory and submit those simulation jobs to slurm.
+       # Step 5: Check if a rerun is needed
+       orig_max_voltage = read_input_float_field(
+           input_file, 'DischargeInceptionTagger.max_voltage')
+       if orig_max_voltage is None:
+           raise RuntimeError(f"missing 'DischargeInceptionTagger.max_voltage'")
 
-        # We utilize helper functions from the configurator to alleviate the burden.
+       if orig_max_voltage < calculated_max_voltage:
+           shutil.move('report.txt', 'report.txt.0')
 
-        # We will use the GenericArrayJobJobscript.py script at the leaf directory level.
-        #----------------------------------------------------------------------------
+           new_max_voltage = math.ceil(calculated_max_voltage / 1000) * 1000
+           log.info(f'Setting DischargeInceptionTagger.max_voltage = {new_max_voltage}')
 
-        # let us enumerate the interresting data, assuming some known structure:
-        #   data[i] corresponds to the (new) parameters ["voltage", "some-other-parameter"]
-        enum_table = list(enumerate(data))
+           # Step 6: Inject updated parameter and rerun (see arch_json_uri)
+           handle_combination({
+               "mesh_max_voltage": {
+                   "target": input_file,
+                   "uri": "DischargeInceptionTagger.max_voltage"
+               }
+           }, dict(mesh_max_voltage=new_max_voltage))
 
-        output_prefix = "voltage_"
+           log.info('Rerunning DischargeInception calculations')
+           p = subprocess.Popen(cmd, shell=True)
+           while p.poll() is None:
+               time.sleep(0.5)
+           sys.exit(p.returncode)
 
-        # first we have to create an index for the sub-directories:
+**Step 3** — ParmParse overrides (``app.mode=inception``, etc.) appended after
+the ``*.inputs`` filename take precedence over the file contents — a common
+pattern when a single binary supports multiple execution modes.
 
-        # guard for reposting of the job
-        MAX_BACKUPS = 10
-        index_path = Path('index.json')
-        backup_file(index_path, max_backups=MAX_BACKUPS)
+**Step 5** — ``read_input_float_field(file, key)`` reads a float value from a
+``*.inputs`` file.  Returns ``None`` if the key is absent.
 
-        # write voltage index
-        with open(index_path, 'w') as voltage_index_file:
-            json.dump(dict(
-                key=["voltage", "some-other-parameter"],
-                prefix=output_prefix,
-                index={i: item for i, item in enum_table}
-                ),
-                      voltage_index_file, indent=4)
+**Step 6** — ``handle_combination(pspace, comb_dict)`` writes parameter values
+to their target files.  The ``pspace`` dict mirrors the parameter space syntax
+from the run definition (see :ref:`arch_param_space` and :ref:`arch_json_uri`).
 
-        # recreate the generic job-script symlink, so that the actual .sh jobscript work:
-        if not os.path.islink('jobscript_symlink'):
-            os.symlink('GenericArrayJobJobscript.py', 'jobscript_symlink')
+.. _jobscripts_study:
 
-        # create run directories, copy files, set voltage and parameters, etc.
-        for i, row in enum_table:
-            voltage_dir = Path(f'{output_prefix}{i:d}')
-            # don't delete old invocations
-            backup_dir(voltage_dir, max_backups=MAX_BACKUPS)
-            os.makedirs(voltage_dir, exist_ok=False)
+Writing a study jobscript
+==========================
 
-            # further symlink program executable to this directory's program-symlink
-            link_path = voltage_dir / 'program'
-            if not link_path.is_symlink():
-                os.symlink(Path('../program'), link_path)
+A study jobscript must:
 
-            # grab original file names from structure
-            required_files = [Path(f).name for f in structure['required_files']]
-            copy_files(log, required_files, voltage_dir)
+1. Read ``structure.json`` to get the run prefix (the prefix may differ from
+   the default ``"run_"``).
+2. Navigate to the matching database run and parse its results.
+3. Create per-voltage subdirectories and inject parameters.
+4. Submit a child SLURM array for the voltage sweep.
 
-            # reuse the combination writing code from the configurator / ConfigUtil, by
-            # building a fake combination and parameter space:
-            # populate values
-            comb_dict = dict(
-                    voltage=row[0],
-                    some_other_parameter=row[1]
-                    )
-            pspace = {
-                    "voltage": {
-                        "target": voltage_dir/input_file,
-                        "uri": "SomeNamespace.potential",
-                        },
-                    "some_other_parameter": {
-                        "target": voltage_dir/'chemistry.json',
-                        'uri': [ ... ]  # some very complex JSON traversing uri
-                        },
-                    }
-            handle_combination(pspace, comb_dict)
+The outline below follows ``PlasmaJobscript.py``:
 
-        # all voltage_* directories are now ready, and we can post a (new!) slurm array job:
-        cmdstr = f'sbatch --array=0-{len(enum_table)-1} ' + \
-                f'--job-name="{structure["identifier"]}_voltage" ' + \
-                'GenericArrayJob.sh'
-        log.debug(f'cmd string: \'{cmdstr}\'')
-        p = Popen(cmdstr, shell=True, stdout=PIPE, encoding='utf-8')
+.. code-block:: python
+   :caption: PlasmaJobscript.py (outline)
+   :linenos:
 
-        job_id = -1
-        while True:  # wait until sbatch is complete
-            # try to capture the job id
-            line = p.stdout.readline()
-            if line:
-                m = re.match('^Submitted batch job (?P<job_id>[0-9]+)', line)
-                if m:
-                    job_id = m.groupdict()['job_id']
+   import json
+   from pathlib import Path
+   from subprocess import Popen, PIPE
+   from discharge_ps.config_util import (
+       setup_jobscript_logging_and_dir, load_slurm_config,
+       build_sbatch_resource_args, handle_combination,
+       copy_files, backup_file, backup_dir, DEFAULT_OUTPUT_DIR_PREFIX
+   )
 
-                    array_job_id_path = Path('array_job_id')
-                    # backups for previously posted runs:
-                    backup_file(array_job_id_path, max_backups=MAX_BACKUPS)
+   if __name__ == '__main__':
 
-                    # write array index file
-                    with open(array_job_id_path, 'w') as job_id_file:
-                        job_id_file.write(job_id)
-                    log.info(f"Submitted array job (for '{structure['identifier']}" +
-                             f"_voltage' combination set). [slurm job id = {job_id}]")
+       # Step 1: Read structure.json to get the prefix, then set up
+       with open('structure.json') as f:
+           structure = json.load(f)
+       prefix = structure.get('output_dir_prefix', DEFAULT_OUTPUT_DIR_PREFIX)
+       log, task_id, run_dir, input_file = setup_jobscript_logging_and_dir(prefix=prefix)
 
-            if p.poll() is not None:
-                break
+       # Step 2: Navigate to the matching database run using index.json
+       #         (see arch_output_dir for the index.json format)
+       with open('../inception_stepper/structure.json') as f:
+           db_structure = json.load(f)
+       db_path = Path('..') / db_structure['identifier']
+
+       with open(db_path / 'index.json') as f:
+           db_index = json.load(f)
+
+       with open('parameters.json') as f:
+           parameters = json.load(f)
+
+       db_run_path = find_database_run(parameters, db_structure, db_index)
+
+       # Step 3: Parse database results
+       table = extract_voltage_table(db_run_path / 'report.txt', ...)
+
+       # Step 4: Create voltage_<i>/ subdirectories and inject parameters
+       #         (uses handle_combination — see arch_json_uri)
+       create_voltage_directories(table, structure, input_file, parameters)
+
+       # Step 5: Submit child SLURM array using build_sbatch_resource_args
+       slurm = load_slurm_config()
+       sbatch_args = (['--array=0-{}'.format(len(table) - 1),
+                       '--job-name="{}_voltage"'.format(structure['identifier'])]
+                      + build_sbatch_resource_args(slurm, stage='plasma'))
+       cmdstr = 'sbatch ' + ' '.join(sbatch_args) + ' GenericArrayJob.sh'
+       p = Popen(cmdstr, shell=True, stdout=PIPE, encoding='utf-8')
+       ...
+
+**Step 1** — Pass the ``prefix`` read from ``structure.json`` to
+``setup_jobscript_logging_and_dir`` so it can find the correct run directory
+even when the study uses a custom ``output_dir_prefix``.
+
+**Step 2** — ``index.json`` maps integer task IDs to parameter tuples; see
+:ref:`arch_output_dir` for the full format.  The ``inception_stepper@`` symlink
+in the study directory points directly to the database stage directory.
+
+**Step 4** — ``create_voltage_directories()`` iterates the voltage table, calls
+``copy_files()`` to populate each ``voltage_<i>/`` directory, and calls
+``handle_combination()`` to inject the voltage and particle-position parameters.
+
+**Step 5** — ``build_sbatch_resource_args(slurm, stage='plasma')`` returns a
+list of ``sbatch`` flag strings built from the ``[slurm.plasma]`` section of
+``slurm.toml`` — see :ref:`arch_slurm_config`.
+
+.. _jobscripts_handle_combination:
+
+Parameter injection with ``handle_combination()``
+==================================================
+
+``handle_combination(pspace, comb_dict)`` is the same function the configurator
+uses to write parameter values into ``*.inputs`` and ``*.json`` files.  Calling
+it from a jobscript lets you inject runtime-computed values (e.g. voltages from
+a database result) using the same URI syntax as the run definition.
+
+*  **``*.inputs`` target** — ``uri`` is a dot-separated ParmParse key:
+
+   .. code-block:: python
+
+      handle_combination(
+          {"voltage": {"target": input_file, "uri": "plasma.voltage"}},
+          {"voltage": 42000.0}
+      )
+
+*  **``*.json`` target** — ``uri`` is a list traversing the JSON hierarchy;
+   see :ref:`arch_param_space` and :ref:`arch_json_uri` for syntax details.
+
+The *fake pspace / comb_dict* pattern from ``PlasmaJobscript.py`` lets you
+write multiple fields in one call:
+
+.. code-block:: python
+
+   comb_dict = dict(
+       voltage=row[0],
+       sphere_dist_props=[center_pos, tip_radius],
+   )
+   pspace = {
+       "voltage": {
+           "target": voltage_dir / input_file,
+           "uri": "plasma.voltage",
+       },
+       "sphere_dist_props": {
+           "target": voltage_dir / 'chemistry.json',
+           'uri': [
+               'plasma species',
+               '+["id"="e"]',
+               'initial particles',
+               '+["sphere distribution"]',
+               'sphere distribution',
+               ['center', 'radius']   # two simultaneous writes
+           ]
+       },
+   }
+   handle_combination(pspace, comb_dict)
