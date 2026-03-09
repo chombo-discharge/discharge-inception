@@ -308,7 +308,7 @@ DischargeInceptionStepper.eval_townsend        = true                           
 DischargeInceptionStepper.inception_alg        = trapz                            ## Integration algorithm. Either euler or trapz
 DischargeInceptionStepper.output_file          = report.txt                       ## Output file
 DischargeInceptionStepper.K_inception          = 10                               ## User-specified inception value
-DischargeInceptionStepper.plt_vars             = K inc alpha eta field poisson    ## Plot variables
+DischargeInceptionStepper.plt_vars             = K Uinc alpha eta field poisson   ## Plot variables
 
 # Particle integration controls
 DischargeInceptionStepper.min_phys_dx          = 1.E-10    ## Minimum permitted physical step size
@@ -320,8 +320,8 @@ DischargeInceptionStepper.grad_alpha_dx        = 0.1       ## Maximum step size 
 DischargeInceptionStepper.townsend_grid_dx     = 2.0       ## Space step to use for Townsend tracking
 
 # Static mode
-DischargeInceptionStepper.rel_step_dU     = 0.025    ## Relative (%) voltage increase for each step
-DischargeInceptionStepper.step_dK         = 0.5
+DischargeInceptionStepper.rel_step_dU     = 0.1      ## Relative (%) voltage increase for each step
+DischargeInceptionStepper.step_dK         = 1.0      ## Target step between each K-value
 DischargeInceptionStepper.limit_max_K     = 15.0     ## Limit the maximum K-value
 
 # Dynamic mode
@@ -338,7 +338,7 @@ DischargeInceptionStepper.max_dt_growth     = 0.05     ## Maximum relative chang
 # DischargeInceptionTagger class options
 # ====================================================================================================
 DischargeInceptionTagger.verbosity       = -1       ## Tagger chattiness.
-DischargeInceptionTagger.buffer          = 8        ## Grown buffer around flagged cells
-DischargeInceptionTagger.max_voltage     = 70E3        ## Maximum applied voltage
-DischargeInceptionTagger.ref_alpha       = 0.3      ## Refinement curvature criterion. Lower => more mesh
+DischargeInceptionTagger.buffer          = 4        ## Grown buffer around flagged cells
+DischargeInceptionTagger.max_voltage     = 60E3        ## Maximum applied voltage
+DischargeInceptionTagger.ref_alpha       = 1.0      ## Refinement curvature criterion. Lower => more mesh
 DischargeInceptionTagger.plot            = false    ## Plot tagging field or not.
