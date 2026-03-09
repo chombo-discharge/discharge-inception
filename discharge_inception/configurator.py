@@ -126,6 +126,7 @@ def clean_definition(obj_def, keys, dim):
             space_order=list(keys),
             dim=dim
             )
+    d['job_script_options'] = obj_def.get('job_script_options', {})
 
     output_dir_prefix = DEFAULT_OUTPUT_DIR_PREFIX
     if 'output_dir_prefix' in obj_def:
@@ -160,7 +161,9 @@ def setup_job_dir(log, obj, output_name_pattern, rel_path, output_dir, i, combin
     # Take note that the field keys are the variable names of the parameters, not
     # the actual URIs
     with open(res_dir / 'parameters.json', 'x') as index:
-        json.dump(comb_dict, index, indent=4)
+        params_out = dict(comb_dict)
+        params_out.update(obj.get('job_script_options', {}))
+        json.dump(params_out, index, indent=4)
 
     cwd = os.getcwd()
     os.chdir(res_dir)

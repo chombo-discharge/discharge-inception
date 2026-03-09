@@ -52,14 +52,20 @@ inception_stepper = {
         rod_dir + 'detachment_rate.dat',
     ],
     'input_overrides': {
-        'max_amr_depth': {
+        'mode': {
             'target': 'master.inputs',
-            'uri': 'AmrMesh.max_amr_depth',
-            'value': 3
-        }
+            'uri': 'app.mode',
+            'value': "inception"
+        },
+        "limit_max_K": {
+            "target": "master.inputs",
+            "uri": "DischargeInceptionStepper.limit_max_K",
+            "value": 12
+        }        
     }
 }
 
+## Study specifications
 plasma_study_1 = {
     'identifier': 'photoion',
     'enable_study': True,
@@ -80,22 +86,24 @@ plasma_study_1 = {
     ],
     'output_directory': 'plasma_simulations',
     'output_dir_prefix': 'run_',
+    'input_overrides' : {
+        'mode': {
+            'target': 'master.inputs',
+            'uri': 'app.mode',
+            'value': "plasma"
+        }
+    },
+    'job_script_options': {
+        'K_min': 6,
+        'K_max': 12.0,
+        'plasma_polarity': 'positive',
+    },
     'parameter_space': {
-        "app_mode": {
-            "target": "master.inputs",
-            "uri": "app.mode",
-            "values": ["plasma"]
-        },
         "geometry_radius": {
             "database": "inception_stepper",  # database dependency
             "target": "master.inputs",
             "uri": "Rod.radius",
             "values": [100E-6, 500E-6, 1e-3] #, 2e-3, 3e-3]
-        },
-        "limit_max_K": {
-            "target": "master.inputs",
-            "uri": "DischargeInceptionStepper.limit_max_K",
-            "values": [12]
         },
         "pressure": {
             "database": "inception_stepper",  # database dependency
@@ -103,12 +111,6 @@ plasma_study_1 = {
             "uri": ["gas", "law", "ideal_gas", "pressure"],
             "values": [1e5]  # np.arange(1e5, 11e5, 10e5).tolist()
         },
-        "K_min": { "values": [6] }, # needed by jobscript, written to parameters.json for each run
-        "K_max": {
-            "database": "inception_stepper",
-            "values": [12.0]
-        },
-        "plasma_polarity": { "values": ["positive"] },  # used by jobscript
         "photoionization": {
             "target": "chemistry.json",
             "uri": [
