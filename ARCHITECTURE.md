@@ -1,10 +1,10 @@
-# Architecture: discharge-parametric-studies
+# Architecture: discharge-inception
 
 ## Overview
 
 This project sets up, submits, and post-processes parametric studies of gas
 discharge simulations on SLURM clusters.  A study is declared as a Python
-`Runs.py` file and submitted via the `discharge-ps` CLI.  The CLI creates run
+`Runs.py` file and submitted via the `discharge-inception` CLI.  The CLI creates run
 directories, injects parameters, and hands off to SLURM.  Everything that
 happens *inside* a SLURM job is driven by one of the three Python jobscripts.
 
@@ -13,10 +13,10 @@ happens *inside* a SLURM job is driven by one of the three Python jobscripts.
 ## Full call chain
 
 ```
-discharge-ps run <Runs.py>              [CLI  – discharge_ps/configurator.py]
+discharge-inception run <Runs.py>              [CLI  – discharge_inception/configurator.py]
   │  Creates run directories, writes index.json / parameters.json per run,
   │  symlinks jobscript_symlink → <StudyJobscript.py>, writes slurm.toml path
-  │  to DISCHARGE_PS_SLURM_CONFIG, then submits:
+  │  to DISCHARGE_INCEPTION_SLURM_CONFIG, then submits:
   │
   └─ sbatch --array=0-N GenericArrayJob.sh        [SLURM entry-point]
        │  Loads cluster modules from slurm.toml, activates venv, then runs:
@@ -48,7 +48,7 @@ discharge-ps run <Runs.py>              [CLI  – discharge_ps/configurator.py]
 ### `Util/GenericArrayJob.sh`
 - **Role**: Portable SLURM wrapper; the only `#SBATCH` script in the project.
   Never called directly — always submitted via `sbatch --array=...`.
-- **Reads**: `DISCHARGE_PS_SLURM_CONFIG` env var → `slurm.toml` (modules, venv)
+- **Reads**: `DISCHARGE_INCEPTION_SLURM_CONFIG` env var → `slurm.toml` (modules, venv)
 - **Executes**: `python ./jobscript_symlink` (the symlink selects the jobscript)
 
 ### `GenericArrayJobJobscript.py`
@@ -77,7 +77,7 @@ discharge-ps run <Runs.py>              [CLI  – discharge_ps/configurator.py]
 
 ---
 
-## Core library: `discharge_ps/`
+## Core library: `discharge_inception/`
 
 | Module | Role |
 |--------|------|

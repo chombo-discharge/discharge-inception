@@ -22,7 +22,7 @@ reruns with updated parameters.  The example below closely follows the actual
    sys.path.append(os.getcwd())  # needed for local ParseReport import
    from ParseReport import parse_report_file
 
-   from discharge_ps.config_util import (
+   from discharge_inception.config_util import (
        setup_jobscript_logging_and_dir, load_slurm_config,
        handle_combination, read_input_float_field,
    )

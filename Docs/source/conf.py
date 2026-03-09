@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Discharge Parametric Studies'
+project = 'Discharge Inception'
 copyright = '2026, SINTEF Energi AS'
 author = 'André Kapelrud, Robert Marskar'
 release = '1.0'

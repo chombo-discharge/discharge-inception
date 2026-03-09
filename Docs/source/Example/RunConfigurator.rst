@@ -6,7 +6,7 @@ Running the configurator
 .. code-block:: bash
 
    cd Exec/Rod/Studies/PressureStudy
-   discharge-ps run Runs.py \
+   discharge-inception run Runs.py \
        --output-dir ~/my_rod_study \
        --dim 2 \
        --verbose

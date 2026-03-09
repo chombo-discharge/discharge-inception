@@ -14,7 +14,7 @@ import importlib.util
 import sys
 import re
 
-from discharge_ps.config_util import (
+from discharge_inception.config_util import (
         handle_combination, copy_files, get_output_prefix,
         DEFAULT_OUTPUT_DIR_PREFIX,
         load_slurm_config, build_sbatch_resource_args,

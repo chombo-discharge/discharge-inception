@@ -8,7 +8,7 @@ import sys
 import subprocess
 
 # local imports
-from discharge_ps.config_util import setup_jobscript_logging_and_dir, load_slurm_config
+from discharge_inception.config_util import setup_jobscript_logging_and_dir, load_slurm_config
 
 
 if __name__ == '__main__':

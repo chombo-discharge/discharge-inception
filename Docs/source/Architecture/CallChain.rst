@@ -5,9 +5,9 @@ The full call chain
 
 .. code-block:: text
 
-   discharge-ps run <Runs.py>          [CLI — discharge_ps/configurator.py]
+   discharge-inception run <Runs.py>          [CLI — discharge_inception/configurator.py]
      │  Creates run dirs, writes index.json / parameters.json per run,
-     │  symlinks jobscript_symlink, writes DISCHARGE_PS_SLURM_CONFIG,
+     │  symlinks jobscript_symlink, writes DISCHARGE_INCEPTION_SLURM_CONFIG,
      │  then submits:
      │
      └─ sbatch --array=0-N GenericArrayJob.sh        [SLURM entry-point]
@@ -42,7 +42,7 @@ enforce ordering.
 **``GenericArrayJob.sh``** — The only ``#SBATCH`` script in the project.  It is
 completely resource-agnostic; all resource values are injected at submission time
 by the Python jobscripts via ``build_sbatch_resource_args()``.  It reads
-``DISCHARGE_PS_SLURM_CONFIG`` to load cluster modules and activate the virtual
+``DISCHARGE_INCEPTION_SLURM_CONFIG`` to load cluster modules and activate the virtual
 environment, then calls ``python ./jobscript_symlink``.
 
 **``DischargeInceptionJobscript.py``** — Reads ``index.json`` to find its run

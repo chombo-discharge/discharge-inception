@@ -3,7 +3,7 @@
 Where jobscripts fit
 ====================
 
-``discharge-ps run`` sets up the directory structure and submits SLURM array
+``discharge-inception run`` sets up the directory structure and submits SLURM array
 jobs, but the actual simulation work is done by *jobscripts* — Python scripts
 that run inside each SLURM task.  ``GenericArrayJob.sh`` is the SLURM entry
 point; it activates the environment and then calls

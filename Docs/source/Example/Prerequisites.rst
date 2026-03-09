@@ -15,7 +15,7 @@ The Rod case demonstrates the **two-level database → study pipeline**:
 
 Before starting, ensure the following are available:
 
-* ``discharge-ps`` is installed — see :doc:`/Installation/Install`.
+* ``discharge-inception`` is installed — see :doc:`/Installation/Install`.
 * ``DISCHARGE_HOME`` is set and points to a compiled
   `chombo-discharge <https://chombo-discharge.github.io/>`_ installation —
   see :ref:`install_prereqs`.
@@ -24,5 +24,5 @@ Before starting, ensure the following are available:
 
   .. code-block:: bash
 
-     export DISCHARGE_PS_VENV=/path/to/repo/.venv
-     export DISCHARGE_PS_SLURM_CONFIG=/path/to/repo/slurm.toml
+     export DISCHARGE_INCEPTION_VENV=/path/to/repo/.venv
+     export DISCHARGE_INCEPTION_SLURM_CONFIG=/path/to/repo/slurm.toml

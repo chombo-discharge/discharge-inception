@@ -15,7 +15,7 @@ import sys
 import itertools
 from pathlib import Path
 
-from discharge_ps.json_requirement import match_requirement, match_reaction
+from discharge_inception.json_requirement import match_requirement, match_reaction
 
 DEFAULT_OUTPUT_DIR_PREFIX = 'run_'
 
@@ -348,11 +348,11 @@ def build_sbatch_resource_args(slurm: dict, stage: str | None = None) -> list[st
 def load_slurm_config() -> dict:
     """Return the [slurm] table from slurm.toml, or {} if not configured.
 
-    The path to slurm.toml is read from the DISCHARGE_PS_SLURM_CONFIG
+    The path to slurm.toml is read from the DISCHARGE_INCEPTION_SLURM_CONFIG
     environment variable.
     """
     import tomllib
-    path = os.environ.get('DISCHARGE_PS_SLURM_CONFIG', '')
+    path = os.environ.get('DISCHARGE_INCEPTION_SLURM_CONFIG', '')
     if path and os.path.isfile(path):
         with open(path, 'rb') as f:
             return tomllib.load(f).get('slurm', {})

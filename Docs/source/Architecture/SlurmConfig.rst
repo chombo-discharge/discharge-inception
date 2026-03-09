@@ -4,7 +4,7 @@ SLURM configuration
 ===================
 
 Resource requests are stored in ``slurm.toml`` (path given by
-``DISCHARGE_PS_SLURM_CONFIG``).  This keeps all cluster-specific settings in
+``DISCHARGE_INCEPTION_SLURM_CONFIG``).  This keeps all cluster-specific settings in
 one place and out of shell scripts.
 
 .. code-block:: toml
@@ -32,7 +32,7 @@ one place and out of shell scripts.
 ``module load`` for each entry.  Job scripts call ``build_sbatch_resource_args()``
 to translate the ``[slurm.<stage>]`` section into ``sbatch`` command-line flags.
 
-The ``DISCHARGE_PS_SLURM_CONFIG`` variable must be set (and exported) before
+The ``DISCHARGE_INCEPTION_SLURM_CONFIG`` variable must be set (and exported) before
 submitting any job so that compute nodes can find the file.
 
 As an alternative to ``slurm.toml``, standard SLURM environment variables

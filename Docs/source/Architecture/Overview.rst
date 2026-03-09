@@ -3,9 +3,9 @@
 Overview
 ========
 
-``discharge-parametric-studies`` is a framework for submitting, tracking, and
+``discharge-inception`` is a framework for submitting, tracking, and
 post-processing parametric chombo-discharge studies on SLURM clusters.  A study
-is declared as a Python ``Runs.py`` file and submitted via the ``discharge-ps``
+is declared as a Python ``Runs.py`` file and submitted via the ``discharge-inception``
 CLI.  The CLI creates run directories, injects parameters, and hands off to
 SLURM.  Everything that happens *inside* a SLURM job is driven by one of the
 three Python jobscripts.

@@ -20,7 +20,7 @@ The outline below follows ``PlasmaJobscript.py``:
    import json
    from pathlib import Path
    from subprocess import Popen, PIPE
-   from discharge_ps.config_util import (
+   from discharge_inception.config_util import (
        setup_jobscript_logging_and_dir, load_slurm_config,
        build_sbatch_resource_args, handle_combination,
        copy_files, backup_file, backup_dir, DEFAULT_OUTPUT_DIR_PREFIX

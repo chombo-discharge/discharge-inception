@@ -40,7 +40,7 @@ jobs:
         working-directory: ${{ github.workspace }}/Docs
         run: |
           cp -a build/html/* ./
-          mv build/latex/dischargeparametricstudies.pdf ./discharge-parametric-studies.pdf
+          mv build/latex/dischargeinception.pdf ./discharge-inception.pdf
           rm -rf build
 
 
@@ -50,7 +50,7 @@ jobs:
           touch .nojekyll
 
       - name: Deploy
-        if: github.event_name == 'push' && github.repository == 'chombo-discharge/discharge-parametric-studies' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.repository == 'chombo-discharge/discharge-inception' && github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

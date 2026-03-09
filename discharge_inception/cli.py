@@ -16,7 +16,7 @@ from pathlib import Path
 
 
 # ---------------------------------------------------------------------------
-# discharge-ps ls
+# discharge-inception ls
 # ---------------------------------------------------------------------------
 
 def _format_val(v) -> str:
@@ -87,13 +87,13 @@ def cmd_ls(args) -> None:
 
 
 # ---------------------------------------------------------------------------
-# discharge-ps run
+# discharge-inception run
 # ---------------------------------------------------------------------------
 
 def cmd_run(args) -> None:
-    from discharge_ps import configurator
+    from discharge_inception import configurator
 
-    log = logging.getLogger('discharge-ps')
+    log = logging.getLogger('discharge-inception')
     formatter = logging.Formatter('%(asctime)s | %(levelname)s :: %(message)s')
     sh = logging.StreamHandler(sys.stdout)
     sh.setFormatter(formatter)
@@ -118,12 +118,12 @@ def cmd_run(args) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog='discharge-ps',
+        prog='discharge-inception',
         description='Parametric study configurator for chombo-discharge simulations.')
     subparsers = parser.add_subparsers(dest='command', metavar='command')
     subparsers.required = True
 
-    # --- discharge-ps run ----------------------------------------------------
+    # --- discharge-inception run ----------------------------------------------------
     run_p = subparsers.add_parser(
         'run', help='Configure and submit a parametric study.')
     run_p.add_argument(
@@ -141,7 +141,7 @@ def main() -> None:
         '--logfile', default='configurator.log',
         help='Log file; rotated automatically each invocation. (default: configurator.log)')
 
-    # --- discharge-ps ls -----------------------------------------------------
+    # --- discharge-inception ls -----------------------------------------------------
     ls_p = subparsers.add_parser(
         'ls', help='List runs and parameter settings in a study directory.')
     ls_p.add_argument(

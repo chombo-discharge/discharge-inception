@@ -3,14 +3,14 @@
 The CLI
 =======
 
-``discharge-ps run``
---------------------
+``discharge-inception run``
+---------------------------
 
 Sets up directory structure and submits the initial SLURM array jobs.
 
 .. code-block:: text
 
-   usage: discharge-ps run [-h] [--output-dir OUTPUT_DIR] [--dim DIM]
+   usage: discharge-inception run [-h] [--output-dir OUTPUT_DIR] [--dim DIM]
                            [--verbose] [--logfile LOGFILE]
                            run_definition
 
@@ -27,15 +27,15 @@ Sets up directory structure and submits the initial SLURM array jobs.
      --logfile LOGFILE     Log file; rotated automatically each invocation.
                            (default: configurator.log)
 
-``discharge-ps ls``
--------------------
+``discharge-inception ls``
+--------------------------
 
 Prints a table of runs, parameter values, and completion status (✓ if
 ``report.txt`` is present).
 
 .. code-block:: text
 
-   usage: discharge-ps ls [-h] study_dir [study_dir ...]
+   usage: discharge-inception ls [-h] study_dir [study_dir ...]
 
    positional arguments:
      study_dir   Study output directory containing index.json (e.g. pdiv_database/).

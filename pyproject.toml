@@ -3,7 +3,7 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "discharge-ps"
+name = "discharge-inception"
 version = "0.1.0"
 description = "Parametric study configurator for chombo-discharge simulations"
 requires-python = ">=3.10"
@@ -13,8 +13,8 @@ dependencies = ["numpy"]
 plot = ["matplotlib", "scipy"]
 
 [project.scripts]
-discharge-ps = "discharge_ps.cli:main"
+discharge-inception = "discharge_inception.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["discharge_ps*"]
+include = ["discharge_inception*"]

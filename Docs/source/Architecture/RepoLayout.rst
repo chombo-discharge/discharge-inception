@@ -9,7 +9,7 @@ Repository layout
 
    * - Path
      - Role
-   * - ``discharge_ps/``
+   * - ``discharge_inception/``
      - Installable Python package: ``configurator``, ``config_util``, ``cli``
    * - ``Util/GenericArrayJob.sh``
      - Portable SLURM bash wrapper; the only ``#SBATCH`` script

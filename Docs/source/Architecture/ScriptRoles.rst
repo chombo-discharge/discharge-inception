@@ -13,7 +13,7 @@ Script roles
      - Called by
    * - ``Util/GenericArrayJob.sh``
      - SLURM wrapper; loads modules, activates venv
-     - ``DISCHARGE_PS_SLURM_CONFIG`` → ``slurm.toml``
+     - ``DISCHARGE_INCEPTION_SLURM_CONFIG`` → ``slurm.toml``
      - ``sbatch --array=...``
    * - ``GenericArrayJobJobscript.py``
      - Runs plasma solver for one voltage
@@ -27,11 +27,11 @@ Script roles
      - Orchestrates voltage sweep: reads inception results, creates subdirs, submits child array
      - ``structure.json``, ``parameters.json``, ``../inception_stepper/``, ``report.txt``
      - First ``sbatch`` on plasma study
-   * - ``discharge_ps/configurator.py``
+   * - ``discharge_inception/configurator.py``
      - Expands parameter space, creates dirs, submits initial arrays
      - ``Runs.py`` / ``top_object``
-     - ``discharge-ps run`` CLI
-   * - ``discharge_ps/config_util.py``
+     - ``discharge-inception run`` CLI
+   * - ``discharge_inception/config_util.py``
      - URI injection, file helpers, SLURM task ID, jobscript setup
      - Called by all jobscripts
      - All jobscripts

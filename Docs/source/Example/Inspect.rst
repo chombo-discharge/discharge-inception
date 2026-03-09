@@ -3,12 +3,12 @@
 Inspecting results
 ==================
 
-Use ``discharge-ps ls`` to see a table of runs with their parameter values and
+Use ``discharge-inception ls`` to see a table of runs with their parameter values and
 completion status:
 
 .. code-block:: bash
 
-   discharge-ps ls ~/my_rod_study/PDIV_DB/
+   discharge-inception ls ~/my_rod_study/PDIV_DB/
 
 Example output::
 

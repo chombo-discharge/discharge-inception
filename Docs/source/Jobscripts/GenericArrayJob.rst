@@ -16,7 +16,7 @@ per-array-task log files:
    :caption: Util/GenericArrayJob.sh
 
    #!/bin/bash
-   # Generic SLURM array job launcher for discharge-parametric-studies.
+   # Generic SLURM array job launcher for discharge-inception.
    #
    # Resource requests (account, partition, ntasks, time) are intentionally
    # absent here so the script is portable across clusters. Supply them via:
@@ -31,13 +31,13 @@ per-array-task log files:
    set -o errexit
    set -o nounset
 
-   # Load cluster modules listed in slurm.toml (requires DISCHARGE_PS_SLURM_CONFIG
+   # Load cluster modules listed in slurm.toml (requires DISCHARGE_INCEPTION_SLURM_CONFIG
    # to be set and exported before submitting the job). Uses the system python3
    # (before venv activation) to parse the TOML. The block is skipped entirely on
    # systems without the 'module' command or without the config file.
    if command -v module > /dev/null 2>&1 \
-           && [ -n "${DISCHARGE_PS_SLURM_CONFIG:-}" ] \
-           && [ -f "${DISCHARGE_PS_SLURM_CONFIG}" ]; then
+           && [ -n "${DISCHARGE_INCEPTION_SLURM_CONFIG:-}" ] \
+           && [ -f "${DISCHARGE_INCEPTION_SLURM_CONFIG}" ]; then
        while IFS= read -r mod; do
            [ -n "$mod" ] && module load "$mod"
        done < <(python3 -c "
@@ -46,11 +46,11 @@ per-array-task log files:
        c = tomllib.load(f)
    for m in c.get('slurm', {}).get('modules', []):
        print(m)
-   " "${DISCHARGE_PS_SLURM_CONFIG}")
+   " "${DISCHARGE_INCEPTION_SLURM_CONFIG}")
    fi
 
-   if [ -n "${DISCHARGE_PS_VENV:-}" ]; then
-       source "$DISCHARGE_PS_VENV/bin/activate"
+   if [ -n "${DISCHARGE_INCEPTION_VENV:-}" ]; then
+       source "$DISCHARGE_INCEPTION_VENV/bin/activate"
    fi
 
    python ./jobscript_symlink

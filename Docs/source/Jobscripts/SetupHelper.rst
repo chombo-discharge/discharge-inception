@@ -3,11 +3,11 @@
 Standard jobscript setup — the helper
 ======================================
 
-Every jobscript begins by calling two helpers from ``discharge_ps.config_util``:
+Every jobscript begins by calling two helpers from ``discharge_inception.config_util``:
 
 .. code-block:: python
 
-   from discharge_ps.config_util import setup_jobscript_logging_and_dir, load_slurm_config
+   from discharge_inception.config_util import setup_jobscript_logging_and_dir, load_slurm_config
 
 ``setup_jobscript_logging_and_dir(prefix=None)``
    Reads ``$SLURM_ARRAY_TASK_ID``, sets up a ``logging`` instance, locates the
@@ -26,6 +26,6 @@ Every jobscript begins by calling two helpers from ``discharge_ps.config_util``:
    scripts) rather than using the default ``"run_"`` prefix.
 
 ``load_slurm_config(stage=None)``
-   Reads ``slurm.toml`` (via ``DISCHARGE_PS_SLURM_CONFIG``) and returns the
+   Reads ``slurm.toml`` (via ``DISCHARGE_INCEPTION_SLURM_CONFIG``) and returns the
    merged configuration dict for the requested stage.  Keys at
    ``[slurm.<stage>]`` override top-level ``[slurm]`` defaults.
