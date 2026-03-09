@@ -79,8 +79,8 @@ inception_stepper = {
 }
 
 ## Study specifications
-plasma_study_1 = {
-    'identifier': 'photoion',
+plasma_study = {
+    'identifier': 'radius',
     'enable_study': True,
     'program': rod_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
     'job_script': '../Scripts/PlasmaJobscript.py',
@@ -139,7 +139,7 @@ plasma_study_1 = {
     }
 }
 
-top_object = dict(databases=[inception_stepper], studies=[plasma_study_1])
+top_object = dict(databases=[inception_stepper], studies=[plasma_study])
 
 if __name__ == '__main__':
     with open('runs.json', 'w') as f:

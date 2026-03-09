@@ -109,7 +109,7 @@ def cmd_run(args) -> None:
         fh.doRollover()
 
     configurator.setup(log, args.output_dir, args.run_definition, dim=args.dim,
-                       verbose=args.verbose)
+                       verbose=args.verbose, pdiv_only=args.pdiv_only)
 
 
 # ---------------------------------------------------------------------------
@@ -140,6 +140,10 @@ def main() -> None:
     run_p.add_argument(
         '--logfile', default='configurator.log',
         help='Log file; rotated automatically each invocation. (default: configurator.log)')
+    run_p.add_argument(
+        '--pdiv-only', action='store_true',
+        help='Set up and submit only the inception (PDIV) database jobs; '
+             'skip all plasma study setup and Slurm submission.')
 
     # --- discharge-inception ls -----------------------------------------------------
     ls_p = subparsers.add_parser(

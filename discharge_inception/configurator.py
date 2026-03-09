@@ -214,7 +214,8 @@ def setup(log,
           output_dir,
           run_definition,
           structure=None,
-          dim=3, verbose=False):
+          dim=3, verbose=False,
+          pdiv_only=False):
     """ Parse the parameter space definition and create output directory structure for
     all combinations in the parameter space.
     """
@@ -291,6 +292,9 @@ def setup(log,
                     combination_set=set())
 
     log.info(LOG_SPACER_STR)
+    if pdiv_only:
+        log.info("--pdiv-only: computing database combinations from studies; "
+                 "skipping study directory setup and Slurm submission.")
     studies = dict()
     for study in structure['studies']:
         if not study.get('enable_study', True):
@@ -301,17 +305,28 @@ def setup(log,
         if missing_fields:
             raise ValueError(f'study \'{study["identifier"]}\' is missing fields:' +
                              f'{missing_fields}')
-        keys, combinations, st_dir, db_params = setup_study(log, study,
-                                                            output_dir, dim,
-                                                            structure_rel_include_path)
 
-        studies[study['identifier']] = dict(
-                structure=study,
-                database_deps=db_params,
-                directory=st_dir,
-                keys=keys,
-                combinations=combinations
-                )
+        if pdiv_only:
+            # Compute combinations and db_params without creating any directories.
+            pspace = study['parameter_space']
+            keys = list(pspace.keys())
+            combinations = list(get_combinations(pspace, keys))
+            db_params = {}
+            for key, param_def in pspace.items():
+                if 'database' in param_def:
+                    dbname = param_def['database']
+                    db_params.setdefault(dbname, []).append(key)
+        else:
+            keys, combinations, st_dir, db_params = setup_study(log, study,
+                                                                output_dir, dim,
+                                                                structure_rel_include_path)
+            studies[study['identifier']] = dict(
+                    structure=study,
+                    database_deps=db_params,
+                    directory=st_dir,
+                    keys=keys,
+                    combinations=combinations
+                    )
 
         log.debug(f"keys: {keys}")
         log.debug(f"combinations: {combinations}")
