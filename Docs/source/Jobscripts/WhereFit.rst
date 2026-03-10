@@ -19,6 +19,6 @@ ready-made scripts in ``Scripts/``:
 
 Both scripts are invoked through ``GenericArrayJob.sh``, which is the SLURM entry
 point: it activates the environment and calls ``python ./jobscript_symlink``, which
-resolves to the appropriate script for the stage.  See :ref:`jobscripts_generic_array_job`
+resolves to the appropriate script for the stage.  See :ref:`jobscripts_generic_array`
 for details on the SLURM wrapper itself, and :ref:`arch_call_chain` for a full picture
 of how all the pieces connect.

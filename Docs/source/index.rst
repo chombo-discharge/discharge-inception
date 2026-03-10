@@ -24,7 +24,7 @@ This step is automatic run by submitting jobs via a SLURM queue system, so the u
    section#installation,
    section#architecture,
    section#jobscripts-guide,
-   section#post-processing,   
+   section#post-processing,
    section#example-rod-case {
        display:none;
    }
