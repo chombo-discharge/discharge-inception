@@ -89,7 +89,7 @@ Post-processing
    :hidden:
 
    PostProcess/ExtractInceptionVoltages
-   PostProcess/Gather
+   PostProcess/GatherPlasmaEventLogs
    PostProcess/Analyze
    PostProcess/PlotDeltaERel
    PostProcess/Summarize
