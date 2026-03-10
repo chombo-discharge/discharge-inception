@@ -1,8 +1,38 @@
+"""Generate ``main.cpp`` for a dual-mode DischargeInception + ItoKMC application."""
+
 import os
 import sys
 
 
 def write_template(args):
+    """Write a parametrized ``main.cpp`` into the new application directory.
+
+    The generated file contains the necessary ``#include`` directives, type
+    aliases (``I``, ``C``, ``R``, ``F``), and a ``main()`` that branches on
+    ``app.mode`` at runtime: ``"inception"`` activates ``DischargeInceptionStepper``
+    and ``"plasma"`` activates the chosen ``ItoKMCStepper`` subclass.
+
+    Args:
+        args (argparse.Namespace): Parsed command-line arguments.  Consumed
+            attributes:
+
+            * ``discharge_home`` — path to the chombo-discharge source tree.
+            * ``base_dir`` — parent directory for the new application.
+            * ``app_name`` — subdirectory name of the new application.
+            * ``geometry`` — computational geometry class name.
+            * ``physics`` — ItoKMC plasma physics model class name.
+            * ``ito_solver`` — Ito-diffusion solver type (``I`` alias).
+            * ``cdr_solver`` — CDR solver type (``C`` alias).
+            * ``rte_solver`` — radiative-transfer solver type (``R`` alias).
+            * ``field_solver`` — Poisson/field solver type (``F`` alias).
+            * ``plasma_stepper`` — ItoKMC time-stepper for plasma mode.
+            * ``plasma_tagger`` — cell-tagger for plasma mode, or ``"none"``.
+
+    Side effects:
+        Creates ``<base_dir>/<app_name>/`` (if absent) and writes
+        ``<base_dir>/<app_name>/main.cpp``.  Prints a warning to stdout for
+        each expected header file that cannot be found on disk.
+    """
     discharge_home = args.discharge_home
 
     # Warn (don't abort) if expected headers are missing

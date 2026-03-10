@@ -76,6 +76,7 @@ Jobscripts guide
    :caption: Jobscripts guide
    :hidden:
 
+   Jobscripts/SetupTool
    Jobscripts/WhereFit
    Jobscripts/GenericArrayJob
    Jobscripts/DischargeInceptionScript

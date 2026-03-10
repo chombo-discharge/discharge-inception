@@ -1,4 +1,25 @@
 #!/usr/bin/env python3
+"""Scaffold a new chombo-discharge simulation directory for the dual-mode inception+plasma workflow.
+
+Usage::
+
+    python3 Setup/setup.py \\
+        -discharge_home "$DISCHARGE_HOME" \\
+        -base_dir Exec \\
+        -app_name MyApp \\
+        -geometry Rod \\
+        -physics ItoKMCJSON \\
+        -plasma_stepper ItoKMCBackgroundEvaluator \\
+        -plasma_tagger ItoKMCStreamerTagger
+
+The script delegates to three helper modules:
+
+* ``app_main``    — generates ``main.cpp`` with dual-mode ``main()``.
+* ``app_options`` — collects ``.options`` files and writes ``template.inputs``.
+* ``app_inc``     — reads ``CD_{physics}.inc`` and copies dependency files (e.g. ``chemistry.json``).
+
+A ``GNUmakefile`` is also copied from ``Setup/python/`` into the new directory.
+"""
 import argparse
 import os
 import sys
