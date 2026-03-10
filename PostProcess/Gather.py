@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Author André Kapelrud
-Copyright © 2025 SINTEF Energi AS
+Author André Kapelrud, Robert Marskar
+Copyright © 2026 SINTEF Energi AS
 """
 
 from collections import deque

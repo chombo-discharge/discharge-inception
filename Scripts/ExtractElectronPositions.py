@@ -24,8 +24,8 @@ Typical usage::
         'report.txt',
         interesting=['+/- Voltage', 'Max K(+)', 'Pos. max K(+)'])
 
-Author André Kapelrud
-Copyright © 2025 SINTEF Energi AS
+Author André Kapelrud, Robert Marskar
+Copyright © 2026 SINTEF Energi AS
 """
 
 import sys

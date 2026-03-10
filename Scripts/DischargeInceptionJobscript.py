@@ -25,8 +25,8 @@ Execution flow
    ``report.txt`` is backed up, ``max_voltage`` is rounded up to the nearest
    kV and written back to the input file, and the stepper is rerun.
 
-Author André Kapelrud
-Copyright © 2025 SINTEF Energi AS
+Author André Kapelrud, Robert Marskar
+Copyright © 2026 SINTEF Energi AS
 """
 
 import math

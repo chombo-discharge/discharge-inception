@@ -35,8 +35,8 @@ Execution flow
    d. :func:`submit_voltage_array` — submits the resulting array to SLURM and
       records the job ID.
 
-Author André Kapelrud
-Copyright © 2025 SINTEF Energi AS
+Author André Kapelrud, Robert Marskar
+Copyright © 2026 SINTEF Energi AS
 """
 
 import json

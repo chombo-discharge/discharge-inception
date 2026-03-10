@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Author André Kapelrud
-# Copyright © 2025 SINTEF Energi AS
+# Author André Kapelrud, Robert Marskar
+# Copyright © 2026 SINTEF Energi AS
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 

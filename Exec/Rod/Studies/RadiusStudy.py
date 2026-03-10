@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Author André Kapelrud
-Copyright © 2025 SINTEF Energi AS
+Author André Kapelrud, Robert Marskar
+Copyright © 2026 SINTEF Energi AS
 """
 
 import json
@@ -104,7 +104,12 @@ plasma_study = {
             'target': 'master.inputs',
             'uri': 'app.mode',
             'value': "plasma"
-        }
+        },
+        "max_steps": {
+            "target": "master.inputs",
+            "uri": "Driver.max_steps",
+            "value": 500
+        },        
     },
     'job_script_options': {
         'K_min': 6,
