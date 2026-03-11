@@ -26,3 +26,8 @@ exclude_patterns = []
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+
+# -- Options for LaTeX output ------------------------------------------------
+latex_elements = {
+    'preamble': r'\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}',
+}

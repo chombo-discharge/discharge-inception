@@ -195,9 +195,10 @@ def plot_run(run_id: int,
 
 # ---- Main ----
 
-def main():
-    """Parse command-line arguments and produce one PNG per database run."""
+def make_parser(add_help=True) -> argparse.ArgumentParser:
+    """Return the configured argument parser (separated from main() for CLI reuse)."""
     ap = argparse.ArgumentParser(
+        add_help=add_help,
         description=(
             "Batch-plot Delta E(rel) vs time for every run in a plasma "
             "simulation database."
@@ -215,9 +216,11 @@ def main():
         "--output-dir", default=None, metavar="DIR",
         help="Directory for output PNG files (default: same as db_dir).",
     )
+    return ap
 
-    args = ap.parse_args()
 
+def run(args) -> None:
+    """Execute the pipeline given a pre-parsed Namespace."""
     db_dir = Path(args.db_dir)
     if not db_dir.is_dir():
         print(f"error: '{db_dir}' is not a directory", file=sys.stderr)
@@ -245,6 +248,11 @@ def main():
 
         out_png = output_dir / f"plt_{run_id}.png"
         plot_run(run_id, t, E_rel, keys, param_values, out_png)
+
+
+def main():
+    """Parse command-line arguments and produce one PNG per database run."""
+    run(make_parser().parse_args())
 
 
 if __name__ == "__main__":

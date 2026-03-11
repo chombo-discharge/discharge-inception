@@ -45,4 +45,4 @@ Database-linked parameters restrict that product to matching combinations.
        }
    }
 
-The above yields 6 run directories (3 × 2).
+The above yields 6 run directories (3 x 2).

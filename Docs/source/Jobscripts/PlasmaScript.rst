@@ -30,7 +30,7 @@ All keys are read from ``parameters.json`` at runtime.
    * - ``plasma_polarity``
      - ``str``
      - both
-     - ``'positive'`` selects K(+) voltages only; ``'negative'`` selects K(−) voltages
+     - ``'positive'`` selects K(+) voltages only; ``'negative'`` selects K(-) voltages
        only.  Omit the key (or set it to ``'both'``) to include both polarities.
    * - ``K_min``
      - ``float``

@@ -6,7 +6,7 @@ Prerequisites
 Python
 ------
 
-``discharge-inception`` requires **Python ≥ 3.10**.  The minimum version is set
+``discharge-inception`` requires **Python >= 3.10**.  The minimum version is set
 by the use of structural pattern matching (``match``/``case``) in the parameter
 handling code and by ``tomllib``, which entered the standard library in 3.11 but
 is available as a backport (``tomli``) for 3.10.  Using the newest Python 3.x

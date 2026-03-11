@@ -13,7 +13,7 @@ Script roles
      - Called by
    * - ``Util/GenericArrayJob.sh``
      - SLURM wrapper; loads modules, activates venv
-     - ``DISCHARGE_INCEPTION_SLURM_CONFIG`` → ``slurm.toml``
+     - ``DISCHARGE_INCEPTION_SLURM_CONFIG`` -> ``slurm.toml``
      - ``sbatch --array=...``
    * - ``GenericArrayJobJobscript.py``
      - Runs plasma solver for one voltage

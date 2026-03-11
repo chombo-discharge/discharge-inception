@@ -5,30 +5,30 @@ The full call chain
 
 .. code-block:: text
 
-   discharge-inception run <Runs.py>          [CLI — discharge_inception/configurator.py]
-     │  Creates run dirs, writes index.json / parameters.json per run,
-     │  symlinks jobscript_symlink, writes DISCHARGE_INCEPTION_SLURM_CONFIG,
-     │  then submits:
-     │
-     └─ sbatch --array=0-N GenericArrayJob.sh        [SLURM entry-point]
-          │  Loads cluster modules from slurm.toml, activates venv, then runs:
-          │
-          └─ python ./jobscript_symlink               [jobscript dispatch]
-               │
-               ├─── DischargeInceptionJobscript.py    [inception database runs]
-               │      Navigates to run_<id>/ via index.json, runs the inception
-               │      solver, validates max_voltage, optionally reruns.
-               │      Output: report.txt in each run directory.
-               │
-               └─── PlasmaJobscript.py                [plasma study runs]
+   discharge-inception run <Runs.py>          [CLI -- discharge_inception/configurator.py]
+     |  Creates run dirs, writes index.json / parameters.json per run,
+     |  symlinks jobscript_symlink, writes DISCHARGE_INCEPTION_SLURM_CONFIG,
+     |  then submits:
+     |
+     \- sbatch --array=0-N GenericArrayJob.sh        [SLURM entry-point]
+          |  Loads cluster modules from slurm.toml, activates venv, then runs:
+          |
+          \- python ./jobscript_symlink               [jobscript dispatch]
+               |
+               +--- DischargeInceptionJobscript.py    [inception database runs]
+               |      Navigates to run_<id>/ via index.json, runs the inception
+               |      solver, validates max_voltage, optionally reruns.
+               |      Output: report.txt in each run directory.
+               |
+               \--- PlasmaJobscript.py                [plasma study runs]
                       Navigates to run_<id>/ via structure.json prefix, looks up
                       the matching inception database run, reads its report.txt,
                       builds a voltage table, creates voltage_<i>/ subdirs,
                       then submits a SECOND sbatch array:
-                      │
-                      └─ sbatch --array=0-M GenericArrayJob.sh   [voltage array]
-                           └─ python ./jobscript_symlink
-                                └─── GenericArrayJobJobscript.py  [voltage runs]
+                      |
+                      \- sbatch --array=0-M GenericArrayJob.sh   [voltage array]
+                           \- python ./jobscript_symlink
+                                \--- GenericArrayJobJobscript.py  [voltage runs]
                                        Navigates to voltage_<id>/ via index.json,
                                        runs the plasma solver for one voltage.
 

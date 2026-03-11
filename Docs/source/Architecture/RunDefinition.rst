@@ -7,7 +7,7 @@ Each database or study entry is a dictionary with these configurable fields:
 
 ``identifier``
    Unique string name for this database/study.  Used as the symlink name in
-   dependent study directories (e.g. ``study0/inception_stepper →
+   dependent study directories (e.g. ``study0/inception_stepper ->
    ../PDIV_DB``).
 
 ``output_directory``
@@ -23,7 +23,7 @@ Each database or study entry is a dictionary with these configurable fields:
 
 ``job_script``
    Python script that drives the actual SLURM work for this stage.  The
-   configurator creates a symlink ``jobscript_symlink →
+   configurator creates a symlink ``jobscript_symlink ->
    <job_script>`` in the stage directory so ``GenericArrayJob.sh`` can call it
    generically.
 

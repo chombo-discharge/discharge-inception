@@ -632,9 +632,11 @@ def plot_2x4(time: np.ndarray, series: Dict[str, np.ndarray]) -> None:
     plt.show()
 
 # ---------- Main ----------
-def main():
-    """Parse command-line arguments and run the full extract → smooth → differentiate → write → plot pipeline."""
+
+def make_parser(add_help=True) -> argparse.ArgumentParser:
+    """Return the configured argument parser (separated from main() for CLI reuse)."""
     ap = argparse.ArgumentParser(
+        add_help=add_help,
         description="Extract, (optionally) smooth, differentiate, and (optionally) low-pass filter; write aligned .dat with commented header; then plot."
     )
     # (1) -i no longer required; default to pout.0
@@ -650,8 +652,11 @@ def main():
     ap.add_argument("--lp", action="store_true", help="Apply low-pass filter to derivative columns 9–10")
     ap.add_argument("--lp-tau", type=float, default=None, help="Low-pass time constant τ (seconds) for bidirectional EMA")
 
-    args = ap.parse_args()
+    return ap
 
+
+def run(args) -> None:
+    """Execute the pipeline given a pre-parsed Namespace."""
     in_path = args.input
     if not os.path.isfile(in_path):
         print(f"Error: input file not found: {in_path}", file=sys.stderr)
@@ -684,6 +689,11 @@ def main():
     # ---- Plot at end of main ----
     time = series["Time"]
     plot_2x4(time, series)
+
+
+def main():
+    """Parse command-line arguments and run the full extract → smooth → differentiate → write → plot pipeline."""
+    run(make_parser().parse_args())
 
 if __name__ == "__main__":
     main()

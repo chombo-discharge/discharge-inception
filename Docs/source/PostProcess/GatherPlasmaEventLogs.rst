@@ -23,7 +23,7 @@ The following information is extracted for every run:
   ``convergence_failure``, ``abort``, or ``not_found``
 
 Status is assigned with the following priority (highest first):
-``not_found`` → ``inception`` → ``convergence_failure`` → ``abort`` →
+``not_found`` -> ``inception`` -> ``convergence_failure`` -> ``abort`` ->
 ``completed``.
 
 The script reads ``index.json`` (required) and ``structure.json`` (optional,

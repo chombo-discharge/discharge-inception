@@ -7,12 +7,42 @@ Top-level CLI entry point.  Dispatches 'run' and 'ls' subcommands.
 """
 
 import argparse
+import importlib
 import json
 import logging
 import logging.handlers
 import os
 import sys
 from pathlib import Path
+
+_PP_DIR = Path(__file__).parent.parent / 'PostProcess'
+
+
+def _import_pp(name: str):
+    """Import a PostProcess module by filename stem, adding the directory to sys.path once."""
+    if str(_PP_DIR) not in sys.path:
+        sys.path.insert(0, str(_PP_DIR))
+    return importlib.import_module(name)
+
+
+# ---------------------------------------------------------------------------
+# discharge-inception post-process subcommands
+# ---------------------------------------------------------------------------
+
+def cmd_analyze_time_series(args) -> None:
+    _import_pp('AnalyzeTimeSeries').run(args)
+
+
+def cmd_extract_inception_voltages(args) -> None:
+    _import_pp('ExtractInceptionVoltages').run(args)
+
+
+def cmd_gather_plasma_event_logs(args) -> None:
+    _import_pp('GatherPlasmaEventLogs').run(args)
+
+
+def cmd_plot_delta_e_rel(args) -> None:
+    _import_pp('PlotDeltaERel').run(args)
 
 
 # ---------------------------------------------------------------------------
@@ -152,12 +182,48 @@ def main() -> None:
         'study_dirs', nargs='+', type=Path, metavar='study_dir',
         help='Study output directory containing index.json (e.g. pdiv_database/).')
 
+    # --- discharge-inception analyze-time-series ------------------------------------
+    pp_mod = _import_pp('AnalyzeTimeSeries')
+    subparsers.add_parser(
+        'analyze-time-series',
+        parents=[pp_mod.make_parser(add_help=False)],
+        help='Extract, smooth, differentiate, and filter time-series data from a plasma log.')
+
+    # --- discharge-inception extract-inception-voltages -----------------------------
+    pp_mod = _import_pp('ExtractInceptionVoltages')
+    subparsers.add_parser(
+        'extract-inception-voltages',
+        parents=[pp_mod.make_parser(add_help=False)],
+        help='Extract inception voltages from a pdiv_database and write NetCDF/CSV.')
+
+    # --- discharge-inception gather-plasma-event-logs -------------------------------
+    pp_mod = _import_pp('GatherPlasmaEventLogs')
+    subparsers.add_parser(
+        'gather-plasma-event-logs',
+        parents=[pp_mod.make_parser(add_help=False)],
+        help='Gather plasma event logs from a database and write a CSV summary.')
+
+    # --- discharge-inception plot-delta-e-rel ---------------------------------------
+    pp_mod = _import_pp('PlotDeltaERel')
+    subparsers.add_parser(
+        'plot-delta-e-rel',
+        parents=[pp_mod.make_parser(add_help=False)],
+        help='Batch-plot ΔE(rel) vs time for every run in a plasma database.')
+
     args = parser.parse_args()
 
     if args.command == 'run':
         cmd_run(args)
     elif args.command == 'ls':
         cmd_ls(args)
+    elif args.command == 'analyze-time-series':
+        cmd_analyze_time_series(args)
+    elif args.command == 'extract-inception-voltages':
+        cmd_extract_inception_voltages(args)
+    elif args.command == 'gather-plasma-event-logs':
+        cmd_gather_plasma_event_logs(args)
+    elif args.command == 'plot-delta-e-rel':
+        cmd_plot_delta_e_rel(args)
 
 
 if __name__ == '__main__':

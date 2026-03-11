@@ -21,5 +21,5 @@ The parameter space of a study is the Cartesian product of its own parameters,
 filtered to only the combinations that match a completed database run.
 
 *Example:* a database sweeping 5 pressures produces 5 SLURM array tasks.
-A study sweeping those same 5 pressures × 3 rod radii produces 15 tasks, all
+A study sweeping those same 5 pressures x 3 rod radii produces 15 tasks, all
 chained after the database completes.

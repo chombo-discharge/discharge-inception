@@ -357,9 +357,10 @@ def plot_status(rows: list, keys: list, plot_param: str):
 
 # ---- main ----
 
-def main():
-    """Parse command-line arguments and orchestrate the data pipeline."""
+def make_parser(add_help=True) -> argparse.ArgumentParser:
+    """Return the configured argument parser (separated from main() for CLI reuse)."""
     ap = argparse.ArgumentParser(
+        add_help=add_help,
         description=(
             "Gather plasma event logs from a simulation database and write "
             "a structured CSV summary."
@@ -385,9 +386,11 @@ def main():
         "--no-output", action="store_true",
         help="Skip writing the CSV file; only print the summary table to stdout.",
     )
+    return ap
 
-    args = ap.parse_args()
 
+def run(args) -> None:
+    """Execute the pipeline given a pre-parsed Namespace."""
     db_dir = Path(args.db_dir)
     if not db_dir.is_dir():
         print(f"error: '{db_dir}' is not a directory", file=sys.stderr)
@@ -416,6 +419,11 @@ def main():
     # Optional plot
     if args.plot:
         plot_status(rows, keys, args.plot)
+
+
+def main():
+    """Parse command-line arguments and orchestrate the data pipeline."""
+    run(make_parser().parse_args())
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ Prerequisites
 This chapter walks through the complete workflow for the ``Exec/Rod``
 parametric study, from compilation through post-processing.
 
-The Rod case demonstrates the **two-level database → study pipeline**:
+The Rod case demonstrates the **two-level database -> study pipeline**:
 
 1. A discharge-inception database sweeps over pressures and rod radii to
    compute inception voltages.

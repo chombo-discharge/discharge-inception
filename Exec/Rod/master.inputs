@@ -198,9 +198,9 @@ Rod.live       = true             ## Live or not
 # ====================================================================================================
 # ItoKMCBackgroundEvaluator class options
 # ====================================================================================================
-ItoKMCBackgroundEvaluator.max_field_exit_crit       = -1       ## percentage change in max field due to space charge before stopping simulation (-1: off)
-ItoKMCBackgroundEvaluator.rel_field_exit_crit       = 0.25     ## percentage per cell change in field due to space charge before stopping simulation (-1: off)
-ItoKMCBackgroundEvaluator.max_initial_time_step     = 1E-11    ## maximum initial timestep, capped to preventing the particles from moving to far from the initial position
+ItoKMCBackgroundEvaluator.max_field_exit_crit                      = -1                 ## percentage change in max field due to space charge before stopping simulation (-1: off)
+ItoKMCBackgroundEvaluator.rel_field_exit_crit                      = 0.25               ## percentage per cell change in field due to space charge before stopping simulation (-1: off)
+ItoKMCBackgroundEvaluator.max_initial_time_step                    = 1E-11              ## maximum initial timestep, capped to preventing the particles from moving to far from the initial position
 ItoKMCBackgroundEvaluator.checkpoint_particles                     = true               ## If true, regrid on restart is supported (otherwise it's not)
 ItoKMCBackgroundEvaluator.verbosity                                = -1                 ## Verbosity
 ItoKMCBackgroundEvaluator.secondary_emission                       = after_reactions    ## When to emit secondary particles. Either 'before_reactions' or 'after_reactions'
@@ -296,15 +296,15 @@ TracerParticleSolver.volume_scale      = false    ## If true, depositions yield 
 # ====================================================================================================
 # DischargeInceptionStepper class options
 # ====================================================================================================
-DischargeInceptionStepper.verbosity            = -1                               ## Chattiness.
+DischargeInceptionStepper.verbosity            = -1                                ## Chattiness.
 DischargeInceptionStepper.profile              = false
 DischargeInceptionStepper.full_integration     = true
-DischargeInceptionStepper.mode                 = stationary                       ## Mode (stationary or transient)
-DischargeInceptionStepper.eval_townsend        = true                             ## Evaluate Townsend criterion or not (only for stationary)
-DischargeInceptionStepper.inception_alg        = trapz                            ## Integration algorithm. Either euler or trapz
-DischargeInceptionStepper.output_file          = report.txt                       ## Output file
-DischargeInceptionStepper.K_inception          = 10                               ## User-specified inception value
-DischargeInceptionStepper.plt_vars             = K Uinc alpha eta field poisson   ## Plot variables
+DischargeInceptionStepper.mode                 = stationary                        ## Mode (stationary or transient)
+DischargeInceptionStepper.eval_townsend        = true                              ## Evaluate Townsend criterion or not (only for stationary)
+DischargeInceptionStepper.inception_alg        = trapz                             ## Integration algorithm. Either euler or trapz
+DischargeInceptionStepper.output_file          = report.txt                        ## Output file
+DischargeInceptionStepper.K_inception          = 10                                ## User-specified inception value
+DischargeInceptionStepper.plt_vars             = K Uinc alpha eta field poisson    ## Plot variables
 
 # Particle integration controls
 DischargeInceptionStepper.min_phys_dx          = 1.E-10    ## Minimum permitted physical step size
@@ -316,9 +316,9 @@ DischargeInceptionStepper.grad_alpha_dx        = 0.1       ## Maximum step size 
 DischargeInceptionStepper.townsend_grid_dx     = 2.0       ## Space step to use for Townsend tracking
 
 # Static mode
-DischargeInceptionStepper.rel_step_dU     = 0.05     ## Relative (%) voltage increase for each step
-DischargeInceptionStepper.step_dK         = 1.0      ## Target step between each K-value
-DischargeInceptionStepper.limit_max_K     = 15.0     ## Limit the maximum K-value
+DischargeInceptionStepper.rel_step_dU     = 0.05    ## Relative (%) voltage increase for each step
+DischargeInceptionStepper.step_dK         = 1.0     ## Target step between each K-value
+DischargeInceptionStepper.limit_max_K     = 15.0    ## Limit the maximum K-value
 
 # Dynamic mode
 DischargeInceptionStepper.ion_transport     = true     ## Turn on/off ion transport

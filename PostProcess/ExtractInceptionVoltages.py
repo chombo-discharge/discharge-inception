@@ -358,8 +358,10 @@ def plot_2d(ds, keys, plot_params, select_map, voltage_filter):
 
 # ---- main ----
 
-def main():
+def make_parser(add_help=True) -> argparse.ArgumentParser:
+    """Return the configured argument parser (separated from main() for CLI reuse)."""
     ap = argparse.ArgumentParser(
+        add_help=add_help,
         description="Extract inception voltages from a pdiv_database and write NetCDF/CSV."
     )
     ap.add_argument("db_dir", help="Path to a pdiv_database directory (must contain index.json)")
@@ -383,8 +385,12 @@ def main():
         "--voltage", choices=["min", "streamer", "townsend", "all"], default="all",
         help="Which voltage type(s) to plot (default: all)"
     )
+    return ap
 
-    args = ap.parse_args()
+
+def run(args) -> None:
+    """Execute the pipeline given a pre-parsed Namespace."""
+    ap = make_parser()
 
     # Validate --plot count
     if args.plot is not None and len(args.plot) > 2:
@@ -460,6 +466,10 @@ def main():
                     print(f"error: '{p}' is not a known parameter. Known: {keys}", file=sys.stderr)
                     sys.exit(1)
             plot_2d(ds, keys, [p1, p2], select_map, args.voltage)
+
+
+def main():
+    run(make_parser().parse_args())
 
 
 if __name__ == "__main__":

@@ -64,13 +64,13 @@ Two further columns are derived by finite differentiation of the charge columns:
 The processing pipeline is:
 
 1. Parse all time-step blocks from the log.
-2. Optionally smooth columns 3–6 with a **Savitzky–Golay** filter (``--sg``).
-3. Compute columns 9–10 as finite-difference derivatives of the (possibly
+2. Optionally smooth columns 3-6 with a **Savitzky-Golay** filter (``--sg``).
+3. Compute columns 9-10 as finite-difference derivatives of the (possibly
    smoothed) Q columns.
 4. Optionally apply a **bidirectional exponential moving average** low-pass
-   filter to columns 9–10 (``--lp``).
+   filter to columns 9-10 (``--lp``).
 5. Write the aligned ``.dat`` file with a commented column header.
-6. Display a 2 × 4 Matplotlib figure of columns 3–10 vs time.
+6. Display a 2 x 4 Matplotlib figure of columns 3--10 vs time.
 
 The output file always begins with commented lines documenting the column
 layout, and all values are written in 8-digit scientific notation.
@@ -107,28 +107,28 @@ Options
 
 .. option:: --sg
 
-   Apply Savitzky–Golay smoothing to columns 3–6 (Delta E and Q columns)
+   Apply Savitzky-Golay smoothing to columns 3-6 (Delta E and Q columns)
    before computing the derivative columns.  Requires ``scipy``.
 
 .. option:: --sg-window N
 
-   Savitzky–Golay window length (default: ``9``).  Must be odd and greater
+   Savitzky-Golay window length (default: ``9``).  Must be odd and greater
    than ``--sg-order``; the value is automatically reduced if necessary to fit
    the data length.
 
 .. option:: --sg-order N
 
-   Savitzky–Golay polynomial order (default: ``3``).  Must be strictly less
+   Savitzky-Golay polynomial order (default: ``3``).  Must be strictly less
    than ``--sg-window``.
 
 .. option:: --lp
 
    Apply a bidirectional exponential moving average low-pass filter to the
-   derivative columns 9–10 after differentiation.  Requires ``--lp-tau``.
+   derivative columns 9-10 after differentiation.  Requires ``--lp-tau``.
 
 .. option:: --lp-tau TAU
 
-   EMA time constant τ in seconds (default: none).  Required when ``--lp`` is
+   EMA time constant :math:`\tau` in seconds (default: none).  Required when ``--lp`` is
    set.  Smaller values pass more high-frequency content; larger values smooth
    more aggressively.
 
@@ -140,7 +140,7 @@ Extract and write the default output without any filtering::
 
    python PostProcess/AnalyzeTimeSeries.py -i run_0/pout.0 -o run_0/pout.out
 
-Apply Savitzky–Golay smoothing (window 15, order 3) before differentiating::
+Apply Savitzky-Golay smoothing (window 15, order 3) before differentiating::
 
    python PostProcess/AnalyzeTimeSeries.py \
        -i run_0/pout.0 \

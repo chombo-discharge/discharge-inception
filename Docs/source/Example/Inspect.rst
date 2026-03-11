@@ -15,11 +15,11 @@ Example output::
    ~/my_rod_study/pdiv_database  (3 runs)
      run     geometry_radius  pressure
      -------  ---------------  --------
-     run_0    0.0001           100000  ✓
-     run_1    0.0005           100000  ✓
+     run_0    0.0001           100000  [done]
+     run_1    0.0005           100000  [done]
      run_2    0.001            100000
 
-The ✓ mark indicates that ``report.txt`` is present in that run directory.
+The [done] mark indicates that ``report.txt`` is present in that run directory.
 
 To inspect the exact parameters for a specific run:
 
