@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """
-Batch-plot the relative electric field change Δ E(rel) vs time for every run
-in a plasma simulation database.
+Plot the relative electric field change Δ E(rel) vs time for all runs found
+under a parent directory containing one or more ``voltage_*`` subdirectories
+(each with its own ``index.json``), or directly from a single database
+directory.
 
-For each run found in ``index.json`` the script reads the corresponding
-``{prefix}{run_id}.0`` log file, extracts ``Time`` and ``Delta E(rel)`` at
-every reported time step, and saves a PNG figure annotated with the run's
-sweep-parameter values.
+All curves are drawn on one figure, labelled by their sweep-parameter values.
+An interactive window is shown by default; PNG output and CSV data export are
+opt-in via ``--png`` and ``--output``.
 
 Usage::
 
@@ -45,9 +46,24 @@ _EREL_RE = re.compile(
 _STEP_RE = re.compile(r'Driver::Time step report -- Time step #(?P<step>\d+)')
 
 
+# ---- Group discovery ----
+
+def _find_groups(db_dir: Path) -> list:
+    """Return sorted subdirectories that contain index.json.
+    Falls back to [db_dir] itself if no subdirectories qualify."""
+    subs = sorted(p for p in db_dir.iterdir()
+                  if p.is_dir() and (p / 'index.json').exists())
+    if subs:
+        return subs
+    if (db_dir / 'index.json').exists():
+        return [db_dir]
+    print(f"error: no index.json found under {db_dir}", file=sys.stderr)
+    sys.exit(1)
+
+
 # ---- Metadata loading ----
 
-def load_metadata(db_dir: Path) -> Tuple[list, dict, list]:
+def load_metadata(db_dir: Path) -> Tuple[list, str, dict, list]:
     """
     Load run metadata from ``index.json`` in *db_dir*.
 
@@ -60,9 +76,11 @@ def load_metadata(db_dir: Path) -> Tuple[list, dict, list]:
     -------
     keys : list of str
         Ordered sweep-parameter key names.
+    prefix : str
+        Directory prefix for run folders.
     run_index : dict
         Mapping ``str(run_id) -> list of parameter values``.
-    sorted_ids : list of int
+    sorted_ids : list of str
         Run IDs sorted numerically.
     """
     index_path = db_dir / "index.json"
@@ -148,50 +166,61 @@ def parse_pout(pout_path: Path) -> Tuple[np.ndarray, np.ndarray]:
     return t, E
 
 
-# ---- Single-run plotting ----
+# ---- Helpers ----
 
-def plot_run(run_id: int,
-             t: np.ndarray,
-             E_rel: np.ndarray,
-             keys: list,
-             param_values: list,
-             output_path: Path) -> None:
-    """
-    Save a ``Delta E(rel)`` vs time figure for one run.
+def _fmt_val(v) -> str:
+    if isinstance(v, list):
+        return '[' + ', '.join(_fmt_val(x) for x in v) + ']'
+    try:
+        return f'{v:.4g}'
+    except (TypeError, ValueError):
+        return str(v)
 
-    Parameters
-    ----------
-    run_id : int
-        Run identifier (used in the default output filename).
-    t : np.ndarray
-        Simulation time array (seconds).
-    E_rel : np.ndarray
-        Corresponding ``Delta E(rel)`` values (%).
-    keys : list of str
-        Sweep-parameter key names (used to build the title).
-    param_values : list
-        Parameter values for this run (same order as *keys*).
-    output_path : Path
-        Destination PNG file path.
-    """
+
+def _run_label(keys, param_values, group_path: Path, group_count: int) -> str:
+    if keys and param_values:
+        pairs = [(k, v) for k, v in zip(keys, param_values)
+                 if k != "particle_position"]
+        if pairs:
+            return ", ".join(f"{k} = {_fmt_val(v)}" for k, v in pairs)
+    return group_path.name
+
+
+# ---- Plotting ----
+
+def plot_all(curves, png_path=None) -> None:
+    """Draw all curves on one figure, optionally saving to PNG."""
     fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(t * 1e9, E_rel)
+    for label, t, E_rel in curves:
+        ax.plot(t * 1e9, E_rel, label=label)
     ax.set_ylabel(r'$\Delta E_\mathrm{rel}$ (%)')
     ax.set_xlabel('$t$ [ns]')
     ax.grid(True, linestyle=':', linewidth=0.5)
-
-    if keys and param_values:
-        parts = ", ".join(
-            f"{k} = {v:.4g}" for k, v in zip(keys, param_values)
-        )
-        ax.set_title(parts)
-    else:
-        ax.set_title(f"Run {run_id}")
-
+    if curves:
+        ax.legend(fontsize='small')
     fig.tight_layout()
-    fig.savefig(output_path, dpi=150)
+    if png_path:
+        fig.savefig(png_path, dpi=150)
+        print(f"Saved: {png_path}")
+    else:
+        plt.show()
     plt.close(fig)
-    print(f"  Saved: {output_path}")
+
+
+# ---- CSV output ----
+
+def write_csv(path: Path, curves) -> None:
+    """Write curve data to a CSV file with a commented header block."""
+    with open(path, 'w') as f:
+        f.write('# Delta E(rel) vs time\n')
+        f.write('# Columns: label, t_ns, delta_e_rel_pct\n')
+        f.write('# label           - sweep parameter values identifying this run\n')
+        f.write('# t_ns            - simulation time [ns]\n')
+        f.write('# delta_e_rel_pct - Delta E(rel) [%]\n')
+        for label, t, E_rel in curves:
+            for ti, ei in zip(t * 1e9, E_rel):
+                f.write(f'"{label}",{ti:.6g},{ei:.6g}\n')
+    print(f"Saved: {path}")
 
 
 # ---- Main ----
@@ -201,21 +230,28 @@ def make_parser(add_help=True) -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         add_help=add_help,
         description=(
-            "Batch-plot Delta E(rel) vs time for every run in a plasma "
-            "simulation database."
+            "Plot Delta E(rel) vs time for all runs found under a parent "
+            "directory.  Multiple voltage_* subdirectories (each with "
+            "index.json) are collected into one figure labelled by their "
+            "sweep-parameter values."
         )
     )
     ap.add_argument(
         "db_dir",
-        help="Path to the plasma simulation database directory (must contain index.json).",
+        help="Parent directory containing voltage_* subdirs with index.json, "
+             "or a single database directory with index.json.",
     )
     ap.add_argument(
         "--prefix", default="pout", metavar="PREFIX",
         help="Prefix for log filenames (default: 'pout', giving pout.0).",
     )
     ap.add_argument(
-        "--output-dir", default=None, metavar="DIR",
-        help="Directory for output PNG files (default: same as db_dir).",
+        "--png", metavar="FILE", default=None,
+        help="Save figure to this PNG file instead of opening an interactive window.",
+    )
+    ap.add_argument(
+        "-o", "--output", metavar="FILE", default=None,
+        help="Write curve data to a CSV file.",
     )
     return ap
 
@@ -227,32 +263,32 @@ def run(args) -> None:
         print(f"error: '{db_dir}' is not a directory", file=sys.stderr)
         sys.exit(1)
 
-    output_dir = Path(args.output_dir) if args.output_dir else db_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
+    groups = _find_groups(db_dir)
 
-    keys, dir_prefix, run_index, sorted_ids = load_metadata(db_dir)
+    curves = []
+    for group in groups:
+        keys, dir_prefix, run_index, sorted_ids = load_metadata(group)
+        for run_str in sorted_ids:
+            run_id = int(run_str)
+            pout_path = group / f"{dir_prefix}{run_id}" / f"{args.prefix}.0"
+            t, E_rel = parse_pout(pout_path)
+            if t.size == 0:
+                continue
+            label = _run_label(keys, run_index[run_str], group, len(groups))
+            curves.append((label, t, E_rel))
 
-    print(f"# Database : {db_dir}")
-    print(f"# Runs     : {len(sorted_ids)}")
+    if not curves:
+        print("warning: no data found", file=sys.stderr)
+        sys.exit(1)
 
-    for run_str in sorted_ids:
-        run_id = int(run_str)
-        pout_path = db_dir / f"{dir_prefix}{run_id}" / f"{args.prefix}.0"
-        param_values = run_index[run_str]
+    plot_all(curves, png_path=args.png)
 
-        print(f"Run {run_id}: {pout_path}")
-        t, E_rel = parse_pout(pout_path)
-
-        if t.size == 0:
-            print(f"  warning: no data found, skipping.")
-            continue
-
-        out_png = output_dir / f"plt_{run_id}.png"
-        plot_run(run_id, t, E_rel, keys, param_values, out_png)
+    if args.output:
+        write_csv(Path(args.output), curves)
 
 
 def main():
-    """Parse command-line arguments and produce one PNG per database run."""
+    """Parse command-line arguments and plot Delta E(rel) curves."""
     run(make_parser().parse_args())
 
 
