@@ -129,6 +129,30 @@ def cmd_status(args) -> None:
 # discharge-inception run
 # ---------------------------------------------------------------------------
 
+def _resolve_output_dir(output_dir: Path, overwrite: bool, suffix: bool) -> Path:
+    if not output_dir.exists():
+        return output_dir
+
+    if overwrite:
+        import shutil
+        shutil.rmtree(output_dir)
+        return output_dir
+
+    if suffix:
+        n = 1
+        while True:
+            candidate = Path(str(output_dir) + f'_{n}')
+            if not candidate.exists():
+                return candidate
+            n += 1
+
+    # Neither flag given — tell user and exit cleanly
+    print(f"error: output directory already exists: '{output_dir}'", file=sys.stderr)
+    print("  Use --overwrite to delete it or --suffix to create a numbered copy.",
+          file=sys.stderr)
+    sys.exit(1)
+
+
 def cmd_run(args) -> None:
     from discharge_inception import configurator
 
@@ -147,7 +171,10 @@ def cmd_run(args) -> None:
     if doroll:
         fh.doRollover()
 
-    configurator.setup(log, args.output_dir, args.run_definition, dim=args.dim,
+    output_dir = _resolve_output_dir(args.output_dir, args.overwrite, args.suffix)
+    if output_dir != args.output_dir:
+        log.info(f"Output directory renamed to '{output_dir}'")
+    configurator.setup(log, output_dir, args.run_definition, dim=args.dim,
                        verbose=args.verbose, pdiv_only=args.pdiv_only)
 
 
@@ -183,6 +210,13 @@ def main() -> None:
         '--pdiv-only', action='store_true',
         help='Set up and submit only the inception (PDIV) database jobs; '
              'skip all plasma study setup and Slurm submission.')
+    conflict_group = run_p.add_mutually_exclusive_group()
+    conflict_group.add_argument(
+        '--overwrite', action='store_true',
+        help='Delete and recreate output directory if it already exists.')
+    conflict_group.add_argument(
+        '--suffix', action='store_true',
+        help='Append _1, _2, … to output directory name if it already exists.')
 
     # --- discharge-inception ls -----------------------------------------------------
     ls_p = subparsers.add_parser(
