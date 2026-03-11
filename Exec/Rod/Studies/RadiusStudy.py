@@ -40,12 +40,12 @@ rod_dir = '../'
 ## PDIV database specifications.
 inception_stepper = {
     'identifier': 'inception_stepper',
-    'job_script': '../../../Scripts/DischargeInceptionJobscript.py',
+    'job_script': f'{_di_home}/Scripts/DischargeInceptionJobscript.py',
     'program': rod_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
     'output_directory': 'pdiv_database',
     'job_script_dependencies': [
         f'{_di_home}/Util/GenericArrayJob.sh',
-        '../../../Scripts/ExtractElectronPositions.py',
+        f'{_di_home}/Scripts/ExtractElectronPositions.py',
     ],
     'required_files': [
         rod_dir + 'master.inputs',
@@ -83,10 +83,10 @@ plasma_study = {
     'identifier': 'radius',
     'enable_study': True,
     'program': rod_dir + 'main{DIMENSIONALITY}d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex',
-    'job_script': '../../../Scripts/PlasmaJobscript.py',
+    'job_script': f'{_di_home}/Scripts/PlasmaJobscript.py',
     'job_script_dependencies': [
         f'{_di_home}/Util/GenericArrayJob.sh',
-        '../../../Scripts/ExtractElectronPositions.py',
+        f'{_di_home}/Scripts/ExtractElectronPositions.py',
     ],
     'required_files': [
         rod_dir + 'master.inputs',
