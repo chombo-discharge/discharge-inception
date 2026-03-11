@@ -40,14 +40,12 @@ also means that the ``discharge-inception`` command-line entry point is
 registered in the virtual environment and will always run the current state of
 the checked-out source.
 
-The ``[plot]`` optional dependency group adds ``matplotlib`` and ``scipy``,
-which are used by the post-processing scripts in ``PostProcess/`` but are not
-required to run the configurator or submit SLURM jobs:
+``matplotlib`` and ``scipy`` are included as standard dependencies and are
+installed automatically alongside the core package:
 
 .. code-block:: bash
 
-   pip install -e .                 # core only
-   pip install -e ".[plot]"         # with matplotlib + scipy
+   pip install -e .
 
 .. _install_verify:
 

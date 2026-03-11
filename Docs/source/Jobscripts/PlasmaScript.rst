@@ -68,6 +68,52 @@ All keys are read from ``parameters.json`` at runtime.
      - Explicit sphere centre as ``[x, y, z]``.  Defaults to the K-weighted position
        read from the database.
 
+Caveats
+-------
+
+Initial particle structure must exist in ``chemistry.json``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The plasma jobscript injects the electron seed position (and weight or sphere
+parameters) into each ``voltage_<i>/chemistry.json`` by traversing the JSON
+tree with a **required** path match (``+["id"="e"]`` → ``initial particles``
+→ ``+["single particle"]`` or ``+["sphere distribution"]``).  A required match
+raises a hard error if the target element is absent — it will not auto-create
+the structure.
+
+The ``chemistry.json`` template in the study directory **must** therefore
+already contain the appropriate ``initial particles`` block under the electron
+species entry before any plasma runs are submitted.  The expected skeleton is:
+
+.. code-block:: json
+
+   {
+     "plasma species": [
+       {
+         "id": "e",
+         "initial particles": [
+           {
+             "single particle": {
+               "position": [0, 0, 0],
+               "weight": 1
+             }
+           }
+         ]
+       }
+     ]
+   }
+
+For ``particle_mode='sphere'`` the inner element should instead be
+``"sphere distribution"`` with at least the ``"center"``, ``"radius"``, and
+``"num particles"`` fields.  The script overwrites the placeholder values at
+runtime, but the enclosing structure must already exist.
+
+Omitting this block produces the error::
+
+   RuntimeError: missing list element has requirement
+
+at ``config_util.set_nested_value`` when the voltage directories are created.
+
 Parameter space and input overrides
 -------------------------------------
 
