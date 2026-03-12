@@ -16,7 +16,7 @@ administrators and ``pip install`` into it is either forbidden or inadvisable.
 The virtual environment directory is conventionally named ``.venv`` and placed
 at the repository root.  Because compute nodes need to activate the same
 environment, the ``.venv`` directory must live on a shared filesystem that is
-accessible from all nodes — typically your home directory or a project scratch
+accessible from all nodes -- typically your home directory or a project scratch
 space, both of which are usually network-mounted on HPC clusters.  Do **not**
 place ``.venv`` on a node-local scratch directory (e.g. ``/tmp``), as it will
 not be visible to other nodes.
@@ -40,14 +40,12 @@ also means that the ``discharge-inception`` command-line entry point is
 registered in the virtual environment and will always run the current state of
 the checked-out source.
 
-The ``[plot]`` optional dependency group adds ``matplotlib`` and ``scipy``,
-which are used by the post-processing scripts in ``PostProcess/`` but are not
-required to run the configurator or submit SLURM jobs:
+``matplotlib`` and ``scipy`` are included as standard dependencies and are
+installed automatically alongside the core package:
 
 .. code-block:: bash
 
-   pip install -e .                 # core only
-   pip install -e ".[plot]"         # with matplotlib + scipy
+   pip install -e .
 
 .. _install_verify:
 
@@ -58,8 +56,8 @@ After installing the package, confirm that the ``discharge-inception`` entry
 point is registered in the active virtual environment and that the package
 imports correctly.  The ``which`` command should resolve to the ``.venv/bin/``
 directory, confirming that the system Python (or another environment) is not
-being used by mistake.  Running ``--help`` exercises the full import chain —
-including ``configurator`` and ``config_util`` — so any missing dependency or
+being used by mistake.  Running ``--help`` exercises the full import chain --
+including ``configurator`` and ``config_util`` -- so any missing dependency or
 broken import will surface here rather than at job-submission time.
 
 .. code-block:: bash
@@ -76,7 +74,7 @@ Two environment variables configure runtime behaviour on compute nodes.  Both
 paths must be reachable from all compute nodes (typically a shared filesystem
 such as ``$HOME`` or a project scratch space).  Because ``GenericArrayJob.sh``
 runs on whatever node SLURM allocates, it cannot rely on paths that were valid
-only on the login node — using absolute paths on a shared filesystem avoids
+only on the login node -- using absolute paths on a shared filesystem avoids
 node-local ambiguity entirely.
 
 ``DISCHARGE_INCEPTION_VENV``

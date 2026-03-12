@@ -69,18 +69,19 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../PostProcess/Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Compile.html">Compiling the executable</a></li>
@@ -127,7 +128,7 @@ mpirun<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span>
 <p>This runs a stationary inception-voltage sweep on the default rod geometry at
 1 atm.  Results are written to <code class="docutils literal notranslate"><span class="pre">report.txt</span></code>; plot files go to <code class="docutils literal notranslate"><span class="pre">plt/</span></code>.</p>
 <p>To test plasma mode instead, override the mode (and optionally the voltage) on
-the command line — ParmParse arguments appended after the input filename take
+the command line – ParmParse arguments appended after the input filename take
 precedence over the file:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./main2d.Linux.64.mpic++.gfortran.OPTHIGH.MPI.ex<span class="w"> </span>master.inputs<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>app.mode<span class="o">=</span>plasma<span class="w"> </span><span class="se">\</span>

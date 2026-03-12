@@ -60,5 +60,5 @@ Key files and symlinks:
    Symlink pointing to the executable in the parent stage directory.
 
 ``study0/inception_stepper@``
-   Symlink pointing to ``../PDIV_DB`` — gives the plasma study jobscript
+   Symlink pointing to ``../PDIV_DB`` -- gives the plasma study jobscript
    direct access to database results.

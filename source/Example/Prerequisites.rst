@@ -15,12 +15,12 @@ The Rod case demonstrates the **two-level database -> study pipeline**:
 
 Before starting, ensure the following are available:
 
-* ``discharge-inception`` is installed — see :doc:`/Installation/InstallationInstructions`.
+* ``discharge-inception`` is installed -- see :doc:`/Installation/InstallationInstructions`.
 * ``DISCHARGE_HOME`` is set and points to a compiled
-  `chombo-discharge <https://chombo-discharge.github.io/>`_ installation —
+  `chombo-discharge <https://chombo-discharge.github.io/>`_ installation --
   see :ref:`install_prereqs`.
-* A SLURM scheduler is available on the machine — see :ref:`install_prereqs`.
-* Both environment variables are exported — see :ref:`install_env_vars`:
+* A SLURM scheduler is available on the machine -- see :ref:`install_prereqs`.
+* Both environment variables are exported -- see :ref:`install_env_vars`:
 
   .. code-block:: bash
 

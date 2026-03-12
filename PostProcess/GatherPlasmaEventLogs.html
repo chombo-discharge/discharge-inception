@@ -69,12 +69,13 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Identifying discharge inception events from plasma logs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
@@ -85,7 +86,7 @@
 <li class="toctree-l1"><a class="reference internal" href="AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Compile.html">Compiling the executable</a></li>
@@ -131,13 +132,13 @@ state and event information.  It writes a structured CSV file and always prints
 a human-readable summary table to standard output.</p>
 <p>The following information is extracted for every run:</p>
 <ul class="simple">
-<li><p><strong>final_step</strong> — last reported time-step number</p></li>
-<li><p><strong>final_time</strong> — last reported simulation time</p></li>
-<li><p><strong>final_dt</strong> — last reported time-step size</p></li>
-<li><p><strong>inception</strong> — whether a discharge inception event was detecte d</p></li>
-<li><p><strong>convergence_failures</strong> — number of Poisson solver convergence failures</p></li>
-<li><p><strong>other_abort</strong> — whether any other unexpected abort was found</p></li>
-<li><p><strong>status</strong> — derived run outcome: <code class="docutils literal notranslate"><span class="pre">completed</span></code>, <code class="docutils literal notranslate"><span class="pre">inception</span></code>,
+<li><p><strong>final_step</strong> – last reported time-step number</p></li>
+<li><p><strong>final_time</strong> – last reported simulation time</p></li>
+<li><p><strong>final_dt</strong> – last reported time-step size</p></li>
+<li><p><strong>inception</strong> – whether a discharge inception event was detecte d</p></li>
+<li><p><strong>convergence_failures</strong> – number of Poisson solver convergence failures</p></li>
+<li><p><strong>other_abort</strong> – whether any other unexpected abort was found</p></li>
+<li><p><strong>status</strong> – derived run outcome: <code class="docutils literal notranslate"><span class="pre">completed</span></code>, <code class="docutils literal notranslate"><span class="pre">inception</span></code>,
 <code class="docutils literal notranslate"><span class="pre">convergence_failure</span></code>, <code class="docutils literal notranslate"><span class="pre">abort</span></code>, or <code class="docutils literal notranslate"><span class="pre">not_found</span></code></p></li>
 </ul>
 <p>Status is assigned with the following priority (highest first):
@@ -149,7 +150,7 @@ directory.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>Optional dependency</strong></p>
-<p><code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> — required only when <code class="docutils literal notranslate"><span class="pre">--plot</span></code> is used.  If it is absent
+<p><code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> – required only when <code class="docutils literal notranslate"><span class="pre">--plot</span></code> is used.  If it is absent
 the script exits with an error when plotting is requested.  Install with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">matplotlib</span>
 </pre></div>

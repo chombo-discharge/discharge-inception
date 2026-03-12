@@ -3,7 +3,7 @@
 Dummy parameters
 ================
 
-A *dummy* parameter has no ``target`` or ``uri`` — only a ``name`` and a
+A *dummy* parameter has no ``target`` or ``uri`` -- only a ``name`` and a
 ``values`` list (and optionally ``database``).  It passes configuration options
 to jobscripts through ``parameters.json`` without modifying any simulation
 input files.
@@ -17,7 +17,7 @@ A dummy parameter with a **single value** does not expand the parameter space
        ...
        "parameter_space": {
            "K_min": {
-               "values": [6.0]    # single value — does not add runs
+               "values": [6.0]    # single value -- does not add runs
            },
        }
    }

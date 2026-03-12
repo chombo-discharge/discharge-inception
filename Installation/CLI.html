@@ -54,6 +54,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#discharge-inception-run"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">run</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#discharge-inception-ls"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">ls</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-slurm-status"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">slurm-status</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-postprocess"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">postprocess</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-plasma-status"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plasma-status</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-list-results"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">list-results</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-plot-delta-e"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plot-delta-e</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#discharge-inception-analyze-time-series"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">analyze-time-series</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#discharge-inception-extract-inception-voltages"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">extract-inception-voltages</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#discharge-inception-gather-plasma-event-logs"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">gather-plasma-event-logs</span></code></a></li>
@@ -78,18 +83,19 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../PostProcess/Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Compile.html">Compiling the executable</a></li>
@@ -140,18 +146,18 @@ Parametric study configurator for chombo-discharge simulations.
 
 positional arguments:
   command
-    run                   Configure and submit a parametric study.
-    ls                    List runs and parameter settings in a study directory.
-    analyze-time-series   Extract, smooth, differentiate, and filter time-series
-                          data from a plasma log.
+    run                      Configure and submit a parametric study.
+    ls                       List runs and parameter settings in a study directory.
+    slurm-status             Show Slurm job status for one or more study directories.
+    postprocess              Run all post-processing scripts on a study directory.
+    plasma-status            Show per-run plasma simulation status from plasma_event_log.csv.
+    list-results             List all post-processed result files in a study directory.
+    analyze-time-series      Extract, smooth, differentiate, and filter time-series data from a plasma log.
     extract-inception-voltages
-                          Extract inception voltages from a pdiv_database and
-                          write NetCDF/CSV.
-    gather-plasma-event-logs
-                          Gather plasma event logs from a database and write a
-                          CSV summary.
-    plot-delta-e-rel      Batch-plot Delta E(rel) vs time for every run in a plasma
-                          database.
+                             Extract inception voltages from a pdiv_database and write NetCDF/CSV.
+    gather-plasma-event-logs Gather plasma event logs from a database and write a CSV summary.
+    plot-delta-e-rel         Batch-plot Delta E(rel) vs time for every run in a plasma database.
+    plot-delta-e             Plot peak Delta E(rel) and/or Delta E(max) vs voltage for a run_* database.
 
 options:
   -h, --help            show this help message and exit
@@ -167,6 +173,8 @@ options:
 <p>Sets up directory structure and submits the initial SLURM array jobs.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception run [-h] [--output-dir OUTPUT_DIR] [--dim DIM]
                         [--verbose] [--logfile LOGFILE]
+                        [--pdiv-only]
+                        [--overwrite | --suffix SUFFIX]
                         run_definition
 
 positional arguments:
@@ -181,6 +189,12 @@ options:
   --verbose             Increase verbosity.
   --logfile LOGFILE     Log file; rotated automatically each invocation.
                         (default: configurator.log)
+  --pdiv-only           Set up and submit only the inception (PDIV) database jobs;
+                        skip all plasma study setup and Slurm submission.
+  --overwrite           Overwrite the output directory if it already exists.
+  --suffix SUFFIX       Append SUFFIX to the output directory name to avoid
+                        conflicting with an existing directory (mutually exclusive
+                        with --overwrite).
 </pre></div>
 </div>
 </section>
@@ -200,6 +214,196 @@ positional arguments:
   <span class="o">---</span>  <span class="o">--------</span>  <span class="o">---------------</span>  <span class="o">-----</span>
   <span class="n">run_0</span>  <span class="mi">100000</span>  <span class="mf">0.001</span>            <span class="mi">12</span>  <span class="p">[</span><span class="n">done</span><span class="p">]</span>
   <span class="n">run_1</span>  <span class="mi">200000</span>  <span class="mf">0.001</span>            <span class="mi">12</span>
+</pre></div>
+</div>
+</section>
+<section id="discharge-inception-slurm-status">
+<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">slurm-status</span></code><a class="headerlink" href="#discharge-inception-slurm-status" title="Permalink to this heading"></a></h2>
+<p>Queries SLURM (via <code class="docutils literal notranslate"><span class="pre">sacct</span></code>/<code class="docutils literal notranslate"><span class="pre">squeue</span></code>) and prints a live status table for
+every run in one or more study directories.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception slurm-status [-h] [--no-voltage] study_dir [study_dir ...]
+
+positional arguments:
+  study_dir      Study directory (containing index.json) or parent directory
+                 containing multiple studies.
+
+options:
+  -h, --help     show this help message and exit
+  --no-voltage   Skip inner voltage array queries (faster).
+</pre></div>
+</div>
+<p>Accepts a <strong>study directory</strong> (one that contains <code class="docutils literal notranslate"><span class="pre">index.json</span></code>) or a <strong>parent
+output directory</strong> whose sub-directories are studies – in the latter case all
+studies are reported in one pass.</p>
+<p>For inception-stepper databases the table shows the outer array-job state and,
+for failed tasks, the exit code:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>slurm-status<span class="w"> </span>study_results/pdiv_database/
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>study_results/pdiv_database/  (4 runs, job 98765)
+  run     state
+  ------  ---------
+  run_0   completed
+  run_1   completed
+  run_2   running
+  run_3   pending
+  Summary: 2 completed, 1 running, 1 pending
+</pre></div>
+</div>
+<p>For plasma studies the table also shows a compact summary of each run’s inner
+voltage array:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>slurm-status<span class="w"> </span>study_results/plasma_simulations/
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>study_results/plasma_simulations/  (2 runs, job 98766)
+  run     state      voltages
+  ------  ---------  --------
+  run_0   completed  7/7 done
+  run_1   running    running (3/7 done)
+  Summary: 1 completed, 1 running
+</pre></div>
+</div>
+<p>Pass <code class="docutils literal notranslate"><span class="pre">--no-voltage</span></code> to skip the inner voltage queries when the study has many
+runs and a fast summary is sufficient.  Multiple directories can be combined in
+a single call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">slurm</span><span class="o">-</span><span class="n">status</span> <span class="n">study_results</span><span class="o">/</span><span class="n">pdiv_database</span><span class="o">/</span> <span class="n">study_results</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span>
+<span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">slurm</span><span class="o">-</span><span class="n">status</span> <span class="n">study_results</span><span class="o">/</span>   <span class="c1"># auto-discovers all sub-studies</span>
+</pre></div>
+</div>
+</section>
+<section id="discharge-inception-postprocess">
+<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">postprocess</span></code><a class="headerlink" href="#discharge-inception-postprocess" title="Permalink to this heading"></a></h2>
+<p>Orchestrates the full post-processing pipeline on a study root directory.
+The command locates the PDIV database and plasma simulation directories, runs
+each post-processing tool in the correct order, and writes all output under
+<code class="docutils literal notranslate"><span class="pre">&lt;study_root&gt;/Results/</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception postprocess [-h] [--pdiv-db DIRNAME]
+                                       [--plasma-sim DIRNAME]
+                                       [--run-prefix PREFIX]
+                                       study_root
+
+positional arguments:
+  study_root            Root directory of the parametric study.
+
+options:
+  -h, --help            show this help message and exit
+  --pdiv-db DIRNAME     Name of the PDIV database sub-directory.
+                        (default: pdiv_database)
+  --plasma-sim DIRNAME  Name of the plasma simulations sub-directory.
+                        (default: plasma_simulations)
+  --run-prefix PREFIX   Prefix used for individual run directories inside the
+                        plasma simulation directory. Overridden automatically
+                        by the value stored in index.json when present.
+                        (default: run_)
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <a class="reference internal" href="../PostProcess/Quickstart.html#postprocess-quickstart"><span class="std std-ref">Quickstart</span></a> for a step-by-step walkthrough of the full
+post-processing workflow.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">postprocess</span> <span class="n">PressureStudy_1</span><span class="o">/</span>
+</pre></div>
+</div>
+</section>
+<section id="discharge-inception-plasma-status">
+<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plasma-status</span></code><a class="headerlink" href="#discharge-inception-plasma-status" title="Permalink to this heading"></a></h2>
+<p>Reads <code class="docutils literal notranslate"><span class="pre">plasma_event_log.csv</span></code> from the Results mirror and prints a formatted
+per-run status table.  Accepts either the <code class="docutils literal notranslate"><span class="pre">plasma_simulations/</span></code> directory
+(in which case the CSV is located automatically under <code class="docutils literal notranslate"><span class="pre">Results/</span></code>) or a direct
+path to the CSV file.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception plasma-status [-h] [--filter STATUS] plasma_sim
+
+positional arguments:
+  plasma_sim      Path to the plasma_simulations/ directory or directly to
+                  plasma_event_log.csv.
+
+options:
+  -h, --help      show this help message and exit
+  --filter STATUS Show only runs whose status matches STATUS (e.g. inception,
+                  completed, convergence_failure, abort).
+</pre></div>
+</div>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic call -- pass the plasma_simulations/ directory</span>
+<span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span>
+
+<span class="c1"># Pass the CSV file directly</span>
+<span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">Results</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span><span class="n">plasma_event_log</span><span class="o">.</span><span class="n">csv</span>
+
+<span class="c1"># Show only runs that reached inception</span>
+<span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">inception</span>
+</pre></div>
+</div>
+</section>
+<section id="discharge-inception-list-results">
+<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">list-results</span></code><a class="headerlink" href="#discharge-inception-list-results" title="Permalink to this heading"></a></h2>
+<p>Lists all post-processed result files grouped by sub-folder under <code class="docutils literal notranslate"><span class="pre">Results/</span></code>,
+giving a quick overview of every file produced by <code class="docutils literal notranslate"><span class="pre">postprocess</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception list-results [-h] study_root
+
+positional arguments:
+  study_root   Root directory of the parametric study.
+
+options:
+  -h, --help   show this help message and exit
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="nb">list</span><span class="o">-</span><span class="n">results</span> <span class="n">PressureStudy_1</span><span class="o">/</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Results in PressureStudy_1/  (8 files in 4 folders)
+
+  pdiv_database/
+    inception_voltages.nc
+
+  plasma_simulations/
+    plasma_event_log.csv
+
+  plasma_simulations/run_0/
+    delta_e_rel.csv
+    delta_e_rel.png
+    peak_delta_e.csv
+    peak_delta_e.png
+
+  plasma_simulations/run_1/
+    ...
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <a class="reference internal" href="../PostProcess/Quickstart.html#postprocess-quickstart"><span class="std std-ref">Quickstart</span></a> -&gt; <em>Inspecting results</em> for guidance on
+interpreting the output.</p>
+</div>
+</section>
+<section id="discharge-inception-plot-delta-e">
+<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plot-delta-e</span></code><a class="headerlink" href="#discharge-inception-plot-delta-e" title="Permalink to this heading"></a></h2>
+<p>Produces a dual-axis plot of peak Delta E(rel) and Delta E(max) vs voltage for a single
+<code class="docutils literal notranslate"><span class="pre">run_*</span></code> database.  This command is typically called automatically by
+<code class="docutils literal notranslate"><span class="pre">postprocess</span></code> for each run directory, but can also be invoked standalone for
+custom output paths or to regenerate individual plots.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception plot-delta-e [-h] [--rel-field REL_FIELD]
+                                        [--max-field MAX_FIELD]
+                                        [--png PNG] [--output OUTPUT]
+                                        db_dir
+
+positional arguments:
+  db_dir              Path to the run_* directory containing the plasma database.
+
+options:
+  -h, --help          show this help message and exit
+  --rel-field REL_FIELD
+                      Name of the relative field column in the database.
+  --max-field MAX_FIELD
+                      Name of the maximum field column in the database.
+  --png PNG           Output path for the PNG figure.
+  --output OUTPUT     Output path for the CSV summary of peak values.
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plot</span><span class="o">-</span><span class="n">delta</span><span class="o">-</span><span class="n">e</span> <span class="n">plasma_simulations</span><span class="o">/</span><span class="n">run_0</span><span class="o">/</span>
 </pre></div>
 </div>
 </section>

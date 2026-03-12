@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Plotting relative electric field change over time &mdash; Discharge Inception 1.0 documentation</title>
+  <title>Quickstart &mdash; Discharge Inception 1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
 
@@ -18,12 +18,11 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Prerequisites" href="../Example/Prerequisites.html" />
-    <link rel="prev" title="Analysing simulation time-series output" href="AnalyzeTimeSeries.html" /> 
+    <link rel="next" title="Extracting partial discharge inception voltages" href="ExtractInceptionVoltages.html" />
+    <link rel="prev" title="Specifying the plasma simulation options" href="../Jobscripts/PlasmaScript.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -76,16 +75,15 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inspecting-results">Inspecting results</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Plotting relative electric field change over time</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#options">Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul>
@@ -113,9 +111,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Plotting relative electric field change over time</li>
+      <li class="breadcrumb-item active">Quickstart</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/PostProcess/PlotDeltaERel.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/PostProcess/Quickstart.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -123,70 +121,83 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="plotting-relative-electric-field-change-over-time">
-<span id="postprocess-plotdeltaerel"></span><h1>Plotting relative electric field change over time<a class="headerlink" href="#plotting-relative-electric-field-change-over-time" title="Permalink to this heading"></a></h1>
+  <section id="quickstart">
+<span id="postprocess-quickstart"></span><h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading"></a></h1>
+<p>After simulations have finished, a single command runs all post-processing
+scripts in the correct order:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>postprocess<span class="w"> </span>&lt;db_dir&gt;/
+</pre></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">&lt;db_dir&gt;</span></code> is the root folder of your study (the directory that contains
+<code class="docutils literal notranslate"><span class="pre">pdiv_database/</span></code> and <code class="docutils literal notranslate"><span class="pre">plasma_simulations/</span></code> as sub-directories).</p>
+<p>The command searches for those sub-directories under <code class="docutils literal notranslate"><span class="pre">&lt;db_dir&gt;</span></code>, runs each
+tool in sequence, and writes all output under <code class="docutils literal notranslate"><span class="pre">&lt;db_dir&gt;/Results/</span></code>, mirroring
+the layout of the simulation directories.</p>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">PlotDeltaERel.py</span></code> is a batch plotting tool that produces one PNG figure per
-run in a plasma simulation database.  For each run it reads the corresponding
-<code class="docutils literal notranslate"><span class="pre">{prefix}{run_id}.0</span></code> log file, extracts the simulation time and the relative
-electric field change <span class="math notranslate nohighlight">\(\Delta\)</span> E(rel) at every reported time step, and saves a labelled
-PNG file.</p>
+<p><code class="docutils literal notranslate"><span class="pre">postprocess</span></code> runs the following steps in order:</p>
+<ol class="arabic simple">
+<li><p><strong>ExtractInceptionVoltages</strong> on <code class="docutils literal notranslate"><span class="pre">pdiv_database/</span></code> -&gt;
+<code class="docutils literal notranslate"><span class="pre">Results/pdiv_database/inception_voltages.nc</span></code></p></li>
+<li><p><strong>GatherPlasmaEventLogs</strong> on <code class="docutils literal notranslate"><span class="pre">plasma_simulations/</span></code> -&gt;
+<code class="docutils literal notranslate"><span class="pre">Results/plasma_simulations/plasma_event_log.csv</span></code></p></li>
+<li><p>For every <code class="docutils literal notranslate"><span class="pre">run_N</span></code> sub-directory in <code class="docutils literal notranslate"><span class="pre">plasma_simulations/</span></code>:</p>
+<ol class="loweralpha simple">
+<li><p><strong>PlotDeltaERel</strong> -&gt; <code class="docutils literal notranslate"><span class="pre">Results/plasma_simulations/run_N/delta_e_rel.png</span></code>
+and <code class="docutils literal notranslate"><span class="pre">Results/plasma_simulations/run_N/delta_e_rel.csv</span></code></p></li>
+<li><p><strong>PlotDeltaE</strong> -&gt; <code class="docutils literal notranslate"><span class="pre">Results/plasma_simulations/run_N/peak_delta_e.png</span></code>
+and <code class="docutils literal notranslate"><span class="pre">Results/plasma_simulations/run_N/peak_delta_e.csv</span></code></p></li>
+</ol>
+</li>
+</ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This script targets an older database layout in which the log files sit
-directly inside the database root directory (e.g. <code class="docutils literal notranslate"><span class="pre">pout0.0</span></code>, <code class="docutils literal notranslate"><span class="pre">pout1.0</span></code>,
-…) rather than in per-run sub-directories.  The file prefix can be changed
-with <code class="docutils literal notranslate"><span class="pre">--prefix</span></code>.</p>
+<p>Individual tools can also be run directly – see their own pages for
+standalone usage and additional options.</p>
 </div>
-<p>The figure for each run shows:</p>
+<p>Optional flags let you override the default directory names and run prefix:</p>
 <ul class="simple">
-<li><p><strong>x-axis</strong> – simulation time in nanoseconds</p></li>
-<li><p><strong>y-axis</strong> – <span class="math notranslate nohighlight">\(\Delta\)</span> E(rel) (%)</p></li>
-<li><p><strong>title</strong> – the sweep-parameter key/value pairs for that run as read from
-<code class="docutils literal notranslate"><span class="pre">index.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--pdiv-db</span> <span class="pre">DIRNAME</span></code> (default: <code class="docutils literal notranslate"><span class="pre">pdiv_database</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--plasma-sim</span> <span class="pre">DIRNAME</span></code> (default: <code class="docutils literal notranslate"><span class="pre">plasma_simulations</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--run-prefix</span> <span class="pre">PREFIX</span></code> (default: <code class="docutils literal notranslate"><span class="pre">run_</span></code>, overridden automatically by the
+<code class="docutils literal notranslate"><span class="pre">prefix</span></code> key in <code class="docutils literal notranslate"><span class="pre">index.json</span></code> when present)</p></li>
 </ul>
-<p>Output PNGs are named <code class="docutils literal notranslate"><span class="pre">plt_0.png</span></code>, <code class="docutils literal notranslate"><span class="pre">plt_1.png</span></code>, … and written to
-<em>db_dir</em> by default (or to a custom directory via <code class="docutils literal notranslate"><span class="pre">--output-dir</span></code>).</p>
-<p><strong>Required dependencies</strong>: <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>.</p>
 </section>
-<section id="options">
-<h2>Options<a class="headerlink" href="#options" title="Permalink to this heading"></a></h2>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-arg-db_dir">
-<span id="cmdoption-arg-db-dir"></span><span class="sig-name descname"><span class="pre">db_dir</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-arg-db_dir" title="Permalink to this definition"></a></dt>
-<dd><p><em>Positional (required).</em> Path to the plasma simulation database directory.
-The directory must contain an <code class="docutils literal notranslate"><span class="pre">index.json</span></code> file.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-prefix">
-<span class="sig-name descname"><span class="pre">--prefix</span></span><span class="sig-prename descclassname"> <span class="pre">PREFIX</span></span><a class="headerlink" href="#cmdoption-prefix" title="Permalink to this definition"></a></dt>
-<dd><p>Prefix for the log filenames (default: <code class="docutils literal notranslate"><span class="pre">pout</span></code>).  The script opens
-<code class="docutils literal notranslate"><span class="pre">&lt;db_dir&gt;/&lt;PREFIX&gt;&lt;run_id&gt;.0</span></code> for each run.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-output-dir">
-<span class="sig-name descname"><span class="pre">--output-dir</span></span><span class="sig-prename descclassname"> <span class="pre">DIR</span></span><a class="headerlink" href="#cmdoption-output-dir" title="Permalink to this definition"></a></dt>
-<dd><p>Directory in which output PNG files are saved (default: same as <em>db_dir</em>).
-The directory is created if it does not exist.</p>
-</dd></dl>
-
-</section>
-<section id="example">
-<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading"></a></h2>
-<p>Plot <span class="math notranslate nohighlight">\(\Delta\)</span> E(rel) for all runs in a database, saving PNGs alongside the log files:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">PostProcess</span><span class="o">/</span><span class="n">PlotDeltaERel</span><span class="o">.</span><span class="n">py</span> <span class="n">results</span><span class="o">/</span><span class="n">plasma_db</span>
+<section id="inspecting-results">
+<h2>Inspecting results<a class="headerlink" href="#inspecting-results" title="Permalink to this heading"></a></h2>
+<p>After post-processing completes, use <code class="docutils literal notranslate"><span class="pre">list-results</span></code> to get an overview of
+every output file:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>list-results<span class="w"> </span>&lt;db_dir&gt;/
 </pre></div>
 </div>
-<p>Use a non-default log prefix and write the figures to a dedicated plots folder:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">PostProcess</span><span class="o">/</span><span class="n">PlotDeltaERel</span><span class="o">.</span><span class="n">py</span> \
-    <span class="n">results</span><span class="o">/</span><span class="n">plasma_db</span> \
-    <span class="o">--</span><span class="n">prefix</span> <span class="n">run</span> \
-    <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span> <span class="n">results</span><span class="o">/</span><span class="n">plasma_db</span><span class="o">/</span><span class="n">plots</span>
+<p>Example output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Results in &lt;db_dir&gt;/  (8 files in 4 folders)
+
+  pdiv_database/
+    inception_voltages.nc
+
+  plasma_simulations/
+    plasma_event_log.csv
+
+  plasma_simulations/run_0/
+    delta_e_rel.csv
+    delta_e_rel.png
+    peak_delta_e.csv
+    peak_delta_e.png
+
+  plasma_simulations/run_1/
+    ...
 </pre></div>
 </div>
+<p>All output lives under <code class="docutils literal notranslate"><span class="pre">&lt;db_dir&gt;/Results/</span></code>, mirroring the layout of the
+simulation directories.  The <code class="docutils literal notranslate"><span class="pre">plasma_event_log.csv</span></code> gives a per-run status
+summary; use <code class="docutils literal notranslate"><span class="pre">plasma-status</span></code> for a quick formatted view:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>plasma-status<span class="w"> </span>&lt;db_dir&gt;/plasma_simulations/
+</pre></div>
+</div>
+<p>For more detail on the individual post-processing tools, see
+<a class="reference internal" href="GatherPlasmaEventLogs.html#postprocess-gatherplasmaeventlogs"><span class="std std-ref">Identifying discharge inception events from plasma logs</span></a> and the pages for each tool linked in
+the sidebar.</p>
 </section>
 </section>
 
@@ -194,8 +205,8 @@ The directory is created if it does not exist.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="AnalyzeTimeSeries.html" class="btn btn-neutral float-left" title="Analysing simulation time-series output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../Example/Prerequisites.html" class="btn btn-neutral float-right" title="Prerequisites" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../Jobscripts/PlasmaScript.html" class="btn btn-neutral float-left" title="Specifying the plasma simulation options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ExtractInceptionVoltages.html" class="btn btn-neutral float-right" title="Extracting partial discharge inception voltages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

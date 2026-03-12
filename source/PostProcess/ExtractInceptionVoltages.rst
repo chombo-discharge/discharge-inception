@@ -14,9 +14,9 @@ A summary table is always printed to standard output.
 
 The six voltage quantities extracted are:
 
-* **Minimum inception voltage** — positive and negative polarity
-* **Streamer inception voltage** — positive and negative polarity
-* **Townsend inception voltage** — positive and negative polarity
+* **Minimum inception voltage** -- positive and negative polarity
+* **Streamer inception voltage** -- positive and negative polarity
+* **Townsend inception voltage** -- positive and negative polarity
 
 Values that the solver could not compute (stored internally as ``DBL_MAX``) are
 replaced with ``NaN`` in the output.
@@ -28,13 +28,13 @@ to preserve the intended coordinate ordering) from the database root directory.
 
    **Optional dependencies**
 
-   * ``xarray`` — required for the default NetCDF output format and for all
+   * ``xarray`` -- required for the default NetCDF output format and for all
      plotting functionality.  If it is not installed, use ``--format csv`` to
      produce a plain CSV file instead.  Install with::
 
         pip install xarray netcdf4
 
-   * ``matplotlib`` — required only when ``--plot`` is used.  If it is absent
+   * ``matplotlib`` -- required only when ``--plot`` is used.  If it is absent
      the script exits with an error when plotting is requested.  Install with::
 
         pip install matplotlib

@@ -24,6 +24,6 @@ The ``{N}`` in the filename is replaced by the dimensionality supplied via
    Both pipeline stages share the same ``chemistry.json`` as their single
    source of truth for gas properties and transport data.  In ``inception``
    mode, :math:`\alpha` and :math:`\eta` are computed via ``ItoKMCJSON::computeAlpha/computeEta``,
-   which derives them from the reaction network in ``chemistry.json`` — the
+   which derives them from the reaction network in ``chemistry.json`` -- the
    same path used by ``plasma`` mode.  No separate ``transport_data.txt`` is
    needed.

@@ -34,7 +34,7 @@ To inspect the exact parameters for a specific run:
        "pressure": 100000.0
    }
 
-``index.json`` at the stage level maps run indices to parameter tuples — useful
+``index.json`` at the stage level maps run indices to parameter tuples -- useful
 for scripts that need to iterate all runs:
 
 .. code-block:: bash

@@ -75,18 +75,19 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../PostProcess/Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Compile.html">Compiling the executable</a></li>
@@ -133,7 +134,7 @@ administrators and <code class="docutils literal notranslate"><span class="pre">
 <p>The virtual environment directory is conventionally named <code class="docutils literal notranslate"><span class="pre">.venv</span></code> and placed
 at the repository root.  Because compute nodes need to activate the same
 environment, the <code class="docutils literal notranslate"><span class="pre">.venv</span></code> directory must live on a shared filesystem that is
-accessible from all nodes — typically your home directory or a project scratch
+accessible from all nodes – typically your home directory or a project scratch
 space, both of which are usually network-mounted on HPC clusters.  Do <strong>not</strong>
 place <code class="docutils literal notranslate"><span class="pre">.venv</span></code> on a node-local scratch directory (e.g. <code class="docutils literal notranslate"><span class="pre">/tmp</span></code>), as it will
 not be visible to other nodes.</p>
@@ -151,11 +152,9 @@ source directory take effect immediately without reinstalling.  Editable mode
 also means that the <code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code> command-line entry point is
 registered in the virtual environment and will always run the current state of
 the checked-out source.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">[plot]</span></code> optional dependency group adds <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> and <code class="docutils literal notranslate"><span class="pre">scipy</span></code>,
-which are used by the post-processing scripts in <code class="docutils literal notranslate"><span class="pre">PostProcess/</span></code> but are not
-required to run the configurator or submit SLURM jobs:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w">                 </span><span class="c1"># core only</span>
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[plot]&quot;</span><span class="w">         </span><span class="c1"># with matplotlib + scipy</span>
+<p><code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> and <code class="docutils literal notranslate"><span class="pre">scipy</span></code> are included as standard dependencies and are
+installed automatically alongside the core package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
 </section>
@@ -165,8 +164,8 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 point is registered in the active virtual environment and that the package
 imports correctly.  The <code class="docutils literal notranslate"><span class="pre">which</span></code> command should resolve to the <code class="docutils literal notranslate"><span class="pre">.venv/bin/</span></code>
 directory, confirming that the system Python (or another environment) is not
-being used by mistake.  Running <code class="docutils literal notranslate"><span class="pre">--help</span></code> exercises the full import chain —
-including <code class="docutils literal notranslate"><span class="pre">configurator</span></code> and <code class="docutils literal notranslate"><span class="pre">config_util</span></code> — so any missing dependency or
+being used by mistake.  Running <code class="docutils literal notranslate"><span class="pre">--help</span></code> exercises the full import chain –
+including <code class="docutils literal notranslate"><span class="pre">configurator</span></code> and <code class="docutils literal notranslate"><span class="pre">config_util</span></code> – so any missing dependency or
 broken import will surface here rather than at job-submission time.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>which<span class="w"> </span>discharge-inception<span class="w">               </span><span class="c1"># should point into .venv/bin/</span>
 discharge-inception<span class="w"> </span>--help
@@ -179,7 +178,7 @@ discharge-inception<span class="w"> </span>--help
 paths must be reachable from all compute nodes (typically a shared filesystem
 such as <code class="docutils literal notranslate"><span class="pre">$HOME</span></code> or a project scratch space).  Because <code class="docutils literal notranslate"><span class="pre">GenericArrayJob.sh</span></code>
 runs on whatever node SLURM allocates, it cannot rely on paths that were valid
-only on the login node — using absolute paths on a shared filesystem avoids
+only on the login node – using absolute paths on a shared filesystem avoids
 node-local ambiguity entirely.</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">DISCHARGE_INCEPTION_VENV</span></code></dt><dd><p>Absolute path to the <code class="docutils literal notranslate"><span class="pre">.venv</span></code> directory created during installation.

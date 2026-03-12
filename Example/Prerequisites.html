@@ -69,18 +69,19 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../PostProcess/Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Compile.html">Compiling the executable</a></li>
@@ -129,12 +130,12 @@ creating a sub-hierarchy of per-voltage runs.</p></li>
 </ol>
 <p>Before starting, ensure the following are available:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code> is installed — see <a class="reference internal" href="../Installation/InstallationInstructions.html"><span class="doc">Installation instructions</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code> is installed – see <a class="reference internal" href="../Installation/InstallationInstructions.html"><span class="doc">Installation instructions</span></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DISCHARGE_HOME</span></code> is set and points to a compiled
-<a class="reference external" href="https://chombo-discharge.github.io/">chombo-discharge</a> installation —
+<a class="reference external" href="https://chombo-discharge.github.io/">chombo-discharge</a> installation –
 see <a class="reference internal" href="../Installation/Prerequisites.html#install-prereqs"><span class="std std-ref">Prerequisites</span></a>.</p></li>
-<li><p>A SLURM scheduler is available on the machine — see <a class="reference internal" href="../Installation/Prerequisites.html#install-prereqs"><span class="std std-ref">Prerequisites</span></a>.</p></li>
-<li><p>Both environment variables are exported — see <a class="reference internal" href="../Installation/InstallationInstructions.html#install-env-vars"><span class="std std-ref">Environment variables</span></a>:</p>
+<li><p>A SLURM scheduler is available on the machine – see <a class="reference internal" href="../Installation/Prerequisites.html#install-prereqs"><span class="std std-ref">Prerequisites</span></a>.</p></li>
+<li><p>Both environment variables are exported – see <a class="reference internal" href="../Installation/InstallationInstructions.html#install-env-vars"><span class="std std-ref">Environment variables</span></a>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">DISCHARGE_INCEPTION_VENV</span><span class="o">=</span>/path/to/repo/.venv
 <span class="nb">export</span><span class="w"> </span><span class="nv">DISCHARGE_INCEPTION_SLURM_CONFIG</span><span class="o">=</span>/path/to/repo/slurm.toml
 </pre></div>

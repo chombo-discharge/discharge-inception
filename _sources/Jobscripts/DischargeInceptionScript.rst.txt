@@ -13,7 +13,7 @@ Each SLURM task executes one parameter combination:
    until a valid result is obtained.
 
 The script does not need to be edited directly.  All configuration is driven by the run
-definition — specifically the ``parameter_space`` and ``input_overrides`` fields — which
+definition -- specifically the ``parameter_space`` and ``input_overrides`` fields -- which
 the configurator writes into the ``.inputs`` file before the job runs.
 
 Parameter space

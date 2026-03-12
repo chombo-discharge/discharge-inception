@@ -32,28 +32,28 @@ The full call chain
                                        Navigates to voltage_<id>/ via index.json,
                                        runs the plasma solver for one voltage.
 
-**CLI (``configurator.py``)** — Reads the ``Runs.py`` definition, expands the
+**CLI (``configurator.py``)** -- Reads the ``Runs.py`` definition, expands the
 Cartesian parameter space, creates the full directory tree, copies executables
 and data files, writes ``index.json`` / ``parameters.json`` / ``structure.json``
 per stage, creates ``jobscript_symlink``, and submits the initial ``sbatch``
 arrays.  Study arrays are submitted with ``--dependency=afterok:<db_job_id>`` to
 enforce ordering.
 
-**``GenericArrayJob.sh``** — The only ``#SBATCH`` script in the project.  It is
+**``GenericArrayJob.sh``** -- The only ``#SBATCH`` script in the project.  It is
 completely resource-agnostic; all resource values are injected at submission time
 by the Python jobscripts via ``build_sbatch_resource_args()``.  It reads
 ``DISCHARGE_INCEPTION_SLURM_CONFIG`` to load cluster modules and activate the virtual
 environment, then calls ``python ./jobscript_symlink``.
 
-**``DischargeInceptionJobscript.py``** — Reads ``index.json`` to find its run
+**``DischargeInceptionJobscript.py``** -- Reads ``index.json`` to find its run
 directory, runs the inception solver, parses ``report.txt`` to check the
 voltage range, and reruns with an updated voltage ceiling if necessary.
 
-**``PlasmaJobscript.py``** — Reads ``structure.json`` to find its run directory,
+**``PlasmaJobscript.py``** -- Reads ``structure.json`` to find its run directory,
 locates the matching database run, extracts a filtered voltage table from the
 database ``report.txt``, creates per-voltage subdirectories with injected
 parameters, and submits a child SLURM array for the voltage sweep.
 
-**``GenericArrayJobJobscript.py``** — Leaf-level runner.  Reads ``index.json``
+**``GenericArrayJobJobscript.py``** -- Leaf-level runner.  Reads ``index.json``
 in the voltage subdirectory, navigates to ``voltage_<id>/``, and launches the
 plasma solver via MPI for a single voltage point.

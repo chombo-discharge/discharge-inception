@@ -16,9 +16,9 @@ Repository layout
    * - ``GenericArrayJobJobscript.py``
      - Leaf-level voltage solver runner (called via ``jobscript_symlink``)
    * - ``Exec/Rod/Studies/DischargeInceptionJobscript.py``
-     - Inception database jobscript — runs the inception solver, validates range
+     - Inception database jobscript -- runs the inception solver, validates range
    * - ``Exec/Rod/Studies/PlasmaJobscript.py``
-     - Study orchestrator — reads inception results, creates voltage subdirs, submits child array
+     - Study orchestrator -- reads inception results, creates voltage subdirs, submits child array
    * - ``slurm.toml``
      - Cluster resource configuration (MPI launcher, modules, per-stage overrides)
    * - ``Exec/Rod/``

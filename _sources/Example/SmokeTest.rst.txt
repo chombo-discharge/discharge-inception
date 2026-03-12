@@ -15,7 +15,7 @@ This runs a stationary inception-voltage sweep on the default rod geometry at
 1 atm.  Results are written to ``report.txt``; plot files go to ``plt/``.
 
 To test plasma mode instead, override the mode (and optionally the voltage) on
-the command line — ParmParse arguments appended after the input filename take
+the command line -- ParmParse arguments appended after the input filename take
 precedence over the file:
 
 .. code-block:: bash

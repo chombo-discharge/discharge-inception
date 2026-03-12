@@ -69,18 +69,19 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../PostProcess/Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Compile.html">Compiling the executable</a></li>
@@ -130,7 +131,7 @@ The top-level structure is:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rod_dir</span> <span class="o">=</span> <span class="s1">&#39;../&#39;</span>
 </pre></div>
 </div>
-<p><strong>Database</strong> (<code class="docutils literal notranslate"><span class="pre">inception_stepper</span></code>) — computes inception voltages.  The free
+<p><strong>Database</strong> (<code class="docutils literal notranslate"><span class="pre">inception_stepper</span></code>) – computes inception voltages.  The free
 parameters are determined by the plasma study entries that carry
 <code class="docutils literal notranslate"><span class="pre">&quot;database&quot;:</span> <span class="pre">&quot;inception_stepper&quot;</span></code> (see below).  Fixed settings that apply to
 every database run are collected in <code class="docutils literal notranslate"><span class="pre">input_overrides</span></code>:</p>
@@ -158,7 +159,7 @@ every database run are collected in <code class="docutils literal notranslate"><
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>Study</strong> (<code class="docutils literal notranslate"><span class="pre">plasma_study</span></code>) — runs plasma simulations using the database
+<p><strong>Study</strong> (<code class="docutils literal notranslate"><span class="pre">plasma_study</span></code>) – runs plasma simulations using the database
 results.  <code class="docutils literal notranslate"><span class="pre">app.mode</span></code> is set to <code class="docutils literal notranslate"><span class="pre">plasma</span></code> via <code class="docutils literal notranslate"><span class="pre">input_overrides</span></code>.  Parameters
 marked with <code class="docutils literal notranslate"><span class="pre">&quot;database&quot;:</span> <span class="pre">&quot;inception_stepper&quot;</span></code> declare a SLURM dependency: study
 jobs will not start until the corresponding database job has completed, and the
@@ -212,7 +213,7 @@ configurator ensures that each study run is paired with the matching database en
 <p>The <code class="docutils literal notranslate"><span class="pre">photoionization</span></code> entry uses the <code class="docutils literal notranslate"><span class="pre">&lt;chem_react&gt;</span></code> match expression to
 locate reaction entries in <code class="docutils literal notranslate"><span class="pre">chemistry.json</span></code> by their reaction string.  The
 <code class="docutils literal notranslate"><span class="pre">+</span></code> prefix requires the match to exist; <code class="docutils literal notranslate"><span class="pre">*</span></code> creates the entry if absent.
-A Python list at any level of the <code class="docutils literal notranslate"><span class="pre">uri</span></code> produces multiple parallel writes —
+A Python list at any level of the <code class="docutils literal notranslate"><span class="pre">uri</span></code> produces multiple parallel writes –
 here both reactions are written in a single parameter sweep step.</p>
 <p>See <a class="reference internal" href="../Architecture/ParamSpace.html#arch-param-space"><span class="std std-ref">Defining parameter spaces</span></a>, <a class="reference internal" href="../Architecture/JsonUri.html#arch-json-uri"><span class="std std-ref">JSON URI syntax</span></a>, and <a class="reference internal" href="../Architecture/DbStudy.html#arch-db-study"><span class="std std-ref">Databases and studies</span></a> for
 a full explanation of parameter space syntax, JSON URI conventions, and database

@@ -21,7 +21,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Extracting partial discharge inception voltages" href="../PostProcess/ExtractInceptionVoltages.html" />
+    <link rel="next" title="Quickstart" href="../PostProcess/Quickstart.html" />
     <link rel="prev" title="Specifying the inception database options" href="DischargeInceptionScript.html" /> 
 </head>
 
@@ -69,10 +69,14 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Specifying the plasma simulation options</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#job-script-options-reference">job_script_options reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#caveats">Caveats</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#initial-particle-structure-must-exist-in-chemistry-json">Initial particle structure must exist in <code class="docutils literal notranslate"><span class="pre">chemistry.json</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#parameter-space-and-input-overrides">Parameter space and input overrides</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 </ul>
@@ -80,12 +84,13 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../PostProcess/Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Compile.html">Compiling the executable</a></li>
@@ -179,7 +184,7 @@ using the raw report rows from the database.</p></td>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">particle_mode</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'single'</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">'single'</span></code> — launches one seed electron per task.  <code class="docutils literal notranslate"><span class="pre">'sphere'</span></code> — distributes
+<td><p><code class="docutils literal notranslate"><span class="pre">'single'</span></code> – launches one seed electron per task.  <code class="docutils literal notranslate"><span class="pre">'sphere'</span></code> – distributes
 seed electrons over a sphere.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">num_particles</span></code></p></td>
@@ -190,7 +195,7 @@ mode.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sphere_radius</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p></td>
-<td><p>—</p></td>
+<td><p>–</p></td>
 <td><p>Sphere radius in metres.  <strong>Required</strong> when <code class="docutils literal notranslate"><span class="pre">particle_mode='sphere'</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sphere_center</span></code></p></td>
@@ -201,6 +206,47 @@ read from the database.</p></td>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="caveats">
+<h2>Caveats<a class="headerlink" href="#caveats" title="Permalink to this heading"></a></h2>
+<section id="initial-particle-structure-must-exist-in-chemistry-json">
+<h3>Initial particle structure must exist in <code class="docutils literal notranslate"><span class="pre">chemistry.json</span></code><a class="headerlink" href="#initial-particle-structure-must-exist-in-chemistry-json" title="Permalink to this heading"></a></h3>
+<p>The plasma jobscript injects the electron seed position (and weight or sphere
+parameters) into each <code class="docutils literal notranslate"><span class="pre">voltage_&lt;i&gt;/chemistry.json</span></code> by traversing the JSON
+tree with a <strong>required</strong> path match (<code class="docutils literal notranslate"><span class="pre">+[&quot;id&quot;=&quot;e&quot;]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">initial</span> <span class="pre">particles</span></code>
+-&gt; <code class="docutils literal notranslate"><span class="pre">+[&quot;single</span> <span class="pre">particle&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">+[&quot;sphere</span> <span class="pre">distribution&quot;]</span></code>).  A required match
+raises a hard error if the target element is absent – it will not auto-create
+the structure.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">chemistry.json</span></code> template in the study directory <strong>must</strong> therefore
+already contain the appropriate <code class="docutils literal notranslate"><span class="pre">initial</span> <span class="pre">particles</span></code> block under the electron
+species entry before any plasma runs are submitted.  The expected skeleton is:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;plasma species&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;e&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;initial particles&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;single particle&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;position&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;weight&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For <code class="docutils literal notranslate"><span class="pre">particle_mode='sphere'</span></code> the inner element should instead be
+<code class="docutils literal notranslate"><span class="pre">&quot;sphere</span> <span class="pre">distribution&quot;</span></code> with at least the <code class="docutils literal notranslate"><span class="pre">&quot;center&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;radius&quot;</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">&quot;num</span> <span class="pre">particles&quot;</span></code> fields.  The script overwrites the placeholder values at
+runtime, but the enclosing structure must already exist.</p>
+<p>Omitting this block produces the error:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">RuntimeError</span><span class="p">:</span> <span class="n">missing</span> <span class="nb">list</span> <span class="n">element</span> <span class="n">has</span> <span class="n">requirement</span>
+</pre></div>
+</div>
+<p>at <code class="docutils literal notranslate"><span class="pre">config_util.set_nested_value</span></code> when the voltage directories are created.</p>
+</section>
 </section>
 <section id="parameter-space-and-input-overrides">
 <h2>Parameter space and input overrides<a class="headerlink" href="#parameter-space-and-input-overrides" title="Permalink to this heading"></a></h2>
@@ -236,7 +282,7 @@ as the database stage.  See <a class="reference internal" href="../Architecture/
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="DischargeInceptionScript.html" class="btn btn-neutral float-left" title="Specifying the inception database options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../PostProcess/ExtractInceptionVoltages.html" class="btn btn-neutral float-right" title="Extracting partial discharge inception voltages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../PostProcess/Quickstart.html" class="btn btn-neutral float-right" title="Quickstart" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

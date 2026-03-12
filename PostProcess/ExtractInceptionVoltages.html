@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Identifying discharge inception events from plasma logs" href="GatherPlasmaEventLogs.html" />
-    <link rel="prev" title="Specifying the plasma simulation options" href="../Jobscripts/PlasmaScript.html" /> 
+    <link rel="prev" title="Quickstart" href="Quickstart.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -69,12 +69,13 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Extracting partial discharge inception voltages</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#options">Options</a></li>
@@ -85,7 +86,7 @@
 <li class="toctree-l1"><a class="reference internal" href="AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Compile.html">Compiling the executable</a></li>
@@ -132,9 +133,9 @@ by the sweep parameters and writes either a NetCDF file (default) or a CSV file.
 A summary table is always printed to standard output.</p>
 <p>The six voltage quantities extracted are:</p>
 <ul class="simple">
-<li><p><strong>Minimum inception voltage</strong> — positive and negative polarity</p></li>
-<li><p><strong>Streamer inception voltage</strong> — positive and negative polarity</p></li>
-<li><p><strong>Townsend inception voltage</strong> — positive and negative polarity</p></li>
+<li><p><strong>Minimum inception voltage</strong> – positive and negative polarity</p></li>
+<li><p><strong>Streamer inception voltage</strong> – positive and negative polarity</p></li>
+<li><p><strong>Townsend inception voltage</strong> – positive and negative polarity</p></li>
 </ul>
 <p>Values that the solver could not compute (stored internally as <code class="docutils literal notranslate"><span class="pre">DBL_MAX</span></code>) are
 replaced with <code class="docutils literal notranslate"><span class="pre">NaN</span></code> in the output.</p>
@@ -144,14 +145,14 @@ to preserve the intended coordinate ordering) from the database root directory.<
 <p class="admonition-title">Note</p>
 <p><strong>Optional dependencies</strong></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">xarray</span></code> — required for the default NetCDF output format and for all
+<li><p><code class="docutils literal notranslate"><span class="pre">xarray</span></code> – required for the default NetCDF output format and for all
 plotting functionality.  If it is not installed, use <code class="docutils literal notranslate"><span class="pre">--format</span> <span class="pre">csv</span></code> to
 produce a plain CSV file instead.  Install with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">xarray</span> <span class="n">netcdf4</span>
 </pre></div>
 </div>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> — required only when <code class="docutils literal notranslate"><span class="pre">--plot</span></code> is used.  If it is absent
+<li><p><code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> – required only when <code class="docutils literal notranslate"><span class="pre">--plot</span></code> is used.  If it is absent
 the script exits with an error when plotting is requested.  Install with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">matplotlib</span>
 </pre></div>
@@ -245,7 +246,7 @@ showing only the streamer inception voltage:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../Jobscripts/PlasmaScript.html" class="btn btn-neutral float-left" title="Specifying the plasma simulation options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Quickstart.html" class="btn btn-neutral float-left" title="Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="GatherPlasmaEventLogs.html" class="btn btn-neutral float-right" title="Identifying discharge inception events from plasma logs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

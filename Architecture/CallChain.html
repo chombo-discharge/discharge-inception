@@ -69,18 +69,19 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../PostProcess/Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Example/Compile.html">Compiling the executable</a></li>
@@ -146,25 +147,25 @@
                                     runs the plasma solver for one voltage.
 </pre></div>
 </div>
-<p><strong>CLI (``configurator.py``)</strong> — Reads the <code class="docutils literal notranslate"><span class="pre">Runs.py</span></code> definition, expands the
+<p><strong>CLI (``configurator.py``)</strong> – Reads the <code class="docutils literal notranslate"><span class="pre">Runs.py</span></code> definition, expands the
 Cartesian parameter space, creates the full directory tree, copies executables
 and data files, writes <code class="docutils literal notranslate"><span class="pre">index.json</span></code> / <code class="docutils literal notranslate"><span class="pre">parameters.json</span></code> / <code class="docutils literal notranslate"><span class="pre">structure.json</span></code>
 per stage, creates <code class="docutils literal notranslate"><span class="pre">jobscript_symlink</span></code>, and submits the initial <code class="docutils literal notranslate"><span class="pre">sbatch</span></code>
 arrays.  Study arrays are submitted with <code class="docutils literal notranslate"><span class="pre">--dependency=afterok:&lt;db_job_id&gt;</span></code> to
 enforce ordering.</p>
-<p><strong>``GenericArrayJob.sh``</strong> — The only <code class="docutils literal notranslate"><span class="pre">#SBATCH</span></code> script in the project.  It is
+<p><strong>``GenericArrayJob.sh``</strong> – The only <code class="docutils literal notranslate"><span class="pre">#SBATCH</span></code> script in the project.  It is
 completely resource-agnostic; all resource values are injected at submission time
 by the Python jobscripts via <code class="docutils literal notranslate"><span class="pre">build_sbatch_resource_args()</span></code>.  It reads
 <code class="docutils literal notranslate"><span class="pre">DISCHARGE_INCEPTION_SLURM_CONFIG</span></code> to load cluster modules and activate the virtual
 environment, then calls <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">./jobscript_symlink</span></code>.</p>
-<p><strong>``DischargeInceptionJobscript.py``</strong> — Reads <code class="docutils literal notranslate"><span class="pre">index.json</span></code> to find its run
+<p><strong>``DischargeInceptionJobscript.py``</strong> – Reads <code class="docutils literal notranslate"><span class="pre">index.json</span></code> to find its run
 directory, runs the inception solver, parses <code class="docutils literal notranslate"><span class="pre">report.txt</span></code> to check the
 voltage range, and reruns with an updated voltage ceiling if necessary.</p>
-<p><strong>``PlasmaJobscript.py``</strong> — Reads <code class="docutils literal notranslate"><span class="pre">structure.json</span></code> to find its run directory,
+<p><strong>``PlasmaJobscript.py``</strong> – Reads <code class="docutils literal notranslate"><span class="pre">structure.json</span></code> to find its run directory,
 locates the matching database run, extracts a filtered voltage table from the
 database <code class="docutils literal notranslate"><span class="pre">report.txt</span></code>, creates per-voltage subdirectories with injected
 parameters, and submits a child SLURM array for the voltage sweep.</p>
-<p><strong>``GenericArrayJobJobscript.py``</strong> — Leaf-level runner.  Reads <code class="docutils literal notranslate"><span class="pre">index.json</span></code>
+<p><strong>``GenericArrayJobJobscript.py``</strong> – Leaf-level runner.  Reads <code class="docutils literal notranslate"><span class="pre">index.json</span></code>
 in the voltage subdirectory, navigates to <code class="docutils literal notranslate"><span class="pre">voltage_&lt;id&gt;/</span></code>, and launches the
 plasma solver via MPI for a single voltage point.</p>
 </section>

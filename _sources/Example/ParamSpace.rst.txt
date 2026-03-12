@@ -19,7 +19,7 @@ Both entries point to the flat ``Exec/Rod/`` directory:
 
    rod_dir = '../'
 
-**Database** (``inception_stepper``) — computes inception voltages.  The free
+**Database** (``inception_stepper``) -- computes inception voltages.  The free
 parameters are determined by the plasma study entries that carry
 ``"database": "inception_stepper"`` (see below).  Fixed settings that apply to
 every database run are collected in ``input_overrides``:
@@ -49,7 +49,7 @@ every database run are collected in ``input_overrides``:
        },
    }
 
-**Study** (``plasma_study``) — runs plasma simulations using the database
+**Study** (``plasma_study``) -- runs plasma simulations using the database
 results.  ``app.mode`` is set to ``plasma`` via ``input_overrides``.  Parameters
 marked with ``"database": "inception_stepper"`` declare a SLURM dependency: study
 jobs will not start until the corresponding database job has completed, and the
@@ -106,7 +106,7 @@ Plasma-only parameters (no ``"database"`` key) are swept independently:
 The ``photoionization`` entry uses the ``<chem_react>`` match expression to
 locate reaction entries in ``chemistry.json`` by their reaction string.  The
 ``+`` prefix requires the match to exist; ``*`` creates the entry if absent.
-A Python list at any level of the ``uri`` produces multiple parallel writes —
+A Python list at any level of the ``uri`` produces multiple parallel writes --
 here both reactions are written in a single parameter sweep step.
 
 See :ref:`arch_param_space`, :ref:`arch_json_uri`, and :ref:`arch_db_study` for

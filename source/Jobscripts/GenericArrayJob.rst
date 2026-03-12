@@ -1,6 +1,6 @@
 .. _jobscripts_generic_array:
 
-GenericArrayJob.sh — the SLURM wrapper
+GenericArrayJob.sh -- the SLURM wrapper
 =======================================
 
 ``Util/GenericArrayJob.sh`` is the **only** ``#SBATCH`` script in the project.

@@ -69,18 +69,19 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/SetupTool.html">Setting up a simulation directory</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/WhereFit.html">Where jobscripts fit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh — the SLURM wrapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Jobscripts/GenericArrayJob.html">GenericArrayJob.sh – the SLURM wrapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/DischargeInceptionScript.html">Specifying the inception database options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Jobscripts/PlasmaScript.html">Specifying the plasma simulation options</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Post-processing</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../PostProcess/Quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html">Extracting partial discharge inception voltages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html">Identifying discharge inception events from plasma logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html">Analysing simulation time-series output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../PostProcess/PlotDeltaERel.html">Plotting relative electric field change over time</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Example — Rod Case</span></p>
+<p class="caption" role="heading"><span class="caption-text">Example -- Rod Case</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Compile.html">Compiling the executable</a></li>
@@ -118,11 +119,26 @@
              
   <section id="monitoring-jobs">
 <span id="example-monitor"></span><h1>Monitoring jobs<a class="headerlink" href="#monitoring-jobs" title="Permalink to this heading"></a></h1>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>squeue<span class="w"> </span>-u<span class="w"> </span><span class="nv">$USER</span>
+<p>Use <code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">status</span></code> for a structured per-run view:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>discharge-inception<span class="w"> </span>status<span class="w"> </span>~/my_rod_study/pdiv_database/
+discharge-inception<span class="w"> </span>status<span class="w"> </span>~/my_rod_study/plasma_simulations/
 
-<span class="c1"># Check the submitted job IDs</span>
-cat<span class="w"> </span>~/my_rod_study/pdiv_database/array_job_id<span class="w">       </span><span class="c1"># database job ID</span>
-cat<span class="w"> </span>~/my_rod_study/plasma_simulations/array_job_id<span class="w">  </span><span class="c1"># study job ID (depends on above)</span>
+<span class="c1"># or inspect both in one call:</span>
+discharge-inception<span class="w"> </span>status<span class="w"> </span>~/my_rod_study/
+</pre></div>
+</div>
+<p>Example output while the database is still running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~/</span><span class="n">my_rod_study</span><span class="o">/</span><span class="n">pdiv_database</span><span class="o">/</span>  <span class="p">(</span><span class="mi">3</span> <span class="n">runs</span><span class="p">,</span> <span class="n">job</span> <span class="mi">98765</span><span class="p">)</span>
+  <span class="n">run</span>     <span class="n">state</span>
+  <span class="o">------</span>  <span class="o">---------</span>
+  <span class="n">run_0</span>   <span class="n">completed</span>
+  <span class="n">run_1</span>   <span class="n">running</span>
+  <span class="n">run_2</span>   <span class="n">pending</span>
+  <span class="n">Summary</span><span class="p">:</span> <span class="mi">1</span> <span class="n">completed</span><span class="p">,</span> <span class="mi">1</span> <span class="n">running</span><span class="p">,</span> <span class="mi">1</span> <span class="n">pending</span>
+</pre></div>
+</div>
+<p>For a raw queue listing use <code class="docutils literal notranslate"><span class="pre">squeue</span></code> directly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>squeue -u $USER
 </pre></div>
 </div>
 <p>The study job will remain in <code class="docutils literal notranslate"><span class="pre">Pending</span></code> state (dependency not yet satisfied)
