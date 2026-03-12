@@ -45,6 +45,10 @@ def cmd_plot_delta_e_rel(args) -> None:
     _import_pp('PlotDeltaERel').run(args)
 
 
+def cmd_plot_delta_e(args) -> None:
+    _import_pp('PlotDeltaE').run(args)
+
+
 # ---------------------------------------------------------------------------
 # discharge-inception ls
 # ---------------------------------------------------------------------------
@@ -264,6 +268,13 @@ def main() -> None:
         parents=[pp_mod.make_parser(add_help=False)],
         help='Batch-plot ΔE(rel) vs time for every run in a plasma database.')
 
+    # --- discharge-inception plot-delta-e -------------------------------------------
+    pp_mod = _import_pp('PlotDeltaE')
+    subparsers.add_parser(
+        'plot-delta-e',
+        parents=[pp_mod.make_parser(add_help=False)],
+        help='Plot peak ΔE(rel) and/or ΔE(max) vs voltage for a run_* database.')
+
     args = parser.parse_args()
 
     if args.command == 'run':
@@ -280,6 +291,8 @@ def main() -> None:
         cmd_gather_plasma_event_logs(args)
     elif args.command == 'plot-delta-e-rel':
         cmd_plot_delta_e_rel(args)
+    elif args.command == 'plot-delta-e':
+        cmd_plot_delta_e(args)
 
 
 if __name__ == '__main__':
