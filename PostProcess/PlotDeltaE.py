@@ -157,7 +157,7 @@ def _find_key_index(keys: list, name_or_pattern: str, label: str) -> int:
 # ---------------------------------------------------------------------------
 
 def plot_peak(rows: list, show_rel: bool, show_max: bool,
-              png_path: Optional[Path]) -> None:
+              png_path: Optional[Path], show: bool = False) -> None:
     """
     Draw peak ΔE vs voltage.
 
@@ -167,6 +167,7 @@ def plot_peak(rows: list, show_rel: bool, show_max: bool,
     show_rel : bool
     show_max : bool
     png_path : Path or None  — None means interactive window
+    show : bool  — open interactive window even when saving to png_path
     """
     Us = [r[0] for r in rows]
 
@@ -206,7 +207,7 @@ def plot_peak(rows: list, show_rel: bool, show_max: bool,
     if png_path:
         fig.savefig(png_path, dpi=150)
         print(f"Saved: {png_path}")
-    else:
+    if not png_path or show:
         plt.show()
 
     plt.close(fig)
@@ -285,11 +286,23 @@ def make_parser(add_help: bool = True) -> argparse.ArgumentParser:
     )
     ap.add_argument(
         '--png', default=None, metavar='FILE',
-        help='Save figure to FILE instead of opening an interactive window.',
+        help='Save figure to FILE (overrides default Results/ path).',
+    )
+    ap.add_argument(
+        '--no-png', action='store_true',
+        help='Skip saving the figure (show interactive window instead).',
+    )
+    ap.add_argument(
+        '--show', action='store_true',
+        help='Open an interactive matplotlib window (in addition to saving).',
     )
     ap.add_argument(
         '-o', '--output', default=None, metavar='FILE',
-        help='Write results to a CSV file.',
+        help='Write results to a CSV file (overrides default Results/ path).',
+    )
+    ap.add_argument(
+        '--no-csv', action='store_true',
+        help='Skip writing the CSV output.',
     )
     return ap
 
@@ -329,11 +342,23 @@ def run(args) -> None:
         print("warning: no data found", file=sys.stderr)
         sys.exit(1)
 
-    png_path = Path(args.png) if args.png else None
-    plot_peak(rows, show_rel, show_max, png_path)
+    from discharge_inception.results import ensure_results_dir, link_metadata
+    results_dir = ensure_results_dir(db_dir)
 
-    if args.output:
-        write_csv(Path(args.output), rows, show_rel, show_max)
+    if args.no_png:
+        png_path = None
+    elif args.png:
+        png_path = Path(args.png)
+    else:
+        png_path = results_dir / 'peak_delta_e.png'
+
+    plot_peak(rows, show_rel, show_max, png_path, show=args.show)
+
+    if not args.no_csv:
+        csv_path = Path(args.output) if args.output else results_dir / 'peak_delta_e.csv'
+        write_csv(csv_path, rows, show_rel, show_max)
+
+    link_metadata(db_dir, results_dir)
 
 
 def main() -> None:

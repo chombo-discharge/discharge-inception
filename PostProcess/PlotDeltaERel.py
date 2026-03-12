@@ -188,7 +188,7 @@ def _run_label(keys, param_values, group_path: Path, group_count: int) -> str:
 
 # ---- Plotting ----
 
-def plot_all(curves, png_path=None) -> None:
+def plot_all(curves, png_path=None, show: bool = False) -> None:
     """Draw all curves on one figure, optionally saving to PNG."""
     fig, ax = plt.subplots(figsize=(8, 4))
     for label, t, E_rel in curves:
@@ -202,7 +202,7 @@ def plot_all(curves, png_path=None) -> None:
     if png_path:
         fig.savefig(png_path, dpi=150)
         print(f"Saved: {png_path}")
-    else:
+    if not png_path or show:
         plt.show()
     plt.close(fig)
 
@@ -247,11 +247,23 @@ def make_parser(add_help=True) -> argparse.ArgumentParser:
     )
     ap.add_argument(
         "--png", metavar="FILE", default=None,
-        help="Save figure to this PNG file instead of opening an interactive window.",
+        help="Save figure to FILE (overrides default Results/ path).",
+    )
+    ap.add_argument(
+        "--no-png", action="store_true",
+        help="Skip saving the figure (show interactive window instead).",
+    )
+    ap.add_argument(
+        "--show", action="store_true",
+        help="Open an interactive matplotlib window (in addition to saving).",
     )
     ap.add_argument(
         "-o", "--output", metavar="FILE", default=None,
-        help="Write curve data to a CSV file.",
+        help="Write curve data to a CSV file (overrides default Results/ path).",
+    )
+    ap.add_argument(
+        "--no-csv", action="store_true",
+        help="Skip writing the CSV output.",
     )
     return ap
 
@@ -281,10 +293,23 @@ def run(args) -> None:
         print("warning: no data found", file=sys.stderr)
         sys.exit(1)
 
-    plot_all(curves, png_path=args.png)
+    from discharge_inception.results import ensure_results_dir, link_metadata
+    results_dir = ensure_results_dir(db_dir)
 
-    if args.output:
-        write_csv(Path(args.output), curves)
+    if args.no_png:
+        png_path = None
+    elif args.png:
+        png_path = Path(args.png)
+    else:
+        png_path = results_dir / 'delta_e_rel.png'
+
+    plot_all(curves, png_path=png_path, show=args.show)
+
+    if not args.no_csv:
+        csv_path = Path(args.output) if args.output else results_dir / 'delta_e_rel.csv'
+        write_csv(csv_path, curves)
+
+    link_metadata(db_dir, results_dir)
 
 
 def main():

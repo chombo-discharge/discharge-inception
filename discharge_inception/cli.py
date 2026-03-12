@@ -49,6 +49,23 @@ def cmd_plot_delta_e(args) -> None:
     _import_pp('PlotDeltaE').run(args)
 
 
+def cmd_list_results(args) -> None:
+    from discharge_inception.results import list_results, get_results_dir
+    study_dir = Path(args.study_dir)
+    grouped = list_results(study_dir)
+    if not grouped:
+        print(f"No results found under '{get_results_dir(study_dir)}'")
+        return
+    total = sum(len(v) for v in grouped.values())
+    print(f"Results in {study_dir}/  ({total} file{'s' if total != 1 else ''} "
+          f"in {len(grouped)} folder{'s' if len(grouped) != 1 else ''})\n")
+    for folder, files in sorted(grouped.items()):
+        print(f"  {folder}/")
+        for f in files:
+            print(f"    {f}")
+        print()
+
+
 # ---------------------------------------------------------------------------
 # discharge-inception ls
 # ---------------------------------------------------------------------------
@@ -275,6 +292,14 @@ def main() -> None:
         parents=[pp_mod.make_parser(add_help=False)],
         help='Plot peak ΔE(rel) and/or ΔE(max) vs voltage for a run_* database.')
 
+    # --- discharge-inception list-results -------------------------------------------
+    lr_p = subparsers.add_parser(
+        'list-results',
+        help='List all post-processed result files in a study directory.')
+    lr_p.add_argument(
+        'study_dir', type=Path,
+        help='Study directory (containing index.json and Results/).')
+
     args = parser.parse_args()
 
     if args.command == 'run':
@@ -293,6 +318,8 @@ def main() -> None:
         cmd_plot_delta_e_rel(args)
     elif args.command == 'plot-delta-e':
         cmd_plot_delta_e(args)
+    elif args.command == 'list-results':
+        cmd_list_results(args)
 
 
 if __name__ == '__main__':

@@ -432,14 +432,18 @@ def run(args) -> None:
     print_summary(data)
 
     # Determine output path
+    from discharge_inception.results import ensure_results_dir, link_metadata
+    results_dir = ensure_results_dir(db_dir)
     ext = ".nc" if args.format == "netcdf" else ".csv"
-    output_path = Path(args.output) if args.output else db_dir / f"inception_voltages{ext}"
+    output_path = Path(args.output) if args.output else results_dir / f"inception_voltages{ext}"
 
     # Write output
     if args.format == "netcdf":
         write_netcdf(data, output_path)
     else:
         write_csv(data, output_path)
+
+    link_metadata(db_dir, results_dir)
 
     # Optional plotting
     if args.plot:

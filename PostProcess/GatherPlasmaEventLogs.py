@@ -413,8 +413,11 @@ def run(args) -> None:
 
     # Write CSV
     if not args.no_output:
-        output_path = Path(args.output) if args.output else db_dir / "plasma_event_log.csv"
+        from discharge_inception.results import ensure_results_dir, link_metadata
+        results_dir = ensure_results_dir(db_dir)
+        output_path = Path(args.output) if args.output else results_dir / "plasma_event_log.csv"
         write_csv(rows, keys, output_path)
+        link_metadata(db_dir, results_dir)
 
     # Optional plot
     if args.plot:
