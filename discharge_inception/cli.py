@@ -347,6 +347,31 @@ def main() -> None:
         '--no-voltage', action='store_true',
         help='Skip inner voltage array queries (faster).')
 
+    # --- discharge-inception postprocess --------------------------------------------
+    pp_p = subparsers.add_parser(
+        'postprocess',
+        help='Run all post-processing scripts on a study directory.')
+    pp_p.add_argument(
+        'study_root', type=Path,
+        help='Top-level study directory (e.g. PressureStudy_1/).')
+    pp_p.add_argument(
+        '--pdiv-db', default='pdiv_database', metavar='DIRNAME',
+        help='Subdirectory name of the pdiv database (default: pdiv_database).')
+    pp_p.add_argument(
+        '--plasma-sim', default='plasma_simulations', metavar='DIRNAME',
+        help='Subdirectory name of the plasma simulations (default: plasma_simulations).')
+    pp_p.add_argument(
+        '--run-prefix', default='run_', metavar='PREFIX',
+        help='Run directory prefix (default: run_). Overridden by prefix in index.json.')
+
+    # --- discharge-inception list-results -------------------------------------------
+    lr_p = subparsers.add_parser(
+        'list-results',
+        help='List all post-processed result files in a study directory.')
+    lr_p.add_argument(
+        'study_dir', type=Path,
+        help='Study directory (containing index.json and Results/).')
+
     # --- discharge-inception analyze-time-series ------------------------------------
     pp_mod = _import_pp('AnalyzeTimeSeries')
     subparsers.add_parser(
@@ -381,31 +406,6 @@ def main() -> None:
         'plot-delta-e',
         parents=[pp_mod.make_parser(add_help=False)],
         help='Plot peak ΔE(rel) and/or ΔE(max) vs voltage for a run_* database.')
-
-    # --- discharge-inception postprocess --------------------------------------------
-    pp_p = subparsers.add_parser(
-        'postprocess',
-        help='Run all post-processing scripts on a study directory.')
-    pp_p.add_argument(
-        'study_root', type=Path,
-        help='Top-level study directory (e.g. PressureStudy_1/).')
-    pp_p.add_argument(
-        '--pdiv-db', default='pdiv_database', metavar='DIRNAME',
-        help='Subdirectory name of the pdiv database (default: pdiv_database).')
-    pp_p.add_argument(
-        '--plasma-sim', default='plasma_simulations', metavar='DIRNAME',
-        help='Subdirectory name of the plasma simulations (default: plasma_simulations).')
-    pp_p.add_argument(
-        '--run-prefix', default='run_', metavar='PREFIX',
-        help='Run directory prefix (default: run_). Overridden by prefix in index.json.')
-
-    # --- discharge-inception list-results -------------------------------------------
-    lr_p = subparsers.add_parser(
-        'list-results',
-        help='List all post-processed result files in a study directory.')
-    lr_p.add_argument(
-        'study_dir', type=Path,
-        help='Study directory (containing index.json and Results/).')
 
     args = parser.parse_args()
 
