@@ -192,7 +192,34 @@ def setup_database(log, database_definition, output_dir, dim, rel_path):
     return keys, db_dir
 
 
+def _inject_plasma_voltage_deps(study: dict) -> dict:
+    """Return a copy of *study* with voltage-level files appended to required_files.
+
+    When the job script is PlasmaJobscript.py, each run directory needs
+    ``GenericArrayJob.sh`` and ``GenericArrayJobJobscript.py`` present so
+    that ``submit_voltage_array`` can call sbatch from inside ``run_N/``
+    and the resulting voltage array can execute ``./jobscript_symlink``.
+    These are derived from the job_script path and injected automatically
+    so that users do not have to add them manually to required_files.
+    """
+    if Path(study.get('job_script', '')).name != 'PlasmaJobscript.py':
+        return study
+    di_home = Path(study['job_script']).parent.parent
+    to_inject = [
+        di_home / 'Util' / 'GenericArrayJob.sh',
+        di_home / 'GenericArrayJobJobscript.py',
+    ]
+    existing = {Path(f).name for f in study.get('required_files', [])}
+    extra = [str(p) for p in to_inject if p.name not in existing]
+    if not extra:
+        return study
+    study = dict(study)
+    study['required_files'] = list(study.get('required_files', [])) + extra
+    return study
+
+
 def setup_study(log, study, output_dir, dim, rel_path):
+    study = _inject_plasma_voltage_deps(study)
     st_dir, program = setup_env(log, study, "study", output_dir, dim, rel_path)
 
     pspace = study['parameter_space']  # alias used below
@@ -323,7 +350,7 @@ def setup(log,
                                                                 output_dir, dim,
                                                                 structure_rel_include_path)
             studies[study['identifier']] = dict(
-                    structure=study,
+                    structure=_inject_plasma_voltage_deps(study),
                     database_deps=db_params,
                     directory=st_dir,
                     keys=keys,

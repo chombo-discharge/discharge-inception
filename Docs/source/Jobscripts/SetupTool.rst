@@ -110,9 +110,9 @@ from the project root:
 
 This creates ``Exec/MyRod/`` containing:
 
-* ``main.cpp`` — dual-mode driver configured for the Rod geometry.
-* ``GNUmakefile`` — ready-to-use build file.
-* ``template.inputs`` — complete options for every selected component,
+* ``main.cpp`` -- dual-mode driver configured for the Rod geometry.
+* ``GNUmakefile`` -- ready-to-use build file.
+* ``template.inputs`` -- complete options for every selected component,
   with ``app.mode`` and ``plasma.voltage`` at the top.
-* ``chemistry.json`` — dependency copied from the ``ItoKMCJSON`` model
+* ``chemistry.json`` -- dependency copied from the ``ItoKMCJSON`` model
   directory via ``CD_ItoKMCJSON.inc``.

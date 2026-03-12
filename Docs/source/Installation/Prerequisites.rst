@@ -30,7 +30,7 @@ chombo-discharge, but every ``Exec/`` case depends on it at compile time.
 
 The environment variable ``DISCHARGE_HOME`` must be set and exported before
 compiling any ``Exec/`` case.  It should point to the root of the
-chombo-discharge source tree — the same directory that contains
+chombo-discharge source tree -- the same directory that contains
 ``GNUmakefile.defs``.  Setting this in your ``.bashrc`` (or the cluster
 environment module) is the most convenient approach.
 
@@ -39,7 +39,7 @@ SLURM
 
 SLURM client tools (``sbatch``, ``squeue``, ``sinfo``, ``scancel``) must be
 available on the machine from which you submit jobs.  On HPC clusters these are
-typically pre-installed by system administrators — you need only an account and
+typically pre-installed by system administrators -- you need only an account and
 partition access.
 
 The framework submits jobs programmatically: the ``discharge-inception run``

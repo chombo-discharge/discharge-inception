@@ -21,7 +21,7 @@ searching inside JSON *lists* (arrays of objects):
    See `"Specifying reactions" <https://chombo-discharge.github.io/chombo-discharge/Applications/CdrPlasmaModel.html?highlight=reaction#specifying-reactions>`_
    in the chombo-discharge documentation.
 
-**Multiple parallel targets** — when the second element of the uri list is
+**Multiple parallel targets** -- when the second element of the uri list is
 itself a list, the same traversal step applies to *all* entries in that inner
 list simultaneously.  This is used to write two fields at the same time:
 
@@ -37,7 +37,7 @@ list simultaneously.  This is used to write two fields at the same time:
    ],
    "values": [[1.0, 0.0]]
 
-**Example 1** — simple object search in a list:
+**Example 1** -- simple object search in a list:
 
 .. code-block:: json
 
@@ -61,7 +61,7 @@ list simultaneously.  This is used to write two fields at the same time:
        "target-field"         # the actual target
    ]
 
-**Example 2** — searching by a specific value:
+**Example 2** -- searching by a specific value:
 
 .. code-block:: json
 
@@ -85,7 +85,7 @@ list simultaneously.  This is used to write two fields at the same time:
        "target-field"                      # the actual target
    ]
 
-**Example 3** — traversing two list levels:
+**Example 3** -- traversing two list levels:
 
 .. code-block:: json
 

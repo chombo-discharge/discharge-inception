@@ -370,8 +370,9 @@ def make_parser(add_help=True) -> argparse.ArgumentParser:
         help="Output file path (default: <db_dir>/inception_voltages.nc or .csv)"
     )
     ap.add_argument(
-        "--format", choices=["netcdf", "csv"], default="netcdf",
-        help="Output format: netcdf (default, requires xarray) or csv"
+        "--format", choices=["netcdf", "csv", "auto"], default="auto",
+        help="Output format: auto (default — netcdf if xarray is installed, else csv), "
+             "netcdf (requires xarray), or csv."
     )
     ap.add_argument(
         "--plot", nargs="+", metavar="PARAM",
@@ -431,15 +432,30 @@ def run(args) -> None:
     # Print summary
     print_summary(data)
 
+    # Resolve effective format
+    fmt = args.format
+    if fmt == "auto":
+        fmt = "netcdf" if _try_import_xarray() is not None else "csv"
+        if fmt == "csv":
+            print("note: xarray not installed — writing CSV instead of NetCDF.")
+
     # Determine output path
-    ext = ".nc" if args.format == "netcdf" else ".csv"
-    output_path = Path(args.output) if args.output else db_dir / f"inception_voltages{ext}"
+    from discharge_inception.results import ensure_results_dir, link_metadata
+    results_dir = ensure_results_dir(db_dir)
+    ext = ".nc" if fmt == "netcdf" else ".csv"
+    output_path = Path(args.output) if args.output else results_dir / f"inception_voltages{ext}"
+    # If an explicit output path was given but has the wrong extension for the resolved
+    # format (e.g. postprocess passed .nc but we fell back to csv), fix the extension.
+    if args.output:
+        output_path = output_path.with_suffix(ext)
 
     # Write output
-    if args.format == "netcdf":
+    if fmt == "netcdf":
         write_netcdf(data, output_path)
     else:
         write_csv(data, output_path)
+
+    link_metadata(db_dir, results_dir)
 
     # Optional plotting
     if args.plot:

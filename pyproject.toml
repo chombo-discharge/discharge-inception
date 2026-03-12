@@ -7,10 +7,7 @@ name = "discharge-inception"
 version = "0.1.0"
 description = "Parametric study configurator for chombo-discharge simulations"
 requires-python = ">=3.10"
-dependencies = ["numpy"]
-
-[project.optional-dependencies]
-plot = ["matplotlib", "scipy"]
+dependencies = ["numpy", "matplotlib", "scipy"]
 
 [project.scripts]
 discharge-inception = "discharge_inception.cli:main"

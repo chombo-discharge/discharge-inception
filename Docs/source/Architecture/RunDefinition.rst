@@ -33,7 +33,7 @@ Each database or study entry is a dictionary with these configurable fields:
    stage's top-level directory.
 
 ``required_files``
-   List of files copied into **every** per-run ``run_N/`` directory —
+   List of files copied into **every** per-run ``run_N/`` directory --
    typically ``*.inputs``, ``chemistry.json``, and other data files needed by
    the executable.
 
@@ -42,9 +42,9 @@ Each database or study entry is a dictionary with these configurable fields:
 
 The key distinction between ``job_script_dependencies`` and ``required_files``:
 
-* ``job_script_dependencies`` — files the jobscript at the stage level needs
+* ``job_script_dependencies`` -- files the jobscript at the stage level needs
   (present once in the stage directory).
-* ``required_files`` — files needed by every invocation of the executable
+* ``required_files`` -- files needed by every invocation of the executable
   (copied into every ``run_N/`` directory).
 
 A realistic example:
@@ -69,5 +69,5 @@ A realistic example:
        'parameter_space': { ... }
    }
 
-Note the use of ``{DIMENSIONALITY}`` in the ``program`` field — this token is
+Note the use of ``{DIMENSIONALITY}`` in the ``program`` field -- this token is
 substituted with the value supplied via ``--dim`` on the command line.

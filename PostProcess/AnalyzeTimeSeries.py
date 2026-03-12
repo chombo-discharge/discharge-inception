@@ -662,7 +662,14 @@ def run(args) -> None:
         print(f"Error: input file not found: {in_path}", file=sys.stderr)
         sys.exit(1)
 
-    out_path = args.output or str(Path(in_path).with_suffix(".out"))
+    if args.output:
+        out_path = args.output
+    else:
+        from discharge_inception.results import ensure_results_dir, link_metadata
+        input_path = Path(in_path)
+        results_dir = ensure_results_dir(input_path)
+        out_path = str(results_dir / 'pout.out')
+        link_metadata(input_path.parent, results_dir)
 
     rows = parse_file(in_path)
     if not rows:

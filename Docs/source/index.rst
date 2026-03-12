@@ -90,18 +90,19 @@ Post-processing
    :caption: Post-processing
    :hidden:
 
+   PostProcess/Quickstart
    PostProcess/ExtractInceptionVoltages
    PostProcess/GatherPlasmaEventLogs
    PostProcess/AnalyzeTimeSeries
    PostProcess/PlotDeltaERel
 
 
-Example — Rod Case
-******************
+Example -- Rod Case
+*******************
 
 .. toctree::
    :maxdepth: 2
-   :caption: Example — Rod Case
+   :caption: Example -- Rod Case
    :hidden:
 
    Example/Prerequisites

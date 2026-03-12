@@ -13,13 +13,13 @@ a human-readable summary table to standard output.
 
 The following information is extracted for every run:
 
-* **final_step** — last reported time-step number
-* **final_time** — last reported simulation time
-* **final_dt** — last reported time-step size
-* **inception** — whether a discharge inception event was detecte d
-* **convergence_failures** — number of Poisson solver convergence failures
-* **other_abort** — whether any other unexpected abort was found
-* **status** — derived run outcome: ``completed``, ``inception``,
+* **final_step** -- last reported time-step number
+* **final_time** -- last reported simulation time
+* **final_dt** -- last reported time-step size
+* **inception** -- whether a discharge inception event was detecte d
+* **convergence_failures** -- number of Poisson solver convergence failures
+* **other_abort** -- whether any other unexpected abort was found
+* **status** -- derived run outcome: ``completed``, ``inception``,
   ``convergence_failure``, ``abort``, or ``not_found``
 
 Status is assigned with the following priority (highest first):
@@ -34,7 +34,7 @@ directory.
 
    **Optional dependency**
 
-   ``matplotlib`` — required only when ``--plot`` is used.  If it is absent
+   ``matplotlib`` -- required only when ``--plot`` is used.  If it is absent
    the script exits with an error when plotting is requested.  Install with::
 
       pip install matplotlib

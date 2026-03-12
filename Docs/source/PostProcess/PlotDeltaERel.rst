@@ -21,9 +21,9 @@ PNG file.
 
 The figure for each run shows:
 
-* **x-axis** — simulation time in nanoseconds
-* **y-axis** — :math:`\Delta` E(rel) (%)
-* **title** — the sweep-parameter key/value pairs for that run as read from
+* **x-axis** -- simulation time in nanoseconds
+* **y-axis** -- :math:`\Delta` E(rel) (%)
+* **title** -- the sweep-parameter key/value pairs for that run as read from
   ``index.json``
 
 Output PNGs are named ``plt_0.png``, ``plt_1.png``, ... and written to

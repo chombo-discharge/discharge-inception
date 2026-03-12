@@ -79,11 +79,11 @@ layout, and all values are written in 8-digit scientific notation.
 
    **Optional dependencies**
 
-   * ``scipy`` — required when ``--sg`` is used.  Install with::
+   * ``scipy`` -- required when ``--sg`` is used.  Install with::
 
         pip install scipy
 
-   * ``matplotlib`` — required for the interactive plot.  If absent, a warning
+   * ``matplotlib`` -- required for the interactive plot.  If absent, a warning
      is printed and the script continues without plotting.  Install with::
 
         pip install matplotlib
