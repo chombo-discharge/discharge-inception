@@ -107,8 +107,9 @@ _DT_RE = re.compile(
 )
 _STEP_RE = re.compile(r'Driver::Time step report -- Time step #(?P<step>\d+)')
 
-_INCEPTION_PREFIX = (
-    "ItoKMCBackgroundEvaluator -- abort because field changed"
+_INCEPTION_PREFIXES = (
+    "ItoKMCBackgroundEvaluator -- stopping because",  # new soft-exit (daf83c56)
+    "ItoKMCBackgroundEvaluator -- abort because",     # old hard-exit (backward compat)
 )
 _CONVERGENCE_PREFIX = (
     "ItoKMCGodunovStepper::advanceEulerMaruyama - Poisson solve did not converge"
@@ -177,11 +178,11 @@ def parse_pout(pout_path: Path, tail_n: int) -> dict:
             result["final_dt"] = float(m.group("dt"))
             continue
 
-        if stripped.startswith(_INCEPTION_PREFIX):
+        if stripped.startswith(_INCEPTION_PREFIXES):
             result["inception"] = True
         elif stripped.startswith(_CONVERGENCE_PREFIX):
             result["convergence_failures"] += 1
-        elif "abort" in stripped.lower():
+        elif "abort" in stripped.lower() or "stopping because" in stripped.lower():
             result["other_abort"] = True
 
     # Derive status (priority: not_found > inception > convergence_failure > abort > completed)
