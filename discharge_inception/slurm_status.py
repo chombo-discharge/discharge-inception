@@ -2,7 +2,7 @@
 Robert Marskar
 Copyright © 2026 SINTEF Energi AS
 
-Slurm job status reporting for discharge-inception studies.
+Slurm job status reporting for inception studies.
 """
 
 import json

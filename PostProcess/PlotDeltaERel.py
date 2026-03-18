@@ -209,17 +209,38 @@ def plot_all(curves, png_path=None, show: bool = False) -> None:
 
 # ---- CSV output ----
 
+FIELDS       = ['label', 't_ns', 'delta_e_rel_pct']
+DESCRIPTIONS = ['run label', 'simulation time [ns]', 'Delta E(rel) [%]']
+
+
+def _aligned_rows(fieldnames, descriptions, rows):
+    """Yield fixed-width formatted lines: 2 comment lines then header then data."""
+    widths = []
+    for f, d in zip(fieldnames, descriptions):
+        w = max(len(f), len(d))
+        if rows:
+            w = max(w, max(len(str(row.get(f, ''))) for row in rows))
+        widths.append(w + 2)
+
+    def fmt(vals):
+        return '  '.join(f'{str(v):<{w}}' for v, w in zip(vals, widths)).rstrip()
+
+    yield '# ' + fmt(fieldnames)
+    yield '# ' + fmt(descriptions)
+    yield fmt(fieldnames)
+    for row in rows:
+        yield fmt([row.get(f, '') for f in fieldnames])
+
+
 def write_csv(path: Path, curves) -> None:
-    """Write curve data to a CSV file with a commented header block."""
-    with open(path, 'w') as f:
+    """Write curve data to a fixed-width aligned file with a commented header block."""
+    rows = [{'label': label, 't_ns': f'{ti:.6g}', 'delta_e_rel_pct': f'{ei:.6g}'}
+            for label, t, E_rel in curves
+            for ti, ei in zip(t * 1e9, E_rel)]
+    with open(path, 'w', encoding='utf-8') as f:
         f.write('# Delta E(rel) vs time\n')
-        f.write('# Columns: label, t_ns, delta_e_rel_pct\n')
-        f.write('# label           - sweep parameter values identifying this run\n')
-        f.write('# t_ns            - simulation time [ns]\n')
-        f.write('# delta_e_rel_pct - Delta E(rel) [%]\n')
-        for label, t, E_rel in curves:
-            for ti, ei in zip(t * 1e9, E_rel):
-                f.write(f'"{label}",{ti:.6g},{ei:.6g}\n')
+        for line in _aligned_rows(FIELDS, DESCRIPTIONS, rows):
+            f.write(line + '\n')
     print(f"Saved: {path}")
 
 

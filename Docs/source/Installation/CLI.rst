@@ -6,16 +6,16 @@ The CLI
 Overview
 --------
 
-All functionality is accessed through the ``discharge-inception`` command.
+All functionality is accessed through the ``inception`` command.
 Run the following to see every available subcommand:
 
 .. code-block:: console
 
-   $ discharge-inception --help
+   $ inception --help
 
 .. code-block:: text
 
-   usage: discharge-inception [-h] command ...
+   usage: inception [-h] command ...
 
    Parametric study configurator for chombo-discharge simulations.
 
@@ -39,16 +39,16 @@ Run the following to see every available subcommand:
 
 Each subcommand accepts its own ``--help`` flag, e.g.::
 
-   discharge-inception extract-inception-voltages --help
+   inception extract-inception-voltages --help
 
-``discharge-inception run``
+``inception run``
 ---------------------------
 
 Sets up directory structure and submits the initial SLURM array jobs.
 
 .. code-block:: text
 
-   usage: discharge-inception run [-h] [--output-dir OUTPUT_DIR] [--dim DIM]
+   usage: inception run [-h] [--output-dir OUTPUT_DIR] [--dim DIM]
                            [--verbose] [--logfile LOGFILE]
                            [--pdiv-only]
                            [--overwrite | --suffix SUFFIX]
@@ -73,7 +73,7 @@ Sets up directory structure and submits the initial SLURM array jobs.
                            conflicting with an existing directory (mutually exclusive
                            with --overwrite).
 
-``discharge-inception ls``
+``inception ls``
 --------------------------
 
 Prints a table of runs, parameter values, and completion status (``[done]`` if
@@ -81,7 +81,7 @@ Prints a table of runs, parameter values, and completion status (``[done]`` if
 
 .. code-block:: text
 
-   usage: discharge-inception ls [-h] study_dir [study_dir ...]
+   usage: inception ls [-h] study_dir [study_dir ...]
 
    positional arguments:
      study_dir   Study output directory containing index.json (e.g. pdiv_database/).
@@ -94,7 +94,7 @@ Example output::
      run_0  100000  0.001            12  [done]
      run_1  200000  0.001            12
 
-``discharge-inception slurm-status``
+``inception slurm-status``
 --------------------------------------
 
 Queries SLURM (via ``sacct``/``squeue``) and prints a live status table for
@@ -102,7 +102,7 @@ every run in one or more study directories.
 
 .. code-block:: text
 
-   usage: discharge-inception slurm-status [-h] [--no-voltage] study_dir [study_dir ...]
+   usage: inception slurm-status [-h] [--no-voltage] study_dir [study_dir ...]
 
    positional arguments:
      study_dir      Study directory (containing index.json) or parent directory
@@ -121,7 +121,7 @@ for failed tasks, the exit code:
 
 .. code-block:: console
 
-   $ discharge-inception slurm-status study_results/pdiv_database/
+   $ inception slurm-status study_results/pdiv_database/
 
 .. code-block:: text
 
@@ -139,7 +139,7 @@ voltage array:
 
 .. code-block:: console
 
-   $ discharge-inception slurm-status study_results/plasma_simulations/
+   $ inception slurm-status study_results/plasma_simulations/
 
 .. code-block:: text
 
@@ -154,10 +154,10 @@ Pass ``--no-voltage`` to skip the inner voltage queries when the study has many
 runs and a fast summary is sufficient.  Multiple directories can be combined in
 a single call::
 
-   discharge-inception slurm-status study_results/pdiv_database/ study_results/plasma_simulations/
-   discharge-inception slurm-status study_results/   # auto-discovers all sub-studies
+   inception slurm-status study_results/pdiv_database/ study_results/plasma_simulations/
+   inception slurm-status study_results/   # auto-discovers all sub-studies
 
-``discharge-inception postprocess``
+``inception postprocess``
 -------------------------------------
 
 Orchestrates the full post-processing pipeline on a study root directory.
@@ -167,7 +167,7 @@ each post-processing tool in the correct order, and writes all output under
 
 .. code-block:: text
 
-   usage: discharge-inception postprocess [-h] [--pdiv-db DIRNAME]
+   usage: inception postprocess [-h] [--pdiv-db DIRNAME]
                                           [--plasma-sim DIRNAME]
                                           [--run-prefix PREFIX]
                                           study_root
@@ -193,9 +193,9 @@ each post-processing tool in the correct order, and writes all output under
 
 Example::
 
-   discharge-inception postprocess PressureStudy_1/
+   inception postprocess PressureStudy_1/
 
-``discharge-inception plasma-status``
+``inception plasma-status``
 ---------------------------------------
 
 Reads ``plasma_event_log.csv`` from the Results mirror and prints a formatted
@@ -205,7 +205,7 @@ path to the CSV file.
 
 .. code-block:: text
 
-   usage: discharge-inception plasma-status [-h] [--filter STATUS] plasma_sim
+   usage: inception plasma-status [-h] [--filter STATUS] plasma_sim
 
    positional arguments:
      plasma_sim      Path to the plasma_simulations/ directory or directly to
@@ -219,15 +219,15 @@ path to the CSV file.
 Examples::
 
    # Basic call -- pass the plasma_simulations/ directory
-   discharge-inception plasma-status PressureStudy_1/plasma_simulations/
+   inception plasma-status PressureStudy_1/plasma_simulations/
 
    # Pass the CSV file directly
-   discharge-inception plasma-status PressureStudy_1/Results/plasma_simulations/plasma_event_log.csv
+   inception plasma-status PressureStudy_1/Results/plasma_simulations/plasma_event_log.csv
 
    # Show only runs that reached inception
-   discharge-inception plasma-status PressureStudy_1/plasma_simulations/ --filter inception
+   inception plasma-status PressureStudy_1/plasma_simulations/ --filter inception
 
-``discharge-inception list-results``
+``inception list-results``
 --------------------------------------
 
 Lists all post-processed result files grouped by sub-folder under ``Results/``,
@@ -235,7 +235,7 @@ giving a quick overview of every file produced by ``postprocess``.
 
 .. code-block:: text
 
-   usage: discharge-inception list-results [-h] study_root
+   usage: inception list-results [-h] study_root
 
    positional arguments:
      study_root   Root directory of the parametric study.
@@ -245,7 +245,7 @@ giving a quick overview of every file produced by ``postprocess``.
 
 Example::
 
-   discharge-inception list-results PressureStudy_1/
+   inception list-results PressureStudy_1/
 
 .. code-block:: text
 
@@ -271,7 +271,7 @@ Example::
    See :ref:`postprocess_quickstart` -> *Inspecting results* for guidance on
    interpreting the output.
 
-``discharge-inception plot-delta-e``
+``inception plot-delta-e``
 --------------------------------------
 
 Produces a dual-axis plot of peak Delta E(rel) and Delta E(max) vs voltage for a single
@@ -281,7 +281,7 @@ custom output paths or to regenerate individual plots.
 
 .. code-block:: text
 
-   usage: discharge-inception plot-delta-e [-h] [--rel-field REL_FIELD]
+   usage: inception plot-delta-e [-h] [--rel-field REL_FIELD]
                                            [--max-field MAX_FIELD]
                                            [--png PNG] [--output OUTPUT]
                                            db_dir
@@ -300,9 +300,9 @@ custom output paths or to regenerate individual plots.
 
 Example::
 
-   discharge-inception plot-delta-e plasma_simulations/run_0/
+   inception plot-delta-e plasma_simulations/run_0/
 
-``discharge-inception analyze-time-series``
+``inception analyze-time-series``
 -------------------------------------------
 
 Extracts, optionally smooths, and differentiates time-series data from a
@@ -311,16 +311,16 @@ documentation of options and output columns.
 
 .. code-block:: text
 
-   usage: discharge-inception analyze-time-series [-h] [-i INPUT] [-o OUTPUT]
+   usage: inception analyze-time-series [-h] [-i INPUT] [-o OUTPUT]
                                                   [--sg] [--sg-window SG_WINDOW]
                                                   [--sg-order SG_ORDER] [--lp]
                                                   [--lp-tau LP_TAU]
 
 Example::
 
-   discharge-inception analyze-time-series -i run_0/pout.0 -o run_0/pout.out --sg
+   inception analyze-time-series -i run_0/pout.0 -o run_0/pout.out --sg
 
-``discharge-inception extract-inception-voltages``
+``inception extract-inception-voltages``
 ---------------------------------------------------
 
 Extracts the six inception voltages from every run in a ``pdiv_database``
@@ -329,7 +329,7 @@ directory and writes a NetCDF or CSV dataset.  See
 
 .. code-block:: text
 
-   usage: discharge-inception extract-inception-voltages [-h] [--output OUTPUT]
+   usage: inception extract-inception-voltages [-h] [--output OUTPUT]
                                                          [--format {netcdf,csv}]
                                                          [--plot PARAM [PARAM ...]]
                                                          [--select KEY=VALUE ...]
@@ -338,9 +338,9 @@ directory and writes a NetCDF or CSV dataset.  See
 
 Example::
 
-   discharge-inception extract-inception-voltages study_results/pdiv_database
+   inception extract-inception-voltages study_results/pdiv_database
 
-``discharge-inception gather-plasma-event-logs``
+``inception gather-plasma-event-logs``
 -------------------------------------------------
 
 Scans the tail of each run's ``pout.0`` log, classifies every run as
@@ -349,16 +349,16 @@ summary.  See :ref:`postprocess_gatherplasmaeventlogs` for full documentation.
 
 .. code-block:: text
 
-   usage: discharge-inception gather-plasma-event-logs [-h] [--output PATH]
+   usage: inception gather-plasma-event-logs [-h] [--output PATH]
                                                        [--tail N] [--plot PARAM]
                                                        [--no-output]
                                                        db_dir
 
 Example::
 
-   discharge-inception gather-plasma-event-logs study_results/plasma_database
+   inception gather-plasma-event-logs study_results/plasma_database
 
-``discharge-inception plot-delta-e-rel``
+``inception plot-delta-e-rel``
 -----------------------------------------
 
 Batch-plots Delta E(rel) vs time for every run in a plasma database, saving one
@@ -366,10 +366,10 @@ PNG per run.  See :ref:`postprocess_plotdeltaerel` for full documentation.
 
 .. code-block:: text
 
-   usage: discharge-inception plot-delta-e-rel [-h] [--prefix PREFIX]
+   usage: inception plot-delta-e-rel [-h] [--prefix PREFIX]
                                                [--output-dir DIR]
                                                db_dir
 
 Example::
 
-   discharge-inception plot-delta-e-rel study_results/plasma_database --output-dir plots/
+   inception plot-delta-e-rel study_results/plasma_database --output-dir plots/

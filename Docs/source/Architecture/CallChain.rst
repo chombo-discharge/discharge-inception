@@ -5,7 +5,7 @@ The full call chain
 
 .. code-block:: text
 
-   discharge-inception run <Runs.py>          [CLI -- discharge_inception/configurator.py]
+   inception run <Runs.py>          [CLI -- discharge_inception/configurator.py]
      |  Creates run dirs, writes index.json / parameters.json per run,
      |  symlinks jobscript_symlink, writes DISCHARGE_INCEPTION_SLURM_CONFIG,
      |  then submits:

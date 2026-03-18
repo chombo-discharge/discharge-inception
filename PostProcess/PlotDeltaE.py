@@ -217,33 +217,47 @@ def plot_peak(rows: list, show_rel: bool, show_max: bool,
 # CSV output
 # ---------------------------------------------------------------------------
 
-def write_csv(path: Path, rows: list, show_rel: bool, show_max: bool) -> None:
-    """Write peak ΔE data to a CSV file."""
-    col_names = ['U_V', 'K']
+def _aligned_rows(fieldnames, descriptions, rows):
+    """Yield fixed-width formatted lines: 2 comment lines then header then data."""
+    widths = []
+    for f, d in zip(fieldnames, descriptions):
+        w = max(len(f), len(d))
+        if rows:
+            w = max(w, max(len(str(row.get(f, ''))) for row in rows))
+        widths.append(w + 2)
+
+    def fmt(vals):
+        return '  '.join(f'{str(v):<{w}}' for v, w in zip(vals, widths)).rstrip()
+
+    yield '# ' + fmt(fieldnames)
+    yield '# ' + fmt(descriptions)
+    yield fmt(fieldnames)
+    for row in rows:
+        yield fmt([row.get(f, '') for f in fieldnames])
+
+
+def write_csv(path: Path, rows_in: list, show_rel: bool, show_max: bool) -> None:
+    """Write peak ΔE data to a fixed-width aligned file."""
+    fields = ['U_V', 'K']
+    descs  = ['applied voltage [V]', 'ionisation coefficient K']
     if show_rel:
-        col_names.append('peak_delta_e_rel_pct')
+        fields.append('peak_delta_e_rel_pct'); descs.append('peak Delta E(rel) [%]')
     if show_max:
-        col_names.append('peak_delta_e_max_pct')
+        fields.append('peak_delta_e_max_pct'); descs.append('peak Delta E(max) [%]')
 
-    with open(path, 'w') as f:
-        f.write('# Peak Delta E vs voltage\n')
-        f.write(f'# Columns: {", ".join(col_names)}\n')
-        f.write('# U_V                  - applied voltage [V]\n')
-        f.write('# K                    - ionisation coefficient K\n')
+    rows = []
+    for U, K, e_rel, e_max in rows_in:
+        row = {'U_V': f'{U:.6g}', 'K': f'{K:.6g}'}
         if show_rel:
-            f.write('# peak_delta_e_rel_pct - peak Delta E(rel) [%]\n')
+            row['peak_delta_e_rel_pct'] = '' if e_rel is None else f'{e_rel:.6g}'
         if show_max:
-            f.write('# peak_delta_e_max_pct - peak Delta E(max) [%]\n')
+            row['peak_delta_e_max_pct'] = '' if e_max is None else f'{e_max:.6g}'
+        rows.append(row)
 
-        for row in rows:
-            U, K, e_rel, e_max = row
-            parts = [f'{U:.6g}', f'{K:.6g}']
-            if show_rel:
-                parts.append('' if e_rel is None else f'{e_rel:.6g}')
-            if show_max:
-                parts.append('' if e_max is None else f'{e_max:.6g}')
-            f.write(','.join(parts) + '\n')
-
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write('# Peak Delta E vs voltage\n')
+        for line in _aligned_rows(fields, descs, rows):
+            f.write(line + '\n')
     print(f"Saved: {path}")
 
 

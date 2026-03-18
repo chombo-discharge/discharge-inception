@@ -1,6 +1,6 @@
-# SLURM configuration for discharge-inception.
+# SLURM configuration for inception.
 #
-# Before running discharge-inception, point DISCHARGE_INCEPTION_SLURM_CONFIG at this file:
+# Before running inception, point DISCHARGE_INCEPTION_SLURM_CONFIG at this file:
 #
 #   export DISCHARGE_INCEPTION_SLURM_CONFIG=/absolute/path/to/slurm.toml
 #

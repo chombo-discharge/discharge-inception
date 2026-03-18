@@ -26,7 +26,7 @@ def _import_pp(name: str):
 
 
 # ---------------------------------------------------------------------------
-# discharge-inception post-process subcommands
+# inception post-process subcommands
 # ---------------------------------------------------------------------------
 
 def cmd_analyze_time_series(args) -> None:
@@ -157,7 +157,7 @@ def cmd_list_results(args) -> None:
 
 
 # ---------------------------------------------------------------------------
-# discharge-inception ls
+# inception ls
 # ---------------------------------------------------------------------------
 
 def _format_val(v) -> str:
@@ -228,7 +228,7 @@ def cmd_ls(args) -> None:
 
 
 # ---------------------------------------------------------------------------
-# discharge-inception slurm-status
+# inception slurm-status
 # ---------------------------------------------------------------------------
 
 def cmd_status(args) -> None:
@@ -237,11 +237,11 @@ def cmd_status(args) -> None:
 
 
 # ---------------------------------------------------------------------------
-# discharge-inception plasma-status
+# inception plasma-status
 # ---------------------------------------------------------------------------
 
 def cmd_plasma_status(args) -> None:
-    import csv
+    import re
     from discharge_inception.results import get_results_dir
 
     path = Path(args.plasma_sim).resolve()
@@ -254,13 +254,19 @@ def cmd_plasma_status(args) -> None:
 
     if not csv_path.exists():
         print(f"error: no plasma_event_log.csv found at '{csv_path}'", file=sys.stderr)
-        print("  Run 'discharge-inception gather-plasma-event-logs' or "
-              "'discharge-inception postprocess' first.", file=sys.stderr)
+        print("  Run 'inception gather-plasma-event-logs' or "
+              "'inception postprocess' first.", file=sys.stderr)
         sys.exit(1)
 
-    with open(csv_path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        rows = list(reader)
+    def _read_aligned(path):
+        with open(path, encoding='utf-8') as f:
+            lines = [l.rstrip('\n') for l in f if not l.startswith('#')]
+        if not lines:
+            return []
+        header = re.split(r'  +', lines[0].strip())
+        return [dict(zip(header, re.split(r'  +', l.strip()))) for l in lines[1:] if l.strip()]
+
+    rows = _read_aligned(csv_path)
 
     if not rows:
         print("No data in CSV.")
@@ -318,7 +324,7 @@ def cmd_plasma_status(args) -> None:
 
 
 # ---------------------------------------------------------------------------
-# discharge-inception run
+# inception run
 # ---------------------------------------------------------------------------
 
 def _resolve_output_dir(output_dir: Path, overwrite: bool, suffix: bool) -> Path:
@@ -348,7 +354,7 @@ def _resolve_output_dir(output_dir: Path, overwrite: bool, suffix: bool) -> Path
 def cmd_run(args) -> None:
     from discharge_inception import configurator
 
-    log = logging.getLogger('discharge-inception')
+    log = logging.getLogger('inception')
     formatter = logging.Formatter('%(asctime)s | %(levelname)s :: %(message)s')
     sh = logging.StreamHandler(sys.stdout)
     sh.setFormatter(formatter)
@@ -376,12 +382,12 @@ def cmd_run(args) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog='discharge-inception',
+        prog='inception',
         description='Parametric study configurator for chombo-discharge simulations.')
     subparsers = parser.add_subparsers(dest='command', metavar='command')
     subparsers.required = True
 
-    # --- discharge-inception run ----------------------------------------------------
+    # --- inception run ----------------------------------------------------
     run_p = subparsers.add_parser(
         'run', help='Configure and submit a parametric study.')
     run_p.add_argument(
@@ -410,14 +416,14 @@ def main() -> None:
         '--suffix', action='store_true',
         help='Append _1, _2, … to output directory name if it already exists.')
 
-    # --- discharge-inception ls -----------------------------------------------------
+    # --- inception ls -----------------------------------------------------
     ls_p = subparsers.add_parser(
         'ls', help='List runs and parameter settings in a study directory.')
     ls_p.add_argument(
         'study_dirs', nargs='+', type=Path, metavar='study_dir',
         help='Study output directory containing index.json (e.g. pdiv_database/).')
 
-    # --- discharge-inception slurm-status -------------------------------------------
+    # --- inception slurm-status -------------------------------------------
     status_p = subparsers.add_parser(
         'slurm-status', help='Show Slurm job status for one or more study directories.')
     status_p.add_argument(
@@ -428,7 +434,7 @@ def main() -> None:
         '--no-voltage', action='store_true',
         help='Skip inner voltage array queries (faster).')
 
-    # --- discharge-inception postprocess --------------------------------------------
+    # --- inception postprocess --------------------------------------------
     pp_p = subparsers.add_parser(
         'postprocess',
         help='Run all post-processing scripts on a study directory.')
@@ -445,7 +451,7 @@ def main() -> None:
         '--run-prefix', default='run_', metavar='PREFIX',
         help='Run directory prefix (default: run_). Overridden by prefix in index.json.')
 
-    # --- discharge-inception plasma-status ------------------------------------------
+    # --- inception plasma-status ------------------------------------------
     ps_p = subparsers.add_parser(
         'plasma-status',
         help='Show per-run plasma simulation status from plasma_event_log.csv.')
@@ -458,7 +464,7 @@ def main() -> None:
         help='Show only runs with this status '
              '(completed, inception, convergence_failure, abort, not_found).')
 
-    # --- discharge-inception list-results -------------------------------------------
+    # --- inception list-results -------------------------------------------
     lr_p = subparsers.add_parser(
         'list-results',
         help='List all post-processed result files in a study directory.')
@@ -466,35 +472,35 @@ def main() -> None:
         'study_dir', type=Path,
         help='Study directory (containing index.json and Results/).')
 
-    # --- discharge-inception analyze-time-series ------------------------------------
+    # --- inception analyze-time-series ------------------------------------
     pp_mod = _import_pp('AnalyzeTimeSeries')
     subparsers.add_parser(
         'analyze-time-series',
         parents=[pp_mod.make_parser(add_help=False)],
         help='Extract, smooth, differentiate, and filter time-series data from a plasma log.')
 
-    # --- discharge-inception extract-inception-voltages -----------------------------
+    # --- inception extract-inception-voltages -----------------------------
     pp_mod = _import_pp('ExtractInceptionVoltages')
     subparsers.add_parser(
         'extract-inception-voltages',
         parents=[pp_mod.make_parser(add_help=False)],
         help='Extract inception voltages from a pdiv_database and write NetCDF/CSV.')
 
-    # --- discharge-inception gather-plasma-event-logs -------------------------------
+    # --- inception gather-plasma-event-logs -------------------------------
     pp_mod = _import_pp('GatherPlasmaEventLogs')
     subparsers.add_parser(
         'gather-plasma-event-logs',
         parents=[pp_mod.make_parser(add_help=False)],
         help='Gather plasma event logs from a database and write a CSV summary.')
 
-    # --- discharge-inception plot-delta-e-rel ---------------------------------------
+    # --- inception plot-delta-e-rel ---------------------------------------
     pp_mod = _import_pp('PlotDeltaERel')
     subparsers.add_parser(
         'plot-delta-e-rel',
         parents=[pp_mod.make_parser(add_help=False)],
         help='Batch-plot ΔE(rel) vs time for every run in a plasma database.')
 
-    # --- discharge-inception plot-delta-e -------------------------------------------
+    # --- inception plot-delta-e -------------------------------------------
     pp_mod = _import_pp('PlotDeltaE')
     subparsers.add_parser(
         'plot-delta-e',
