@@ -126,7 +126,7 @@
 <span id="install-prereqs"></span><h1>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading"></a></h1>
 <section id="python">
 <h2>Python<a class="headerlink" href="#python" title="Permalink to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code> requires <strong>Python &gt;= 3.10</strong>.  The minimum version is set
+<p><code class="docutils literal notranslate"><span class="pre">inception</span></code> requires <strong>Python &gt;= 3.10</strong>.  The minimum version is set
 by the use of structural pattern matching (<code class="docutils literal notranslate"><span class="pre">match</span></code>/<code class="docutils literal notranslate"><span class="pre">case</span></code>) in the parameter
 handling code and by <code class="docutils literal notranslate"><span class="pre">tomllib</span></code>, which entered the standard library in 3.11 but
 is available as a backport (<code class="docutils literal notranslate"><span class="pre">tomli</span></code>) for 3.10.  Using the newest Python 3.x
@@ -156,7 +156,7 @@ environment module) is the most convenient approach.</p>
 available on the machine from which you submit jobs.  On HPC clusters these are
 typically pre-installed by system administrators – you need only an account and
 partition access.</p>
-<p>The framework submits jobs programmatically: the <code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">run</span></code>
+<p>The framework submits jobs programmatically: the <code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">run</span></code>
 command calls <code class="docutils literal notranslate"><span class="pre">sbatch</span></code> directly from Python, so the SLURM client must be on
 the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> of the machine where you run the configurator.  Compute nodes
 themselves do not need to call <code class="docutils literal notranslate"><span class="pre">sbatch</span></code> unless you use the two-stage pipeline,

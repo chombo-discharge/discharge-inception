@@ -8,7 +8,7 @@ scripts in the correct order:
 
 .. code-block:: console
 
-   $ discharge-inception postprocess <db_dir>/
+   $ inception postprocess <db_dir>/
 
 Here ``<db_dir>`` is the root folder of your study (the directory that contains
 ``pdiv_database/`` and ``plasma_simulations/`` as sub-directories).
@@ -55,7 +55,7 @@ every output file:
 
 .. code-block:: console
 
-   $ discharge-inception list-results <db_dir>/
+   $ inception list-results <db_dir>/
 
 Example output:
 
@@ -84,7 +84,7 @@ summary; use ``plasma-status`` for a quick formatted view:
 
 .. code-block:: console
 
-   $ discharge-inception plasma-status <db_dir>/plasma_simulations/
+   $ inception plasma-status <db_dir>/plasma_simulations/
 
 For more detail on the individual post-processing tools, see
 :ref:`postprocess_gatherplasmaeventlogs` and the pages for each tool linked in

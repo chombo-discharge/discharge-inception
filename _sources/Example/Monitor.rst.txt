@@ -3,15 +3,15 @@
 Monitoring jobs
 ===============
 
-Use ``discharge-inception status`` for a structured per-run view:
+Use ``inception status`` for a structured per-run view:
 
 .. code-block:: bash
 
-   discharge-inception status ~/my_rod_study/pdiv_database/
-   discharge-inception status ~/my_rod_study/plasma_simulations/
+   inception status ~/my_rod_study/pdiv_database/
+   inception status ~/my_rod_study/plasma_simulations/
 
    # or inspect both in one call:
-   discharge-inception status ~/my_rod_study/
+   inception status ~/my_rod_study/
 
 Example output while the database is still running::
 

@@ -52,17 +52,17 @@
 <li class="toctree-l1"><a class="reference internal" href="SlurmConfig.html">SLURM configuration</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The CLI</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-run"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">run</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-ls"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">ls</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-slurm-status"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">slurm-status</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-postprocess"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">postprocess</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-plasma-status"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plasma-status</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-list-results"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">list-results</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-plot-delta-e"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plot-delta-e</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-analyze-time-series"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">analyze-time-series</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-extract-inception-voltages"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">extract-inception-voltages</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-gather-plasma-event-logs"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">gather-plasma-event-logs</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discharge-inception-plot-delta-e-rel"><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plot-delta-e-rel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-run"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">run</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-ls"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">ls</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-slurm-status"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">slurm-status</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-postprocess"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">postprocess</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-plasma-status"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">plasma-status</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-list-results"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">list-results</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-plot-delta-e"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">plot-delta-e</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-analyze-time-series"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">analyze-time-series</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-extract-inception-voltages"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">extract-inception-voltages</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-gather-plasma-event-logs"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">gather-plasma-event-logs</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inception-plot-delta-e-rel"><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">plot-delta-e-rel</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -135,12 +135,12 @@
 <span id="arch-cli"></span><h1>The CLI<a class="headerlink" href="#the-cli" title="Permalink to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
-<p>All functionality is accessed through the <code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code> command.
+<p>All functionality is accessed through the <code class="docutils literal notranslate"><span class="pre">inception</span></code> command.
 Run the following to see every available subcommand:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>--help
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>inception<span class="w"> </span>--help
 </pre></div>
 </div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception [-h] command ...
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception [-h] command ...
 
 Parametric study configurator for chombo-discharge simulations.
 
@@ -164,14 +164,14 @@ options:
 </pre></div>
 </div>
 <p>Each subcommand accepts its own <code class="docutils literal notranslate"><span class="pre">--help</span></code> flag, e.g.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">extract</span><span class="o">-</span><span class="n">inception</span><span class="o">-</span><span class="n">voltages</span> <span class="o">--</span><span class="n">help</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="n">extract</span><span class="o">-</span><span class="n">inception</span><span class="o">-</span><span class="n">voltages</span> <span class="o">--</span><span class="n">help</span>
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-run">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">run</span></code><a class="headerlink" href="#discharge-inception-run" title="Permalink to this heading"></a></h2>
+<section id="inception-run">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">run</span></code><a class="headerlink" href="#inception-run" title="Permalink to this heading"></a></h2>
 <p>Sets up directory structure and submits the initial SLURM array jobs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception run [-h] [--output-dir OUTPUT_DIR] [--dim DIM]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception run [-h] [--output-dir OUTPUT_DIR] [--dim DIM]
                         [--verbose] [--logfile LOGFILE]
                         [--pdiv-only]
                         [--overwrite | --suffix SUFFIX]
@@ -198,11 +198,11 @@ options:
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-ls">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">ls</span></code><a class="headerlink" href="#discharge-inception-ls" title="Permalink to this heading"></a></h2>
+<section id="inception-ls">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">ls</span></code><a class="headerlink" href="#inception-ls" title="Permalink to this heading"></a></h2>
 <p>Prints a table of runs, parameter values, and completion status (<code class="docutils literal notranslate"><span class="pre">[done]</span></code> if
 <code class="docutils literal notranslate"><span class="pre">report.txt</span></code> is present).</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception ls [-h] study_dir [study_dir ...]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception ls [-h] study_dir [study_dir ...]
 
 positional arguments:
   study_dir   Study output directory containing index.json (e.g. pdiv_database/).
@@ -217,11 +217,11 @@ positional arguments:
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-slurm-status">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">slurm-status</span></code><a class="headerlink" href="#discharge-inception-slurm-status" title="Permalink to this heading"></a></h2>
+<section id="inception-slurm-status">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">slurm-status</span></code><a class="headerlink" href="#inception-slurm-status" title="Permalink to this heading"></a></h2>
 <p>Queries SLURM (via <code class="docutils literal notranslate"><span class="pre">sacct</span></code>/<code class="docutils literal notranslate"><span class="pre">squeue</span></code>) and prints a live status table for
 every run in one or more study directories.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception slurm-status [-h] [--no-voltage] study_dir [study_dir ...]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception slurm-status [-h] [--no-voltage] study_dir [study_dir ...]
 
 positional arguments:
   study_dir      Study directory (containing index.json) or parent directory
@@ -237,7 +237,7 @@ output directory</strong> whose sub-directories are studies – in the latter ca
 studies are reported in one pass.</p>
 <p>For inception-stepper databases the table shows the outer array-job state and,
 for failed tasks, the exit code:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>slurm-status<span class="w"> </span>study_results/pdiv_database/
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>inception<span class="w"> </span>slurm-status<span class="w"> </span>study_results/pdiv_database/
 </pre></div>
 </div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>study_results/pdiv_database/  (4 runs, job 98765)
@@ -252,7 +252,7 @@ for failed tasks, the exit code:</p>
 </div>
 <p>For plasma studies the table also shows a compact summary of each run’s inner
 voltage array:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>slurm-status<span class="w"> </span>study_results/plasma_simulations/
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>inception<span class="w"> </span>slurm-status<span class="w"> </span>study_results/plasma_simulations/
 </pre></div>
 </div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>study_results/plasma_simulations/  (2 runs, job 98766)
@@ -266,18 +266,18 @@ voltage array:</p>
 <p>Pass <code class="docutils literal notranslate"><span class="pre">--no-voltage</span></code> to skip the inner voltage queries when the study has many
 runs and a fast summary is sufficient.  Multiple directories can be combined in
 a single call:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">slurm</span><span class="o">-</span><span class="n">status</span> <span class="n">study_results</span><span class="o">/</span><span class="n">pdiv_database</span><span class="o">/</span> <span class="n">study_results</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span>
-<span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">slurm</span><span class="o">-</span><span class="n">status</span> <span class="n">study_results</span><span class="o">/</span>   <span class="c1"># auto-discovers all sub-studies</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="n">slurm</span><span class="o">-</span><span class="n">status</span> <span class="n">study_results</span><span class="o">/</span><span class="n">pdiv_database</span><span class="o">/</span> <span class="n">study_results</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span>
+<span class="n">inception</span> <span class="n">slurm</span><span class="o">-</span><span class="n">status</span> <span class="n">study_results</span><span class="o">/</span>   <span class="c1"># auto-discovers all sub-studies</span>
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-postprocess">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">postprocess</span></code><a class="headerlink" href="#discharge-inception-postprocess" title="Permalink to this heading"></a></h2>
+<section id="inception-postprocess">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">postprocess</span></code><a class="headerlink" href="#inception-postprocess" title="Permalink to this heading"></a></h2>
 <p>Orchestrates the full post-processing pipeline on a study root directory.
 The command locates the PDIV database and plasma simulation directories, runs
 each post-processing tool in the correct order, and writes all output under
 <code class="docutils literal notranslate"><span class="pre">&lt;study_root&gt;/Results/</span></code>.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception postprocess [-h] [--pdiv-db DIRNAME]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception postprocess [-h] [--pdiv-db DIRNAME]
                                        [--plasma-sim DIRNAME]
                                        [--run-prefix PREFIX]
                                        study_root
@@ -303,17 +303,17 @@ options:
 post-processing workflow.</p>
 </div>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">postprocess</span> <span class="n">PressureStudy_1</span><span class="o">/</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="n">postprocess</span> <span class="n">PressureStudy_1</span><span class="o">/</span>
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-plasma-status">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plasma-status</span></code><a class="headerlink" href="#discharge-inception-plasma-status" title="Permalink to this heading"></a></h2>
+<section id="inception-plasma-status">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">plasma-status</span></code><a class="headerlink" href="#inception-plasma-status" title="Permalink to this heading"></a></h2>
 <p>Reads <code class="docutils literal notranslate"><span class="pre">plasma_event_log.csv</span></code> from the Results mirror and prints a formatted
 per-run status table.  Accepts either the <code class="docutils literal notranslate"><span class="pre">plasma_simulations/</span></code> directory
 (in which case the CSV is located automatically under <code class="docutils literal notranslate"><span class="pre">Results/</span></code>) or a direct
 path to the CSV file.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception plasma-status [-h] [--filter STATUS] plasma_sim
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception plasma-status [-h] [--filter STATUS] plasma_sim
 
 positional arguments:
   plasma_sim      Path to the plasma_simulations/ directory or directly to
@@ -327,21 +327,21 @@ options:
 </div>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic call -- pass the plasma_simulations/ directory</span>
-<span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span>
+<span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span>
 
 <span class="c1"># Pass the CSV file directly</span>
-<span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">Results</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span><span class="n">plasma_event_log</span><span class="o">.</span><span class="n">csv</span>
+<span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">Results</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span><span class="n">plasma_event_log</span><span class="o">.</span><span class="n">csv</span>
 
 <span class="c1"># Show only runs that reached inception</span>
-<span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">inception</span>
+<span class="n">inception</span> <span class="n">plasma</span><span class="o">-</span><span class="n">status</span> <span class="n">PressureStudy_1</span><span class="o">/</span><span class="n">plasma_simulations</span><span class="o">/</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">inception</span>
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-list-results">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">list-results</span></code><a class="headerlink" href="#discharge-inception-list-results" title="Permalink to this heading"></a></h2>
+<section id="inception-list-results">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">list-results</span></code><a class="headerlink" href="#inception-list-results" title="Permalink to this heading"></a></h2>
 <p>Lists all post-processed result files grouped by sub-folder under <code class="docutils literal notranslate"><span class="pre">Results/</span></code>,
 giving a quick overview of every file produced by <code class="docutils literal notranslate"><span class="pre">postprocess</span></code>.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception list-results [-h] study_root
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception list-results [-h] study_root
 
 positional arguments:
   study_root   Root directory of the parametric study.
@@ -351,7 +351,7 @@ options:
 </pre></div>
 </div>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="nb">list</span><span class="o">-</span><span class="n">results</span> <span class="n">PressureStudy_1</span><span class="o">/</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="nb">list</span><span class="o">-</span><span class="n">results</span> <span class="n">PressureStudy_1</span><span class="o">/</span>
 </pre></div>
 </div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Results in PressureStudy_1/  (8 files in 4 folders)
@@ -378,13 +378,13 @@ options:
 interpreting the output.</p>
 </div>
 </section>
-<section id="discharge-inception-plot-delta-e">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plot-delta-e</span></code><a class="headerlink" href="#discharge-inception-plot-delta-e" title="Permalink to this heading"></a></h2>
+<section id="inception-plot-delta-e">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">plot-delta-e</span></code><a class="headerlink" href="#inception-plot-delta-e" title="Permalink to this heading"></a></h2>
 <p>Produces a dual-axis plot of peak Delta E(rel) and Delta E(max) vs voltage for a single
 <code class="docutils literal notranslate"><span class="pre">run_*</span></code> database.  This command is typically called automatically by
 <code class="docutils literal notranslate"><span class="pre">postprocess</span></code> for each run directory, but can also be invoked standalone for
 custom output paths or to regenerate individual plots.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception plot-delta-e [-h] [--rel-field REL_FIELD]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception plot-delta-e [-h] [--rel-field REL_FIELD]
                                         [--max-field MAX_FIELD]
                                         [--png PNG] [--output OUTPUT]
                                         db_dir
@@ -403,32 +403,32 @@ options:
 </pre></div>
 </div>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plot</span><span class="o">-</span><span class="n">delta</span><span class="o">-</span><span class="n">e</span> <span class="n">plasma_simulations</span><span class="o">/</span><span class="n">run_0</span><span class="o">/</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="n">plot</span><span class="o">-</span><span class="n">delta</span><span class="o">-</span><span class="n">e</span> <span class="n">plasma_simulations</span><span class="o">/</span><span class="n">run_0</span><span class="o">/</span>
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-analyze-time-series">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">analyze-time-series</span></code><a class="headerlink" href="#discharge-inception-analyze-time-series" title="Permalink to this heading"></a></h2>
+<section id="inception-analyze-time-series">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">analyze-time-series</span></code><a class="headerlink" href="#inception-analyze-time-series" title="Permalink to this heading"></a></h2>
 <p>Extracts, optionally smooths, and differentiates time-series data from a
 plasma simulation log.  See <a class="reference internal" href="../PostProcess/AnalyzeTimeSeries.html#postprocess-analyzetimeseries"><span class="std std-ref">Analysing simulation time-series output</span></a> for full
 documentation of options and output columns.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception analyze-time-series [-h] [-i INPUT] [-o OUTPUT]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception analyze-time-series [-h] [-i INPUT] [-o OUTPUT]
                                                [--sg] [--sg-window SG_WINDOW]
                                                [--sg-order SG_ORDER] [--lp]
                                                [--lp-tau LP_TAU]
 </pre></div>
 </div>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">analyze</span><span class="o">-</span><span class="n">time</span><span class="o">-</span><span class="n">series</span> <span class="o">-</span><span class="n">i</span> <span class="n">run_0</span><span class="o">/</span><span class="n">pout</span><span class="mf">.0</span> <span class="o">-</span><span class="n">o</span> <span class="n">run_0</span><span class="o">/</span><span class="n">pout</span><span class="o">.</span><span class="n">out</span> <span class="o">--</span><span class="n">sg</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="n">analyze</span><span class="o">-</span><span class="n">time</span><span class="o">-</span><span class="n">series</span> <span class="o">-</span><span class="n">i</span> <span class="n">run_0</span><span class="o">/</span><span class="n">pout</span><span class="mf">.0</span> <span class="o">-</span><span class="n">o</span> <span class="n">run_0</span><span class="o">/</span><span class="n">pout</span><span class="o">.</span><span class="n">out</span> <span class="o">--</span><span class="n">sg</span>
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-extract-inception-voltages">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">extract-inception-voltages</span></code><a class="headerlink" href="#discharge-inception-extract-inception-voltages" title="Permalink to this heading"></a></h2>
+<section id="inception-extract-inception-voltages">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">extract-inception-voltages</span></code><a class="headerlink" href="#inception-extract-inception-voltages" title="Permalink to this heading"></a></h2>
 <p>Extracts the six inception voltages from every run in a <code class="docutils literal notranslate"><span class="pre">pdiv_database</span></code>
 directory and writes a NetCDF or CSV dataset.  See
 <a class="reference internal" href="../PostProcess/ExtractInceptionVoltages.html#postprocess-extractinceptionvoltages"><span class="std std-ref">Extracting partial discharge inception voltages</span></a> for full documentation.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception extract-inception-voltages [-h] [--output OUTPUT]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception extract-inception-voltages [-h] [--output OUTPUT]
                                                       [--format {netcdf,csv}]
                                                       [--plot PARAM [PARAM ...]]
                                                       [--select KEY=VALUE ...]
@@ -437,37 +437,37 @@ directory and writes a NetCDF or CSV dataset.  See
 </pre></div>
 </div>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">extract</span><span class="o">-</span><span class="n">inception</span><span class="o">-</span><span class="n">voltages</span> <span class="n">study_results</span><span class="o">/</span><span class="n">pdiv_database</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="n">extract</span><span class="o">-</span><span class="n">inception</span><span class="o">-</span><span class="n">voltages</span> <span class="n">study_results</span><span class="o">/</span><span class="n">pdiv_database</span>
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-gather-plasma-event-logs">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">gather-plasma-event-logs</span></code><a class="headerlink" href="#discharge-inception-gather-plasma-event-logs" title="Permalink to this heading"></a></h2>
+<section id="inception-gather-plasma-event-logs">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">gather-plasma-event-logs</span></code><a class="headerlink" href="#inception-gather-plasma-event-logs" title="Permalink to this heading"></a></h2>
 <p>Scans the tail of each run’s <code class="docutils literal notranslate"><span class="pre">pout.0</span></code> log, classifies every run as
 completed, inception, convergence failure, or abort, and writes a CSV
 summary.  See <a class="reference internal" href="../PostProcess/GatherPlasmaEventLogs.html#postprocess-gatherplasmaeventlogs"><span class="std std-ref">Identifying discharge inception events from plasma logs</span></a> for full documentation.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception gather-plasma-event-logs [-h] [--output PATH]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception gather-plasma-event-logs [-h] [--output PATH]
                                                     [--tail N] [--plot PARAM]
                                                     [--no-output]
                                                     db_dir
 </pre></div>
 </div>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">gather</span><span class="o">-</span><span class="n">plasma</span><span class="o">-</span><span class="n">event</span><span class="o">-</span><span class="n">logs</span> <span class="n">study_results</span><span class="o">/</span><span class="n">plasma_database</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="n">gather</span><span class="o">-</span><span class="n">plasma</span><span class="o">-</span><span class="n">event</span><span class="o">-</span><span class="n">logs</span> <span class="n">study_results</span><span class="o">/</span><span class="n">plasma_database</span>
 </pre></div>
 </div>
 </section>
-<section id="discharge-inception-plot-delta-e-rel">
-<h2><code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">plot-delta-e-rel</span></code><a class="headerlink" href="#discharge-inception-plot-delta-e-rel" title="Permalink to this heading"></a></h2>
+<section id="inception-plot-delta-e-rel">
+<h2><code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">plot-delta-e-rel</span></code><a class="headerlink" href="#inception-plot-delta-e-rel" title="Permalink to this heading"></a></h2>
 <p>Batch-plots Delta E(rel) vs time for every run in a plasma database, saving one
 PNG per run.  See <a class="reference internal" href="../PostProcess/PlotDeltaERel.html#postprocess-plotdeltaerel"><span class="std std-ref">Plotting relative electric field change over time</span></a> for full documentation.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: discharge-inception plot-delta-e-rel [-h] [--prefix PREFIX]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: inception plot-delta-e-rel [-h] [--prefix PREFIX]
                                             [--output-dir DIR]
                                             db_dir
 </pre></div>
 </div>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discharge</span><span class="o">-</span><span class="n">inception</span> <span class="n">plot</span><span class="o">-</span><span class="n">delta</span><span class="o">-</span><span class="n">e</span><span class="o">-</span><span class="n">rel</span> <span class="n">study_results</span><span class="o">/</span><span class="n">plasma_database</span> <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span> <span class="n">plots</span><span class="o">/</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inception</span> <span class="n">plot</span><span class="o">-</span><span class="n">delta</span><span class="o">-</span><span class="n">e</span><span class="o">-</span><span class="n">rel</span> <span class="n">study_results</span><span class="o">/</span><span class="n">plasma_database</span> <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span> <span class="n">plots</span><span class="o">/</span>
 </pre></div>
 </div>
 </section>

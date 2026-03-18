@@ -11,5 +11,5 @@ is sufficient.
 
 .. code-block:: bash
 
-   git clone https://github.com/SINTEF-Power-system-asset-management/discharge-inception.git
-   cd discharge-inception
+   git clone https://github.com/SINTEF-Power-system-asset-management/inception.git
+   cd inception

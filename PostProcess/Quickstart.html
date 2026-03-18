@@ -125,7 +125,7 @@
 <span id="postprocess-quickstart"></span><h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading"></a></h1>
 <p>After simulations have finished, a single command runs all post-processing
 scripts in the correct order:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>postprocess<span class="w"> </span>&lt;db_dir&gt;/
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>inception<span class="w"> </span>postprocess<span class="w"> </span>&lt;db_dir&gt;/
 </pre></div>
 </div>
 <p>Here <code class="docutils literal notranslate"><span class="pre">&lt;db_dir&gt;</span></code> is the root folder of your study (the directory that contains
@@ -167,7 +167,7 @@ standalone usage and additional options.</p>
 <h2>Inspecting results<a class="headerlink" href="#inspecting-results" title="Permalink to this heading"></a></h2>
 <p>After post-processing completes, use <code class="docutils literal notranslate"><span class="pre">list-results</span></code> to get an overview of
 every output file:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>list-results<span class="w"> </span>&lt;db_dir&gt;/
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>inception<span class="w"> </span>list-results<span class="w"> </span>&lt;db_dir&gt;/
 </pre></div>
 </div>
 <p>Example output:</p>
@@ -192,7 +192,7 @@ every output file:</p>
 <p>All output lives under <code class="docutils literal notranslate"><span class="pre">&lt;db_dir&gt;/Results/</span></code>, mirroring the layout of the
 simulation directories.  The <code class="docutils literal notranslate"><span class="pre">plasma_event_log.csv</span></code> gives a per-run status
 summary; use <code class="docutils literal notranslate"><span class="pre">plasma-status</span></code> for a quick formatted view:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>discharge-inception<span class="w"> </span>plasma-status<span class="w"> </span>&lt;db_dir&gt;/plasma_simulations/
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>inception<span class="w"> </span>plasma-status<span class="w"> </span>&lt;db_dir&gt;/plasma_simulations/
 </pre></div>
 </div>
 <p>For more detail on the individual post-processing tools, see

@@ -149,7 +149,7 @@ not be visible to other nodes.</p>
 <span id="install-package"></span><h2>Install the package<a class="headerlink" href="#install-the-package" title="Permalink to this heading"></a></h2>
 <p>Install in <em>editable</em> mode so that local edits to the <code class="docutils literal notranslate"><span class="pre">discharge_inception/</span></code>
 source directory take effect immediately without reinstalling.  Editable mode
-also means that the <code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code> command-line entry point is
+also means that the <code class="docutils literal notranslate"><span class="pre">inception</span></code> command-line entry point is
 registered in the virtual environment and will always run the current state of
 the checked-out source.</p>
 <p><code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> and <code class="docutils literal notranslate"><span class="pre">scipy</span></code> are included as standard dependencies and are
@@ -160,15 +160,15 @@ installed automatically alongside the core package:</p>
 </section>
 <section id="verify">
 <span id="install-verify"></span><h2>Verify<a class="headerlink" href="#verify" title="Permalink to this heading"></a></h2>
-<p>After installing the package, confirm that the <code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code> entry
+<p>After installing the package, confirm that the <code class="docutils literal notranslate"><span class="pre">inception</span></code> entry
 point is registered in the active virtual environment and that the package
 imports correctly.  The <code class="docutils literal notranslate"><span class="pre">which</span></code> command should resolve to the <code class="docutils literal notranslate"><span class="pre">.venv/bin/</span></code>
 directory, confirming that the system Python (or another environment) is not
 being used by mistake.  Running <code class="docutils literal notranslate"><span class="pre">--help</span></code> exercises the full import chain –
 including <code class="docutils literal notranslate"><span class="pre">configurator</span></code> and <code class="docutils literal notranslate"><span class="pre">config_util</span></code> – so any missing dependency or
 broken import will surface here rather than at job-submission time.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>which<span class="w"> </span>discharge-inception<span class="w">               </span><span class="c1"># should point into .venv/bin/</span>
-discharge-inception<span class="w"> </span>--help
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>which<span class="w"> </span>inception<span class="w">               </span><span class="c1"># should point into .venv/bin/</span>
+inception<span class="w"> </span>--help
 </pre></div>
 </div>
 </section>
@@ -189,7 +189,7 @@ empty, the script falls back to whatever <code class="docutils literal notransla
 <code class="docutils literal notranslate"><span class="pre">PATH</span></code>, which may not have <code class="docutils literal notranslate"><span class="pre">discharge_inception</span></code> installed.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">DISCHARGE_INCEPTION_SLURM_CONFIG</span></code></dt><dd><p>Absolute path to the <code class="docutils literal notranslate"><span class="pre">slurm.toml</span></code> configuration file.  The configurator
-(<code class="docutils literal notranslate"><span class="pre">discharge-inception</span> <span class="pre">run</span></code>) reads this file at submission time to build
+(<code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">run</span></code>) reads this file at submission time to build
 <code class="docutils literal notranslate"><span class="pre">sbatch</span></code> resource arguments, and <code class="docutils literal notranslate"><span class="pre">GenericArrayJob.sh</span></code> reads it on
 compute nodes to load the required cluster modules.  Job scripts also call
 <code class="docutils literal notranslate"><span class="pre">load_slurm_config()</span></code> at runtime to retrieve the MPI launcher name and

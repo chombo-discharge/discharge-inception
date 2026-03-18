@@ -30,7 +30,7 @@ Script roles
    * - ``discharge_inception/configurator.py``
      - Expands parameter space, creates dirs, submits initial arrays
      - ``Runs.py`` / ``top_object``
-     - ``discharge-inception run`` CLI
+     - ``inception run`` CLI
    * - ``discharge_inception/config_util.py``
      - URI injection, file helpers, SLURM task ID, jobscript setup
      - Called by all jobscripts

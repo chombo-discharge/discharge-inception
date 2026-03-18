@@ -3,7 +3,7 @@
 Output directory structure
 ==========================
 
-After ``discharge-inception run`` completes (and while the SLURM jobs are running),
+After ``inception run`` completes (and while the SLURM jobs are running),
 the output tree looks like:
 
 .. code-block:: text

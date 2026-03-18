@@ -119,15 +119,15 @@
              
   <section id="overview">
 <span id="arch-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code> is a framework for submitting, tracking, and
+<p><code class="docutils literal notranslate"><span class="pre">inception</span></code> is a framework for submitting, tracking, and
 post-processing parametric chombo-discharge studies on SLURM clusters.  A study
-is declared as a Python <code class="docutils literal notranslate"><span class="pre">Runs.py</span></code> file and submitted via the <code class="docutils literal notranslate"><span class="pre">discharge-inception</span></code>
+is declared as a Python <code class="docutils literal notranslate"><span class="pre">Runs.py</span></code> file and submitted via the <code class="docutils literal notranslate"><span class="pre">inception</span></code>
 CLI.  The CLI creates run directories, injects parameters, and hands off to
 SLURM.  Everything that happens <em>inside</em> a SLURM job is driven by one of the
 three Python jobscripts.</p>
 <p>The framework is built around a <strong>two-stage pipeline</strong> concept:</p>
 <ul class="simple">
-<li><p>A <em>database</em> phase (fast / lightweight, e.g. a discharge-inception sweep) runs
+<li><p>A <em>database</em> phase (fast / lightweight, e.g. a inception sweep) runs
 first and produces intermediate data such as voltage tables.</p></li>
 <li><p>A <em>study</em> phase (full plasma simulation) depends on the database completing
 (via SLURM <code class="docutils literal notranslate"><span class="pre">--dependency=afterok</span></code>) and uses the database results to configure

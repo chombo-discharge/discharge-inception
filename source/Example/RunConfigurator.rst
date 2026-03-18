@@ -6,7 +6,7 @@ Running the configurator
 .. code-block:: bash
 
    cd Exec/Rod/Studies
-   discharge-inception run RadiusStudy.py \
+   inception run RadiusStudy.py \
        --output-dir ~/my_rod_study \
        --dim 2 \
        --verbose
