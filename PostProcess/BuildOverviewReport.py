@@ -581,6 +581,52 @@ def _page_delta_e_vs_k(pdf: PdfPages, plasma_results: Path,
     plt.close(fig)
 
 
+def _page_delta_e_vs_k_combined(pdf: PdfPages, plasma_results: Path,
+                                  run_ids: list, prefix: str) -> None:
+    """
+    Single axes combining all runs — peak ΔE(rel) vs K, one curve per run,
+    labelled by run number.
+    """
+    run_data: dict = {}
+    for run_id in run_ids:
+        csv_path = plasma_results / f"{prefix}{int(run_id)}" / "peak_delta_e.csv"
+        pts = []
+        for row in _read_peak_delta_e_csv(csv_path):
+            try:
+                k = float(row.get("K", "nan"))
+                y = float(row["peak_delta_e_rel_pct"])
+                if not (k != k):  # skip NaN K values
+                    pts.append((k, y))
+            except (ValueError, KeyError):
+                pass
+        if pts:
+            run_data[run_id] = sorted(pts)  # sort by K
+
+    if not run_data:
+        _placeholder_page(pdf, "ΔE(rel) vs K — all runs",
+                          "No peak_delta_e.csv files found.")
+        return
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    for run_id in sorted(run_data, key=lambda r: int(r)):
+        pts = run_data[run_id]
+        Ks = [p[0] for p in pts]
+        ys = [p[1] for p in pts]
+        ax.plot(Ks, ys, marker="o", markersize=4, linewidth=1.2,
+                label=f"{prefix}{int(run_id)}")
+
+    ax.set_xlabel("$K$", fontsize=10)
+    ax.set_ylabel("Peak $\\Delta E_\\mathrm{rel}$ [%]", fontsize=10)
+    ax.set_title("Peak ΔE(rel) vs K — all runs", fontsize=12, fontweight="bold")
+    ax.legend(fontsize=8)
+    ax.grid(True, linestyle=":", linewidth=0.5)
+    ax.tick_params(labelsize=8)
+
+    fig.tight_layout()
+    pdf.savefig(fig)
+    plt.close(fig)
+
+
 # ---------------------------------------------------------------------------
 # Page 5: Time-series compact grid
 # ---------------------------------------------------------------------------
@@ -873,6 +919,10 @@ def run(args) -> None:
         # Page 4: ΔE(rel) vs Voltage — one panel per run_N
         _page_delta_e_vs_k(pdf, plasma_results, plasma_run_ids, plasma_prefix,
                            plasma_params)
+
+        # Page 4b: ΔE(rel) vs K — all runs on one graph
+        _page_delta_e_vs_k_combined(pdf, plasma_results, plasma_run_ids,
+                                     plasma_prefix)
 
         # Page 5: Time-series compact grid — one subplot per run_N
         _page_timeseries_grid(pdf, plasma_results,
