@@ -206,38 +206,87 @@ def collect_runs(db_dir: Path, keys: list, run_index: dict, prefix: str, tail_n:
     Iterate over every run in *run_index*, parse its ``pout.0``, and return
     a list of per-run result dicts.
 
+    Handles two layouts:
+
+    * **Flat**: ``{prefix}{run_id}/pout.0`` exists → one row per outer run.
+    * **Nested**: ``{prefix}{run_id}/index.json`` exists instead → reads the
+      inner voltage sweep and produces one row per ``(run_id, voltage_id)``
+      pair.  The inner ``index.json`` may use either ``"keys"`` or ``"key"``
+      for the field name.
+
     Parameters
     ----------
     db_dir : Path
         Root directory of the database.
     keys : list of str
-        Parameter key names (in order).
+        Outer parameter key names (in order).
     run_index : dict
-        Mapping ``str(run_id) -> list of parameter values``.
+        Mapping ``str(run_id) -> list of outer parameter values``.
     prefix : str
-        Run-directory prefix.
+        Outer run-directory prefix (e.g. ``"run_"``).
     tail_n : int
         Lines to read from the end of each ``pout.0``.
 
     Returns
     -------
-    list of dict
-        One dict per run containing ``run_id``, one key per parameter, and
-        all fields returned by :func:`parse_pout`.
+    rows : list of dict
+        One dict per simulation unit containing ``run_id``, outer parameter
+        values, and (for nested layouts) ``voltage_id`` plus inner parameter
+        values, as well as all fields returned by :func:`parse_pout`.
+    inner_keys : list of str
+        Inner parameter key names when the nested layout is detected,
+        otherwise an empty list.
     """
     rows = []
+    inner_keys: list = []
+
     for run_str, param_combo in sorted(run_index.items(), key=lambda x: int(x[0])):
         run_id = int(run_str)
-        pout_path = db_dir / f"{prefix}{run_id}" / "pout.0"
-        info = parse_pout(pout_path, tail_n)
+        run_dir = db_dir / f"{prefix}{run_id}"
+        pout_path = run_dir / "pout.0"
+        outer_params = {key: param_combo[i] for i, key in enumerate(keys)}
 
-        row = {"run_id": run_id}
-        for i, key in enumerate(keys):
-            row[key] = param_combo[i]
-        row.update(info)
-        rows.append(row)
+        inner_index_path = run_dir / "index.json"
+        if not pout_path.exists() and inner_index_path.exists():
+            # Nested voltage structure: one pout.0 per voltage sub-directory.
+            try:
+                with open(inner_index_path) as f:
+                    inner_idx = json.load(f)
+            except (OSError, json.JSONDecodeError) as exc:
+                print(f"  warning: could not read {inner_index_path}: {exc}", file=sys.stderr)
+                continue
 
-    return rows
+            # Inner index uses "key" (list) or "keys" depending on version.
+            ikeys = inner_idx.get("keys") or inner_idx.get("key") or []
+            if isinstance(ikeys, str):
+                ikeys = [ikeys]
+            if ikeys and not inner_keys:
+                inner_keys = list(ikeys)
+
+            inner_prefix = inner_idx.get("prefix", "voltage_")
+            inner_index = inner_idx.get("index", {})
+
+            for volt_str, volt_combo in sorted(inner_index.items(), key=lambda x: int(x[0])):
+                volt_id = int(volt_str)
+                volt_dir = run_dir / f"{inner_prefix}{volt_id}"
+                info = parse_pout(volt_dir / "pout.0", tail_n)
+
+                row: dict = {"run_id": run_id}
+                row.update(outer_params)
+                row["voltage_id"] = volt_id
+                for i, key in enumerate(ikeys):
+                    row[key] = volt_combo[i]
+                row.update(info)
+                rows.append(row)
+        else:
+            # Flat structure (pout.0 directly in run directory).
+            info = parse_pout(pout_path, tail_n)
+            row = {"run_id": run_id}
+            row.update(outer_params)
+            row.update(info)
+            rows.append(row)
+
+    return rows, inner_keys
 
 
 # ---- CSV output ----
@@ -255,6 +304,7 @@ _EXTRACT_FIELDS = [
 
 _COLUMN_DESCRIPTIONS = {
     "run_id":               "run identifier",
+    "voltage_id":           "voltage run index",
     "final_step":           "last simulation step",
     "final_time":           "simulation time [s]",
     "final_dt":             "time step [s]",
@@ -284,7 +334,7 @@ def _aligned_rows(fieldnames, descriptions, rows):
         yield fmt([row.get(f, '') for f in fieldnames])
 
 
-def write_csv(rows: list, keys: list, output_path: Path):
+def write_csv(rows: list, keys: list, output_path: Path, inner_keys: list = None):
     """
     Write per-run results to a fixed-width aligned file.
 
@@ -293,11 +343,16 @@ def write_csv(rows: list, keys: list, output_path: Path):
     rows : list of dict
         Per-run data as returned by :func:`collect_runs`.
     keys : list of str
-        Parameter key names (used to determine column order).
+        Outer parameter key names (used to determine column order).
     output_path : Path
         Destination file path.
+    inner_keys : list of str, optional
+        Inner parameter key names for nested (voltage-sweep) layouts.
     """
-    fieldnames   = ["run_id"] + keys + _EXTRACT_FIELDS
+    if inner_keys:
+        fieldnames = ["run_id"] + keys + ["voltage_id"] + inner_keys + _EXTRACT_FIELDS
+    else:
+        fieldnames = ["run_id"] + keys + _EXTRACT_FIELDS
     descriptions = [_COLUMN_DESCRIPTIONS.get(f, "simulation parameter") for f in fieldnames]
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("# Plasma event log\n")
@@ -308,7 +363,7 @@ def write_csv(rows: list, keys: list, output_path: Path):
 
 # ---- summary table ----
 
-def print_summary(rows: list, keys: list):
+def print_summary(rows: list, keys: list, inner_keys: list = None):
     """
     Print a fixed-width summary table to standard output.
 
@@ -317,20 +372,33 @@ def print_summary(rows: list, keys: list):
     rows : list of dict
         Per-run data as returned by :func:`collect_runs`.
     keys : list of str
-        Parameter key names.
+        Outer parameter key names.
+    inner_keys : list of str, optional
+        Inner parameter key names for nested (voltage-sweep) layouts.
     """
     param_w = 18
     status_w = 20
     time_w = 16
     dt_w = 16
 
-    header_params = "  ".join(f"{k:>{param_w}}" for k in keys)
+    # All parameter columns: outer keys + voltage_id + inner keys (if nested)
+    all_param_keys = list(keys)
+    if inner_keys:
+        all_param_keys = all_param_keys + ["voltage_id"] + list(inner_keys)
+
+    header_params = "  ".join(f"{k:>{param_w}}" for k in all_param_keys)
     print(f"#\n# {'Run':>5}  {header_params}  {'status':>{status_w}}"
           f"  {'final_time':>{time_w}}  {'final_dt':>{dt_w}}")
-    print("# " + "-" * (5 + 2 + (param_w + 2) * len(keys) + status_w + 2 + time_w + 2 + dt_w))
+    total_w = 5 + 2 + (param_w + 2) * len(all_param_keys) + status_w + 2 + time_w + 2 + dt_w
+    print("# " + "-" * total_w)
+
+    def _fmt_param(v, w):
+        if isinstance(v, (int, float)):
+            return f"{v:>{w}.6g}"
+        return f"{str(v):>{w}}"
 
     for row in rows:
-        param_str = "  ".join(f"{row[k]:>{param_w}.6g}" for k in keys)
+        param_str = "  ".join(_fmt_param(row[k], param_w) for k in all_param_keys)
         t_str = f"{row['final_time']:>{time_w}.6g}" if row["final_time"] is not None else f"{'—':>{time_w}}"
         dt_str = f"{row['final_dt']:>{dt_w}.6g}" if row["final_dt"] is not None else f"{'—':>{dt_w}}"
         print(f"{row['run_id']:>5}  {param_str}  {row['status']:>{status_w}}  {t_str}  {dt_str}")
@@ -422,10 +490,23 @@ def make_parser(add_help=True) -> argparse.ArgumentParser:
 
 def run(args) -> None:
     """Execute the pipeline given a pre-parsed Namespace."""
-    db_dir = Path(args.db_dir)
+    db_dir = Path(args.db_dir).resolve()
     if not db_dir.is_dir():
         print(f"error: '{db_dir}' is not a directory", file=sys.stderr)
         sys.exit(1)
+
+    # Keep a reference to the user-supplied root so we can place Results/
+    # relative to it even after auto-discovery redirects db_dir.
+    study_root = db_dir
+
+    # If given a study root instead of the plasma_simulations sub-directory,
+    # auto-discover the correct path.
+    if not (db_dir / "index.json").exists():
+        candidate = db_dir / "plasma_simulations"
+        if (candidate / "index.json").exists():
+            print(f"[gather-plasma-event-logs] using '{candidate}' "
+                  f"(no index.json in '{db_dir}')")
+            db_dir = candidate
 
     # Load metadata
     keys, coord_values, run_index, prefix = load_metadata(db_dir)
@@ -436,18 +517,33 @@ def run(args) -> None:
     for k in keys:
         print(f"#   {k}: {coord_values[k]}")
 
-    # Collect per-run data
-    rows = collect_runs(db_dir, keys, run_index, prefix, args.tail)
+    # Collect per-run data (nested or flat)
+    rows, inner_keys = collect_runs(db_dir, keys, run_index, prefix, args.tail)
 
     # Print summary
-    print_summary(rows, keys)
+    print_summary(rows, keys, inner_keys)
 
     # Write CSV
     if not args.no_output:
-        from discharge_inception.results import ensure_results_dir, link_metadata
-        results_dir = ensure_results_dir(db_dir)
-        output_path = Path(args.output) if args.output else results_dir / "plasma_event_log.csv"
-        write_csv(rows, keys, output_path)
+        from discharge_inception.results import link_metadata
+        if args.output:
+            output_path = Path(args.output)
+            results_dir = output_path.parent
+            results_dir.mkdir(parents=True, exist_ok=True)
+        else:
+            # Place results under <study_root>/Results/<plasma_sim_dirname>/
+            # so that e.g. "inception gather-plasma-event-logs PressureStudy"
+            # writes to PressureStudy/Results/plasma_simulations/ rather than
+            # PressureStudy/plasma_simulations/Results/.
+            if study_root != db_dir:
+                results_dir = study_root / "Results" / db_dir.name
+            else:
+                from discharge_inception.results import get_results_dir
+                results_dir = get_results_dir(db_dir)
+            results_dir.mkdir(parents=True, exist_ok=True)
+            output_path = results_dir / "plasma_event_log.csv"
+
+        write_csv(rows, keys, output_path, inner_keys)
         link_metadata(db_dir, results_dir)
 
     # Optional plot

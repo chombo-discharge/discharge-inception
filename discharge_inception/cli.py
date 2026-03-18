@@ -49,6 +49,10 @@ def cmd_plot_delta_e(args) -> None:
     _import_pp('PlotDeltaE').run(args)
 
 
+def cmd_build_overview_report(args) -> None:
+    _import_pp('BuildOverviewReport').run(args)
+
+
 def cmd_postprocess(args) -> None:
     study_root = Path(args.study_root).resolve()
     pdiv_db    = study_root / args.pdiv_db
@@ -137,6 +141,46 @@ def cmd_postprocess(args) -> None:
         except SystemExit as e:
             if e.code:
                 print(f"  warning: plot-delta-e exited with code {e.code}")
+
+        # AnalyzeTimeSeries: pout.0 lives inside each voltage_* subdir
+        volt_index_file = run_dir / 'index.json'
+        if volt_index_file.exists():
+            with open(volt_index_file) as _f:
+                volt_idx = json.load(_f)
+            volt_prefix = volt_idx.get('prefix', 'voltage_')
+            volt_ids = sorted(volt_idx.get('index', {}).keys(), key=int)
+            for volt_id in volt_ids:
+                volt_dir     = run_dir     / f'{volt_prefix}{int(volt_id)}'
+                volt_results = run_results / f'{volt_prefix}{int(volt_id)}'
+                pout_path = volt_dir / 'pout.0'
+                if not pout_path.exists():
+                    continue
+                volt_results.mkdir(parents=True, exist_ok=True)
+                print(f"[postprocess] analyze-time-series         {volt_dir}")
+                mod = _import_pp('AnalyzeTimeSeries')
+                ns  = mod.make_parser().parse_args([
+                    '--input',  str(pout_path),
+                    '--output', str(volt_results / 'pout.out'),
+                ])
+                try:
+                    mod.run(ns)
+                except SystemExit as e:
+                    if e.code:
+                        print(f"  warning: analyze-time-series exited with code {e.code}")
+
+    # --- BuildOverviewReport ---
+    print(f"[postprocess] build-overview-report        {study_root}")
+    mod = _import_pp('BuildOverviewReport')
+    ns  = mod.make_parser().parse_args([
+        str(study_root),
+        '--pdiv-db',    args.pdiv_db,
+        '--plasma-sim', args.plasma_sim,
+    ])
+    try:
+        mod.run(ns)
+    except SystemExit as e:
+        if e.code:
+            print(f"  warning: build-overview-report exited with code {e.code}")
 
 
 def cmd_list_results(args) -> None:
@@ -507,6 +551,13 @@ def main() -> None:
         parents=[pp_mod.make_parser(add_help=False)],
         help='Plot peak ΔE(rel) and/or ΔE(max) vs voltage for a run_* database.')
 
+    # --- inception build-overview-report ----------------------------------
+    pp_mod = _import_pp('BuildOverviewReport')
+    subparsers.add_parser(
+        'build-overview-report',
+        parents=[pp_mod.make_parser(add_help=False)],
+        help='Generate a multi-page PDF overview report for an inception study.')
+
     args = parser.parse_args()
 
     if args.command == 'run':
@@ -527,6 +578,8 @@ def main() -> None:
         cmd_plot_delta_e_rel(args)
     elif args.command == 'plot-delta-e':
         cmd_plot_delta_e(args)
+    elif args.command == 'build-overview-report':
+        cmd_build_overview_report(args)
     elif args.command == 'postprocess':
         cmd_postprocess(args)
     elif args.command == 'list-results':

@@ -631,6 +631,40 @@ def plot_2x4(time: np.ndarray, series: Dict[str, np.ndarray]) -> None:
     fig.tight_layout()
     plt.show()
 
+# ---------- Read .dat output ----------
+
+def read_dat(path) -> dict:
+    """
+    Load a ``.dat`` file written by :func:`write_dat_aligned_with_comments` into a
+    dict of numpy arrays.
+
+    Column names are taken from the module-level :data:`FIELDS` list, which defines
+    the fixed column order for all files produced by this module.
+
+    Parameters
+    ----------
+    path : str or Path
+        Path to the ``.dat`` file (``pout.out`` by convention).
+
+    Returns
+    -------
+    dict mapping column name → ``np.ndarray``
+        One entry per column present in the file.  Returns an empty dict if the
+        file cannot be read or contains no numeric rows.
+    """
+    try:
+        data = np.loadtxt(str(path), comments='#')
+    except (OSError, ValueError):
+        return {}
+    if data.ndim == 0:
+        return {}
+    if data.ndim == 1:
+        # Single row: reshape to (1, ncols)
+        data = data.reshape(1, -1)
+    n_cols = data.shape[1]
+    return {FIELDS[i]: data[:, i] for i in range(min(n_cols, len(FIELDS)))}
+
+
 # ---------- Main ----------
 
 def make_parser(add_help=True) -> argparse.ArgumentParser:
