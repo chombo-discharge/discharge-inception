@@ -32,7 +32,43 @@ LOG_SPACER_STR = '-'*40
 
 
 def get_combinations(pspace, keys):
-    return itertools.product(*[pspace[key]['values'] for key in keys])
+    """Return all combinations of parameter values.
+
+    Parameters that share the same ``"group"`` string are zipped together
+    (vary simultaneously).  Groups and ungrouped parameters are combined via
+    ``itertools.product``, preserving the existing all-combinations behaviour
+    for parameters that carry no ``"group"`` field.
+    """
+    key_list = list(keys)
+
+    # Build axes in key-list order; each axis is (list_of_keys, list_of_value_tuples)
+    seen: set = set()
+    axes: list = []
+    for key in key_list:
+        if key in seen:
+            continue
+        group = pspace[key].get('group')
+        if group is not None:
+            # Collect all keys in this group (in key_list order)
+            group_keys = [k for k in key_list if pspace[k].get('group') == group]
+            lengths = [len(pspace[k]['values']) for k in group_keys]
+            if len(set(lengths)) != 1:
+                raise ValueError(
+                    f"Parameter group '{group}' has inconsistent value counts: "
+                    + ", ".join(f"{k}={n}" for k, n in zip(group_keys, lengths))
+                )
+            axes.append((group_keys, list(zip(*[pspace[k]['values'] for k in group_keys]))))
+            seen.update(group_keys)
+        else:
+            axes.append(([key], [(v,) for v in pspace[key]['values']]))
+            seen.add(key)
+
+    for axis_combo in itertools.product(*[vals for _, vals in axes]):
+        val_map: dict = {}
+        for (axis_keys, _), val_tuple in zip(axes, axis_combo):
+            for k, v in zip(axis_keys, val_tuple):
+                val_map[k] = v
+        yield tuple(val_map[k] for k in key_list)
 
 
 def parse_structure_from_input_file(run_definition_file: Path):
