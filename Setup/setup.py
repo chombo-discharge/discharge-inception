@@ -47,6 +47,7 @@ parser.add_argument("-plasma_stepper",  type=str, default="ItoKMCBackgroundEvalu
 parser.add_argument("-plasma_tagger",   type=str, default="ItoKMCStreamerTagger",                      help="Cell tagger for plasma mode, or 'none' (default: %(default)s)")
 
 args = parser.parse_args()
+args.base_dir = os.path.abspath(args.base_dir)
 
 if not args.discharge_home:
     print("Error: DISCHARGE_HOME is not set.")
@@ -61,7 +62,7 @@ app_main.write_template(args)
 app_options.write_template(args)
 app_inc.copy_dependencies(args)
 
-app_dir = args.base_dir + "/" + args.app_name
+app_dir = os.path.join(args.base_dir, args.app_name)
 makefile_src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "python", "GNUmakefile")
 shutil.copy2(makefile_src, os.path.join(app_dir, "GNUmakefile"))
 

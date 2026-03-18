@@ -6,7 +6,7 @@ Prerequisites
 Python
 ------
 
-``discharge-inception`` requires **Python >= 3.10**.  The minimum version is set
+``inception`` requires **Python >= 3.10**.  The minimum version is set
 by the use of structural pattern matching (``match``/``case``) in the parameter
 handling code and by ``tomllib``, which entered the standard library in 3.11 but
 is available as a backport (``tomli``) for 3.10.  Using the newest Python 3.x
@@ -42,7 +42,7 @@ available on the machine from which you submit jobs.  On HPC clusters these are
 typically pre-installed by system administrators -- you need only an account and
 partition access.
 
-The framework submits jobs programmatically: the ``discharge-inception run``
+The framework submits jobs programmatically: the ``inception run``
 command calls ``sbatch`` directly from Python, so the SLURM client must be on
 the ``PATH`` of the machine where you run the configurator.  Compute nodes
 themselves do not need to call ``sbatch`` unless you use the two-stage pipeline,

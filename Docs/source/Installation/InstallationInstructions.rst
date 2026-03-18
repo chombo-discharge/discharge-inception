@@ -36,7 +36,7 @@ Install the package
 
 Install in *editable* mode so that local edits to the ``discharge_inception/``
 source directory take effect immediately without reinstalling.  Editable mode
-also means that the ``discharge-inception`` command-line entry point is
+also means that the ``inception`` command-line entry point is
 registered in the virtual environment and will always run the current state of
 the checked-out source.
 
@@ -52,7 +52,7 @@ installed automatically alongside the core package:
 Verify
 ------
 
-After installing the package, confirm that the ``discharge-inception`` entry
+After installing the package, confirm that the ``inception`` entry
 point is registered in the active virtual environment and that the package
 imports correctly.  The ``which`` command should resolve to the ``.venv/bin/``
 directory, confirming that the system Python (or another environment) is not
@@ -62,8 +62,8 @@ broken import will surface here rather than at job-submission time.
 
 .. code-block:: bash
 
-   which discharge-inception               # should point into .venv/bin/
-   discharge-inception --help
+   which inception               # should point into .venv/bin/
+   inception --help
 
 .. _install_env_vars:
 
@@ -87,7 +87,7 @@ node-local ambiguity entirely.
 
 ``DISCHARGE_INCEPTION_SLURM_CONFIG``
    Absolute path to the ``slurm.toml`` configuration file.  The configurator
-   (``discharge-inception run``) reads this file at submission time to build
+   (``inception run``) reads this file at submission time to build
    ``sbatch`` resource arguments, and ``GenericArrayJob.sh`` reads it on
    compute nodes to load the required cluster modules.  Job scripts also call
    ``load_slurm_config()`` at runtime to retrieve the MPI launcher name and

@@ -57,6 +57,11 @@ def write_template(args):
     main_filename = app_dir + "/main.cpp"
     with open(main_filename, "w") as f:
         # Includes
+        f.write("#include <fstream>\n")
+        f.write("#include <nlohmann/json.hpp>\n")
+        f.write("\n")
+        f.write("#include <ParmParse.H>\n")
+        f.write("\n")
         f.write("#include <CD_Driver.H>\n")
         f.write("#include <CD_" + args.geometry + ".H>\n")
         f.write("#include <CD_DischargeInceptionStepper.H>\n")
@@ -65,10 +70,6 @@ def write_template(args):
         f.write("#include <CD_" + args.plasma_stepper + ".H>\n")
         if args.plasma_tagger != "none":
             f.write("#include <CD_" + args.plasma_tagger + ".H>\n")
-        f.write("#include <ParmParse.H>\n")
-        f.write("\n")
-        f.write("#include <nlohmann/json.hpp>\n")
-        f.write("#include <fstream>\n")
         f.write("\n")
 
         # Namespaces
@@ -124,26 +125,6 @@ def write_template(args):
 
         # inception mode
         f.write("  if (mode == \"inception\") {\n")
-        f.write("\n")
-        f.write("    // Second Townsend ionization coefficient. This is something that now becomes hard-wired to the chemistry file. For simplicity, we use the\n")
-        f.write("    // average rate of reactions that produce electrons.\n")
-        f.write("    int  numEmissionMechanisms = 0;\n")
-        f.write("    Real secondTownsend        = 0.0;\n")
-        f.write("\n")
-        f.write("    for (const auto& entry : json[\"electrode emission\"]) {\n")
-        f.write("      const auto& products     = entry[\"@\"];\n")
-        f.write("      const auto& efficiencies = entry[\"efficiencies\"];\n")
-        f.write("\n")
-        f.write("      for (size_t i = 0; i < products.size(); ++i) {\n")
-        f.write("        if (products[i].get<std::string>() == \"e\") {\n")
-        f.write("          secondTownsend += efficiencies[i].get<Real>();\n")
-        f.write("          numEmissionMechanisms += 1;\n")
-        f.write("        }\n")
-        f.write("      }\n")
-        f.write("    }\n")
-        f.write("\n")
-        f.write("    secondTownsend = (numEmissionMechanisms) > 0 ? secondTownsend / numEmissionMechanisms : 0.0;\n")
-        f.write("\n")
         f.write("    auto alpha = [physics](const Real& E, const RealVect& x) -> Real {\n")
         f.write("      return physics->computeAlpha(E, x);\n")
         f.write("    };\n")
@@ -153,9 +134,6 @@ def write_template(args):
         f.write("    auto alphaEff = [&](const Real& E, const RealVect x) -> Real {\n")
         f.write("      return alpha(E, x) - eta(E, x);\n")
         f.write("    };\n")
-        f.write("    auto secondaryEmission = [&](const Real& E, const RealVect& x) -> Real {\n")
-        f.write("      return secondTownsend;\n")
-        f.write("    };\n")
         f.write("\n")
         f.write("    auto ts = RefCountedPtr<DischargeInceptionStepper<>>(new DischargeInceptionStepper<>());\n")
         f.write("    auto ct = RefCountedPtr<DischargeInceptionTagger>(\n")
@@ -163,7 +141,6 @@ def write_template(args):
         f.write("\n")
         f.write("    ts->setAlpha(alpha);\n")
         f.write("    ts->setEta(eta);\n")
-        f.write("    ts->setSecondaryEmission(secondaryEmission);\n")
         f.write("\n")
         f.write("    timestepper = ts;\n")
         f.write("    celltagger  = ct;\n")

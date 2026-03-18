@@ -24,7 +24,6 @@ Copyright © 2026 SINTEF Energi AS
 """
 
 import argparse
-import csv
 import json
 import re
 import sys
@@ -107,8 +106,9 @@ _DT_RE = re.compile(
 )
 _STEP_RE = re.compile(r'Driver::Time step report -- Time step #(?P<step>\d+)')
 
-_INCEPTION_PREFIX = (
-    "ItoKMCBackgroundEvaluator -- abort because field changed"
+_INCEPTION_PREFIXES = (
+    "ItoKMCBackgroundEvaluator -- stopping because",  # new soft-exit (daf83c56)
+    "ItoKMCBackgroundEvaluator -- abort because",     # old hard-exit (backward compat)
 )
 _CONVERGENCE_PREFIX = (
     "ItoKMCGodunovStepper::advanceEulerMaruyama - Poisson solve did not converge"
@@ -177,11 +177,11 @@ def parse_pout(pout_path: Path, tail_n: int) -> dict:
             result["final_dt"] = float(m.group("dt"))
             continue
 
-        if stripped.startswith(_INCEPTION_PREFIX):
+        if stripped.startswith(_INCEPTION_PREFIXES):
             result["inception"] = True
         elif stripped.startswith(_CONVERGENCE_PREFIX):
             result["convergence_failures"] += 1
-        elif "abort" in stripped.lower():
+        elif "abort" in stripped.lower() or "stopping because" in stripped.lower():
             result["other_abort"] = True
 
     # Derive status (priority: not_found > inception > convergence_failure > abort > completed)
@@ -253,9 +253,40 @@ _EXTRACT_FIELDS = [
 ]
 
 
+_COLUMN_DESCRIPTIONS = {
+    "run_id":               "run identifier",
+    "final_step":           "last simulation step",
+    "final_time":           "simulation time [s]",
+    "final_dt":             "time step [s]",
+    "inception":            "inception flag (1=yes, 0=no)",
+    "convergence_failures": "conv. failure count",
+    "other_abort":          "non-zero if other abort",
+    "status":               "run status",
+}
+
+
+def _aligned_rows(fieldnames, descriptions, rows):
+    """Yield fixed-width formatted lines: 2 comment lines then header then data."""
+    widths = []
+    for f, d in zip(fieldnames, descriptions):
+        w = max(len(f), len(d))
+        if rows:
+            w = max(w, max(len(str(row.get(f, ''))) for row in rows))
+        widths.append(w + 2)
+
+    def fmt(vals):
+        return '  '.join(f'{str(v):<{w}}' for v, w in zip(vals, widths)).rstrip()
+
+    yield '# ' + fmt(fieldnames)
+    yield '# ' + fmt(descriptions)
+    yield fmt(fieldnames)
+    for row in rows:
+        yield fmt([row.get(f, '') for f in fieldnames])
+
+
 def write_csv(rows: list, keys: list, output_path: Path):
     """
-    Write per-run results to a CSV file.
+    Write per-run results to a fixed-width aligned file.
 
     Parameters
     ----------
@@ -264,15 +295,15 @@ def write_csv(rows: list, keys: list, output_path: Path):
     keys : list of str
         Parameter key names (used to determine column order).
     output_path : Path
-        Destination CSV file path.
+        Destination file path.
     """
-    fieldnames = ["run_id"] + keys + _EXTRACT_FIELDS
-    with open(output_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({k: row[k] for k in fieldnames})
-    print(f"Wrote CSV to: {output_path}")
+    fieldnames   = ["run_id"] + keys + _EXTRACT_FIELDS
+    descriptions = [_COLUMN_DESCRIPTIONS.get(f, "simulation parameter") for f in fieldnames]
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("# Plasma event log\n")
+        for line in _aligned_rows(fieldnames, descriptions, rows):
+            f.write(line + '\n')
+    print(f"Wrote to: {output_path}")
 
 
 # ---- summary table ----

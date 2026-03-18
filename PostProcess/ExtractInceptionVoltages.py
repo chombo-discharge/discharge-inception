@@ -13,7 +13,6 @@ See --help for full option list.
 """
 
 import argparse
-import csv
 import json
 import os
 import re
@@ -212,17 +211,45 @@ def write_netcdf(data: dict, output_path: Path):
 
 # ---- output: CSV ----
 
-def write_csv(data: dict, output_path: Path):
-    keys = data["keys"]
-    rows = data["rows"]
-    fieldnames = keys + VOLTAGE_VARS
+_COLUMN_DESCRIPTIONS = {
+    "min_voltage_pos":      "min positive inception voltage [V]",
+    "min_voltage_neg":      "min negative inception voltage [V]",
+    "streamer_voltage_pos": "positive streamer voltage [V]",
+    "streamer_voltage_neg": "negative streamer voltage [V]",
+    "townsend_voltage_pos": "positive Townsend voltage [V]",
+    "townsend_voltage_neg": "negative Townsend voltage [V]",
+}
 
-    with open(output_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow(row)
-    print(f"Wrote CSV to: {output_path}")
+
+def _aligned_rows(fieldnames, descriptions, rows):
+    """Yield fixed-width formatted lines: 2 comment lines then header then data."""
+    widths = []
+    for f, d in zip(fieldnames, descriptions):
+        w = max(len(f), len(d))
+        if rows:
+            w = max(w, max(len(str(row.get(f, ''))) for row in rows))
+        widths.append(w + 2)
+
+    def fmt(vals):
+        return '  '.join(f'{str(v):<{w}}' for v, w in zip(vals, widths)).rstrip()
+
+    yield '# ' + fmt(fieldnames)
+    yield '# ' + fmt(descriptions)
+    yield fmt(fieldnames)
+    for row in rows:
+        yield fmt([row.get(f, '') for f in fieldnames])
+
+
+def write_csv(data: dict, output_path: Path):
+    keys         = data["keys"]
+    rows         = data["rows"]
+    fieldnames   = keys + VOLTAGE_VARS
+    descriptions = [_COLUMN_DESCRIPTIONS.get(f, "simulation parameter") for f in fieldnames]
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("# Inception voltage summary\n")
+        for line in _aligned_rows(fieldnames, descriptions, rows):
+            f.write(line + '\n')
+    print(f"Wrote to: {output_path}")
 
 
 # ---- summary table ----

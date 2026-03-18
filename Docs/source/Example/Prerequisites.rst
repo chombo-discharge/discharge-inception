@@ -8,14 +8,14 @@ parametric study, from compilation through post-processing.
 
 The Rod case demonstrates the **two-level database -> study pipeline**:
 
-1. A discharge-inception database sweeps over pressures and rod radii to
+1. A inception database sweeps over pressures and rod radii to
    compute inception voltages.
 2. A full plasma simulation study uses those inception voltages as its input,
    creating a sub-hierarchy of per-voltage runs.
 
 Before starting, ensure the following are available:
 
-* ``discharge-inception`` is installed -- see :doc:`/Installation/InstallationInstructions`.
+* ``inception`` is installed -- see :doc:`/Installation/InstallationInstructions`.
 * ``DISCHARGE_HOME`` is set and points to a compiled
   `chombo-discharge <https://chombo-discharge.github.io/>`_ installation --
   see :ref:`install_prereqs`.

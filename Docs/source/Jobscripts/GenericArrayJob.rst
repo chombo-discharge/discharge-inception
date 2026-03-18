@@ -16,7 +16,7 @@ per-array-task log files:
    :caption: Util/GenericArrayJob.sh
 
    #!/bin/bash
-   # Generic SLURM array job launcher for discharge-inception.
+   # Generic SLURM array job launcher for inception.
    #
    # Resource requests (account, partition, ntasks, time) are intentionally
    # absent here so the script is portable across clusters. Supply them via:

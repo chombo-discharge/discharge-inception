@@ -1,10 +1,10 @@
-# Architecture: discharge-inception
+# Architecture: inception
 
 ## Overview
 
 This project sets up, submits, and post-processes parametric studies of gas
 discharge simulations on SLURM clusters.  A study is declared as a Python
-`Runs.py` file and submitted via the `discharge-inception` CLI.  The CLI creates run
+`Runs.py` file and submitted via the `inception` CLI.  The CLI creates run
 directories, injects parameters, and hands off to SLURM.  Everything that
 happens *inside* a SLURM job is driven by one of the three Python jobscripts.
 
@@ -13,7 +13,7 @@ happens *inside* a SLURM job is driven by one of the three Python jobscripts.
 ## Full call chain
 
 ```
-discharge-inception run <Runs.py>              [CLI  – discharge_inception/configurator.py]
+inception run <Runs.py>              [CLI  – discharge_inception/configurator.py]
   │  Creates run directories, writes index.json / parameters.json per run,
   │  symlinks jobscript_symlink → <StudyJobscript.py>, writes slurm.toml path
   │  to DISCHARGE_INCEPTION_SLURM_CONFIG, then submits:
