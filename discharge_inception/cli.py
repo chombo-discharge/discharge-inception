@@ -528,49 +528,54 @@ def main() -> None:
         'study_dir', type=Path,
         help='Study directory (containing index.json and Results/).')
 
+    def _add_pp_subparser(name, module, help_text):
+        """Register a PostProcess subparser, falling back to a stub if unavailable."""
+        try:
+            pp_mod = _import_pp(module)
+            subparsers.add_parser(name, parents=[pp_mod.make_parser(add_help=False)],
+                                  help=help_text)
+        except ImportError:
+            stub = subparsers.add_parser(name, help=help_text + ' [unavailable]')
+            stub.set_defaults(_pp_unavailable=module)
+
     # --- inception analyze-time-series ------------------------------------
-    pp_mod = _import_pp('AnalyzeTimeSeries')
-    subparsers.add_parser(
-        'analyze-time-series',
-        parents=[pp_mod.make_parser(add_help=False)],
-        help='Extract, smooth, differentiate, and filter time-series data from a plasma log.')
+    _add_pp_subparser(
+        'analyze-time-series', 'AnalyzeTimeSeries',
+        'Extract, smooth, differentiate, and filter time-series data from a plasma log.')
 
     # --- inception extract-inception-voltages -----------------------------
-    pp_mod = _import_pp('ExtractInceptionVoltages')
-    subparsers.add_parser(
-        'extract-inception-voltages',
-        parents=[pp_mod.make_parser(add_help=False)],
-        help='Extract inception voltages from a pdiv_database and write NetCDF/CSV.')
+    _add_pp_subparser(
+        'extract-inception-voltages', 'ExtractInceptionVoltages',
+        'Extract inception voltages from a pdiv_database and write NetCDF/CSV.')
 
     # --- inception gather-plasma-event-logs -------------------------------
-    pp_mod = _import_pp('GatherPlasmaEventLogs')
-    subparsers.add_parser(
-        'gather-plasma-event-logs',
-        parents=[pp_mod.make_parser(add_help=False)],
-        help='Gather plasma event logs from a database and write a CSV summary.')
+    _add_pp_subparser(
+        'gather-plasma-event-logs', 'GatherPlasmaEventLogs',
+        'Gather plasma event logs from a database and write a CSV summary.')
 
     # --- inception plot-delta-e-rel ---------------------------------------
-    pp_mod = _import_pp('PlotDeltaERel')
-    subparsers.add_parser(
-        'plot-delta-e-rel',
-        parents=[pp_mod.make_parser(add_help=False)],
-        help='Batch-plot ΔE(rel) vs time for every run in a plasma database.')
+    _add_pp_subparser(
+        'plot-delta-e-rel', 'PlotDeltaERel',
+        'Batch-plot ΔE(rel) vs time for every run in a plasma database.')
 
     # --- inception plot-delta-e -------------------------------------------
-    pp_mod = _import_pp('PlotDeltaE')
-    subparsers.add_parser(
-        'plot-delta-e',
-        parents=[pp_mod.make_parser(add_help=False)],
-        help='Plot peak ΔE(rel) and/or ΔE(max) vs voltage for a run_* database.')
+    _add_pp_subparser(
+        'plot-delta-e', 'PlotDeltaE',
+        'Plot peak ΔE(rel) and/or ΔE(max) vs voltage for a run_* database.')
 
     # --- inception build-overview-report ----------------------------------
-    pp_mod = _import_pp('BuildOverviewReport')
-    subparsers.add_parser(
-        'build-overview-report',
-        parents=[pp_mod.make_parser(add_help=False)],
-        help='Generate a multi-page PDF overview report for an inception study.')
+    _add_pp_subparser(
+        'build-overview-report', 'BuildOverviewReport',
+        'Generate a multi-page PDF overview report for an inception study.')
 
     args = parser.parse_args()
+
+    if getattr(args, '_pp_unavailable', None):
+        print(f"error: PostProcess module '{args._pp_unavailable}' is not available.\n"
+              f"The PostProcess scripts are not bundled with the installed package.\n"
+              f"Clone the repository and run inception from within it to use this command.",
+              file=sys.stderr)
+        sys.exit(1)
 
     if args.command == 'run':
         cmd_run(args)
