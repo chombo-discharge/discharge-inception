@@ -425,7 +425,7 @@ def cmd_run(args) -> None:
     if doroll:
         fh.doRollover()
 
-    output_dir = _resolve_output_dir(args.output_dir, args.overwrite, args.suffix)
+    output_dir = _resolve_output_dir(args.output_dir.resolve(), args.overwrite, args.suffix)
     if output_dir != args.output_dir:
         log.info(f"Output directory renamed to '{output_dir}'")
     configurator.setup(log, output_dir, args.run_definition, dim=args.dim,
