@@ -348,11 +348,21 @@ def build_sbatch_resource_args(slurm: dict, stage: str | None = None) -> list[st
 def load_slurm_config() -> dict:
     """Return the [slurm] table from slurm.toml, or {} if not configured.
 
-    The path to slurm.toml is read from the DISCHARGE_INCEPTION_SLURM_CONFIG
-    environment variable.
+    Resolution order:
+    1. DISCHARGE_INCEPTION_SLURM_CONFIG environment variable (absolute path).
+    2. slurm.toml in the current working directory.
+
+    When the CWD fallback is used, DISCHARGE_INCEPTION_SLURM_CONFIG is set to
+    the resolved absolute path so that sbatch and compute-node job scripts
+    inherit the correct location.
     """
     import tomllib
     path = os.environ.get('DISCHARGE_INCEPTION_SLURM_CONFIG', '')
+    if not path:
+        cwd_candidate = os.path.abspath('slurm.toml')
+        if os.path.isfile(cwd_candidate):
+            path = cwd_candidate
+            os.environ['DISCHARGE_INCEPTION_SLURM_CONFIG'] = path
     if path and os.path.isfile(path):
         with open(path, 'rb') as f:
             return tomllib.load(f).get('slurm', {})

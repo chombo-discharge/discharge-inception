@@ -48,7 +48,7 @@ inception run <Runs.py>              [CLI  – discharge_inception/configurator.
 ### `Util/GenericArrayJob.sh`
 - **Role**: Portable SLURM wrapper; the only `#SBATCH` script in the project.
   Never called directly — always submitted via `sbatch --array=...`.
-- **Reads**: `DISCHARGE_INCEPTION_SLURM_CONFIG` env var → `slurm.toml` (modules, venv)
+- **Reads**: `DISCHARGE_INCEPTION_SLURM_CONFIG` env var → `slurm.toml` (modules, venv); the configurator always sets this env var before invoking `sbatch` (falling back to `slurm.toml` in the CWD if needed), so compute nodes reliably inherit it
 - **Executes**: `python ./jobscript_symlink` (the symlink selects the jobscript)
 
 ### `GenericArrayJobJobscript.py`
