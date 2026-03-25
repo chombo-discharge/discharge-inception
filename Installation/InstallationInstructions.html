@@ -180,7 +180,7 @@ such as <code class="docutils literal notranslate"><span class="pre">$HOME</span
 runs on whatever node SLURM allocates, it cannot rely on paths that were valid
 only on the login node – using absolute paths on a shared filesystem avoids
 node-local ambiguity entirely.</p>
-<dl class="simple">
+<dl>
 <dt><code class="docutils literal notranslate"><span class="pre">DISCHARGE_INCEPTION_VENV</span></code></dt><dd><p>Absolute path to the <code class="docutils literal notranslate"><span class="pre">.venv</span></code> directory created during installation.
 <code class="docutils literal notranslate"><span class="pre">GenericArrayJob.sh</span></code> sources <code class="docutils literal notranslate"><span class="pre">$DISCHARGE_INCEPTION_VENV/bin/activate</span></code> on
 each compute node before invoking the Python jobscript, ensuring the correct
@@ -195,11 +195,17 @@ compute nodes to load the required cluster modules.  Job scripts also call
 <code class="docutils literal notranslate"><span class="pre">load_slurm_config()</span></code> at runtime to retrieve the MPI launcher name and
 per-stage resource limits.  See <a class="reference internal" href="SlurmConfig.html#arch-slurm-config"><span class="std std-ref">SLURM configuration</span></a> for the full file
 format and all supported keys.</p>
+<p>This variable is <strong>optional</strong> when <code class="docutils literal notranslate"><span class="pre">slurm.toml</span></code> is in the directory from
+which you run <code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">run</span></code> — the configurator detects it automatically
+and propagates the absolute path to compute nodes.  Set the variable
+explicitly only when the file lives elsewhere.</p>
 </dd>
 </dl>
-<p>Add both exports to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code>, SLURM prologue, or cluster environment
-module so they are present on both login and compute nodes:</p>
+<p>Add the venv export to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code>, SLURM prologue, or cluster environment
+module so it is present on both login and compute nodes.  The slurm config
+export is only needed when <code class="docutils literal notranslate"><span class="pre">slurm.toml</span></code> is not in your working directory:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">DISCHARGE_INCEPTION_VENV</span><span class="o">=</span>/path/to/repo/.venv
+<span class="c1"># Only needed if slurm.toml is not in the directory where you run inception run:</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">DISCHARGE_INCEPTION_SLURM_CONFIG</span><span class="o">=</span>/path/to/repo/slurm.toml
 </pre></div>
 </div>

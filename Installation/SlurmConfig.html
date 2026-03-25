@@ -147,8 +147,13 @@ one place and out of shell scripts.</p>
 <p><code class="docutils literal notranslate"><span class="pre">GenericArrayJob.sh</span></code> reads the <code class="docutils literal notranslate"><span class="pre">modules</span></code> list from <code class="docutils literal notranslate"><span class="pre">slurm.toml</span></code> and calls
 <code class="docutils literal notranslate"><span class="pre">module</span> <span class="pre">load</span></code> for each entry.  Job scripts call <code class="docutils literal notranslate"><span class="pre">build_sbatch_resource_args()</span></code>
 to translate the <code class="docutils literal notranslate"><span class="pre">[slurm.&lt;stage&gt;]</span></code> section into <code class="docutils literal notranslate"><span class="pre">sbatch</span></code> command-line flags.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">DISCHARGE_INCEPTION_SLURM_CONFIG</span></code> variable must be set (and exported) before
-submitting any job so that compute nodes can find the file.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">slurm.toml</span></code> is in the directory where you run <code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">run</span></code>, the
+configurator finds it automatically and exports <code class="docutils literal notranslate"><span class="pre">DISCHARGE_INCEPTION_SLURM_CONFIG</span></code>
+for compute nodes.  If you keep the file elsewhere, set the variable explicitly
+before submitting any job:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">DISCHARGE_INCEPTION_SLURM_CONFIG</span><span class="o">=</span>/absolute/path/to/slurm.toml
+</pre></div>
+</div>
 <p>As an alternative to <code class="docutils literal notranslate"><span class="pre">slurm.toml</span></code>, standard SLURM environment variables
 (<code class="docutils literal notranslate"><span class="pre">SBATCH_ACCOUNT</span></code>, <code class="docutils literal notranslate"><span class="pre">SBATCH_TIMELIMIT</span></code>, etc.) are honoured by <code class="docutils literal notranslate"><span class="pre">sbatch</span></code>
 directly and do not require a config file.</p>

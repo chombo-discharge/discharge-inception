@@ -32,8 +32,14 @@ one place and out of shell scripts.
 ``module load`` for each entry.  Job scripts call ``build_sbatch_resource_args()``
 to translate the ``[slurm.<stage>]`` section into ``sbatch`` command-line flags.
 
-The ``DISCHARGE_INCEPTION_SLURM_CONFIG`` variable must be set (and exported) before
-submitting any job so that compute nodes can find the file.
+If ``slurm.toml`` is in the directory where you run ``inception run``, the
+configurator finds it automatically and exports ``DISCHARGE_INCEPTION_SLURM_CONFIG``
+for compute nodes.  If you keep the file elsewhere, set the variable explicitly
+before submitting any job:
+
+.. code-block:: bash
+
+   export DISCHARGE_INCEPTION_SLURM_CONFIG=/absolute/path/to/slurm.toml
 
 As an alternative to ``slurm.toml``, standard SLURM environment variables
 (``SBATCH_ACCOUNT``, ``SBATCH_TIMELIMIT``, etc.) are honoured by ``sbatch``

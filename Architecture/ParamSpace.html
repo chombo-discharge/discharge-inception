@@ -139,6 +139,12 @@ special syntax.</p>
 A 2nd-order list (list of lists) drives <em>multiple simultaneous writes</em> to
 parallel targets.</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">group</span></code></dt><dd><p>(optional) A string label.  Parameters that share the same <code class="docutils literal notranslate"><span class="pre">&quot;group&quot;</span></code>
+value are <strong>zipped together</strong> — they vary simultaneously rather than
+independently.  All parameters in a group must have the same number of
+values.  Groups (and ungrouped parameters) are still combined with each
+other via the Cartesian product.</p>
+</dd>
 </dl>
 <p>The Cartesian product of all <code class="docutils literal notranslate"><span class="pre">values</span></code> lists determines the number of runs.
 Database-linked parameters restrict that product to matching combinations.</p>
@@ -156,7 +162,38 @@ Database-linked parameters restrict that product to matching combinations.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The above yields 6 run directories (3 x 2).</p>
+<p>The above yields 6 run directories (3 × 2).</p>
+<p class="rubric">Linked parameter groups</p>
+<p>Sometimes two parameters are physically coupled and should always vary
+<em>together</em>.  Adding a <code class="docutils literal notranslate"><span class="pre">&quot;group&quot;</span></code> field to each causes them to be zipped
+rather than crossed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;parameter_space&#39;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;thermo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;chemistry.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;law&quot;</span><span class="p">,</span> <span class="s2">&quot;ideal_gas&quot;</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e5</span><span class="p">,</span> <span class="mf">2e5</span><span class="p">,</span> <span class="mf">3e5</span><span class="p">]</span>        <span class="c1"># \</span>
+    <span class="p">},</span>                                    <span class="c1">#  zipped: 3 pairs</span>
+    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="p">{</span>                      <span class="c1"># /</span>
+        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;thermo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;chemistry.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;master.inputs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;Rod.radius&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">100e-6</span><span class="p">,</span> <span class="mf">500e-6</span><span class="p">]</span>        <span class="c1"># factor 2</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;thermo&quot;</span></code> group produces 3 pairs <code class="docutils literal notranslate"><span class="pre">(pressure,</span> <span class="pre">temperature)</span></code>:
+<code class="docutils literal notranslate"><span class="pre">(1e5,</span> <span class="pre">300)</span></code>, <code class="docutils literal notranslate"><span class="pre">(2e5,</span> <span class="pre">400)</span></code>, <code class="docutils literal notranslate"><span class="pre">(3e5,</span> <span class="pre">500)</span></code>.  Those 3 pairs are then
+crossed with the 2 radii, giving <strong>6 run directories</strong> instead of the 18
+that an unconstrained Cartesian product would produce.</p>
+<p>All parameters in the same group must have the same number of values; a
+mismatch raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> at configuration time.</p>
 </section>
 
 

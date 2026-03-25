@@ -94,12 +94,19 @@ node-local ambiguity entirely.
    per-stage resource limits.  See :ref:`arch_slurm_config` for the full file
    format and all supported keys.
 
-Add both exports to your ``.bashrc``, SLURM prologue, or cluster environment
-module so they are present on both login and compute nodes:
+   This variable is **optional** when ``slurm.toml`` is in the directory from
+   which you run ``inception run`` — the configurator detects it automatically
+   and propagates the absolute path to compute nodes.  Set the variable
+   explicitly only when the file lives elsewhere.
+
+Add the venv export to your ``.bashrc``, SLURM prologue, or cluster environment
+module so it is present on both login and compute nodes.  The slurm config
+export is only needed when ``slurm.toml`` is not in your working directory:
 
 .. code-block:: bash
 
    export DISCHARGE_INCEPTION_VENV=/path/to/repo/.venv
+   # Only needed if slurm.toml is not in the directory where you run inception run:
    export DISCHARGE_INCEPTION_SLURM_CONFIG=/path/to/repo/slurm.toml
 
 .. note::

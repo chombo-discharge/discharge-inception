@@ -135,8 +135,11 @@ creating a sub-hierarchy of per-voltage runs.</p></li>
 <a class="reference external" href="https://chombo-discharge.github.io/">chombo-discharge</a> installation –
 see <a class="reference internal" href="../Installation/Prerequisites.html#install-prereqs"><span class="std std-ref">Prerequisites</span></a>.</p></li>
 <li><p>A SLURM scheduler is available on the machine – see <a class="reference internal" href="../Installation/Prerequisites.html#install-prereqs"><span class="std std-ref">Prerequisites</span></a>.</p></li>
-<li><p>Both environment variables are exported – see <a class="reference internal" href="../Installation/InstallationInstructions.html#install-env-vars"><span class="std std-ref">Environment variables</span></a>:</p>
+<li><p>The venv environment variable is exported and, if <code class="docutils literal notranslate"><span class="pre">slurm.toml</span></code> is not in
+the directory where you run <code class="docutils literal notranslate"><span class="pre">inception</span> <span class="pre">run</span></code>, also the slurm config variable
+– see <a class="reference internal" href="../Installation/InstallationInstructions.html#install-env-vars"><span class="std std-ref">Environment variables</span></a>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">DISCHARGE_INCEPTION_VENV</span><span class="o">=</span>/path/to/repo/.venv
+<span class="c1"># Only needed if slurm.toml is not in the directory where inception run is called:</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">DISCHARGE_INCEPTION_SLURM_CONFIG</span><span class="o">=</span>/path/to/repo/slurm.toml
 </pre></div>
 </div>

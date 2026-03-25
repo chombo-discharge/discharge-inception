@@ -20,9 +20,12 @@ Before starting, ensure the following are available:
   `chombo-discharge <https://chombo-discharge.github.io/>`_ installation --
   see :ref:`install_prereqs`.
 * A SLURM scheduler is available on the machine -- see :ref:`install_prereqs`.
-* Both environment variables are exported -- see :ref:`install_env_vars`:
+* The venv environment variable is exported and, if ``slurm.toml`` is not in
+  the directory where you run ``inception run``, also the slurm config variable
+  -- see :ref:`install_env_vars`:
 
   .. code-block:: bash
 
      export DISCHARGE_INCEPTION_VENV=/path/to/repo/.venv
+     # Only needed if slurm.toml is not in the directory where inception run is called:
      export DISCHARGE_INCEPTION_SLURM_CONFIG=/path/to/repo/slurm.toml
